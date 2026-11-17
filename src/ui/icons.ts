@@ -15,7 +15,7 @@ export const icons = {
   ),
   /** Inntekt: mynt med "kr" */
   earnings: svg(
-    '<circle cx="12" cy="12" r="9.5"/><text x="12" y="15.3" text-anchor="middle" font-size="9" font-weight="800" font-family="system-ui, sans-serif" fill="currentColor" stroke="none">kr</text>',
+    '<circle cx="12" cy="12" r="9.5"/><text x="12" y="16.2" text-anchor="middle" font-size="12" font-weight="800" font-family="system-ui, sans-serif" fill="currentColor" stroke="none">$</text>',
   ),
   /** Gjenstander: fire ruter */
   items: svg(
@@ -54,7 +54,7 @@ export const icons = {
   money: svg('<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/>', 1.6),
   /** Mynt med "kr" (åpningskostnad) */
   coin: svg(
-    '<circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><text x="12" y="15.3" text-anchor="middle" font-size="9" font-weight="800" font-family="system-ui, sans-serif" fill="#fff" stroke="none">kr</text>',
+    '<circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><text x="12" y="16.2" text-anchor="middle" font-size="12" font-weight="800" font-family="system-ui, sans-serif" fill="#fff" stroke="none">$</text>',
   ),
   // --- Profil og skatt ---
   /** Kvittering med kr-tegn (skatt) */

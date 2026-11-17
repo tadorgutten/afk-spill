@@ -13,7 +13,7 @@ import {
   type CarClass,
   type CarModel,
 } from '../game/taxi';
-import { formatDuration, formatInt, formatMoney, formatMoneyRounded } from '../ui/format';
+import { formatDuration, formatInt, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
 
 /*
@@ -85,7 +85,7 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
           (o, i) => `
           <button class="taxi-option ${state.balance >= o.price ? '' : 'poor'}" data-action="expand-cap" data-id="${b.id}" data-index="${i}">
             <strong>+${o.places} plasser</strong>
-            <span>${formatInt(o.price)} kr</span>
+            <span>${formatMoneyWhole(o.price)}</span>
           </button>`,
         ).join('')}
       </div>`;

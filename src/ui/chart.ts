@@ -1,7 +1,7 @@
 import { SAMPLE_MS } from '../game/market';
-import { formatClock } from './format';
+import { formatClock, priceNumber } from './format';
 
-const nb2 = (v: number) => v.toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 
 /**
  * Kursgraf: blå linje med lys flate under, 4 verdier på siden og 5 klokkeslett under.
@@ -11,7 +11,7 @@ export function stockChart(
   history: number[],
   lastSample: number,
   price: number,
-  label: (v: number) => string = nb2,
+  label: (v: number) => string = priceNumber,
 ): string {
   // Siste punkt i historikken er prisen nå (legg den bare til hvis historikken er for kort)
   const points = history.length > 1 ? history : [...history, price];

@@ -2,7 +2,7 @@ import { activeCard, CARDS, cardById, fortune, unlockedCount } from '../game/car
 import { buyClickUpgrade, click, isMaxLevel, perClick, upgradeCost } from '../game/click';
 import type { GameState } from '../game/state';
 import { bankCard } from '../ui/bankCard';
-import { formatInt, formatMoney, formatMoneyRounded } from '../ui/format';
+import { formatMoney, formatMoneyRounded, formatMoneyWhole, MONEY_SCALE } from '../ui/format';
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
 import { html, type Page } from './page';
@@ -264,9 +264,9 @@ export function createEarningsPage(state: GameState): Page {
   };
 }
 
-/** Krav til formue: "10 000 kr", "1,5 mill. kr", "100 mrd. kr". */
+/** Krav til formue: "$ 100 000", "$ 15 mill.", "$ 1 bill.". */
 function formatRequirement(value: number): string {
-  return value >= 1e6 ? formatMoney(value).replace(',00', '') : `${formatInt(value)} kr`;
+  return value * MONEY_SCALE >= 1e6 ? formatMoney(value).replace(',00', '') : formatMoneyWhole(value);
 }
 
 /** Endrer teksten bare når den faktisk er ny (oppdateringen kjører hver skjermoppdatering). */

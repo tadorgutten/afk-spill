@@ -25,14 +25,30 @@ export interface CoinDef {
   color: string;
 }
 
+// Prisene er internt 10x lavere (som resten av spillet) – vises ganget med 10 i dollar.
+// Bitcoin: 9 500 her = $ 95 000 i spillet.
 export const COINS: CoinDef[] = [
   { id: 'bitcoin', name: 'Bitcoin', ticker: 'BTC', supply: 19_950_000, price: 9_500, volatility: 0.01, color: '#f7931a' },
-  { id: 'xrp', name: 'XRP', ticker: 'XRP', supply: 60_000_000_000, price: 0.25, volatility: 0.016, color: '#000000' },
+  { id: 'ethereum', name: 'Ethereum', ticker: 'ETH', supply: 120_700_000, price: 330, volatility: 0.013, color: '#627eea' },
+  { id: 'cardano', name: 'Cardano', ticker: 'ADA', supply: 35_500_000_000, price: 0.07, volatility: 0.017, color: '#0033ad' },
+  { id: 'xrp', name: 'XRP', ticker: 'XRP', supply: 60_000_000_000, price: 0.23, volatility: 0.016, color: '#000000' },
+  { id: 'solana', name: 'Solana', ticker: 'SOL', supply: 520_000_000, price: 18, volatility: 0.017, color: '#14f195' },
+  { id: 'polkadot', name: 'Polkadot', ticker: 'DOT', supply: 1_520_000_000, price: 0.45, volatility: 0.018, color: '#e6007a' },
+  { id: 'dogecoin', name: 'Dogecoin', ticker: 'DOGE', supply: 148_000_000_000, price: 0.02, volatility: 0.02, color: '#c2a633' },
+  { id: 'avalanche', name: 'Avalanche', ticker: 'AVAX', supply: 410_000_000, price: 2.5, volatility: 0.018, color: '#e84142' },
   { id: 'litecoin', name: 'Litecoin', ticker: 'LTC', supply: 76_000_000, price: 9.5, volatility: 0.014, color: '#345d9d' },
   { id: 'tellor', name: 'Tellor', ticker: 'TRB', supply: 2_700_000, price: 6, volatility: 0.022, color: '#20fe9c' },
+  { id: 'axie', name: 'Axie Infinity', ticker: 'AXS', supply: 165_000_000, price: 0.45, volatility: 0.02, color: '#0055d5' },
   { id: 'cosmos', name: 'Cosmos', ticker: 'ATOM', supply: 420_000_000, price: 0.5, volatility: 0.018, color: '#a3a9d0' },
   { id: 'ravencoin', name: 'Ravencoin', ticker: 'RVN', supply: 15_500_000_000, price: 0.0018, volatility: 0.022, color: '#e0604b' },
-  { id: 'axie', name: 'Axie Infinity', ticker: 'AXS', supply: 165_000_000, price: 0.45, volatility: 0.02, color: '#0055d5' },
+  // Flere populære
+  { id: 'bnb', name: 'BNB', ticker: 'BNB', supply: 140_000_000, price: 65, volatility: 0.012, color: '#f0b90b' },
+  { id: 'tron', name: 'Tron', ticker: 'TRX', supply: 95_000_000_000, price: 0.025, volatility: 0.014, color: '#eb0029' },
+  { id: 'chainlink', name: 'Chainlink', ticker: 'LINK', supply: 640_000_000, price: 1.8, volatility: 0.018, color: '#2a5ada' },
+  { id: 'shiba', name: 'Shiba Inu', ticker: 'SHIB', supply: 589_000_000_000_000, price: 0.0000013, volatility: 0.022, color: '#ffa409' },
+  { id: 'sui', name: 'Sui', ticker: 'SUI', supply: 3_400_000_000, price: 0.35, volatility: 0.02, color: '#4da2ff' },
+  { id: 'stellar', name: 'Stellar', ticker: 'XLM', supply: 31_000_000_000, price: 0.035, volatility: 0.016, color: '#000000' },
+  { id: 'bitcoincash', name: 'Bitcoin Cash', ticker: 'BCH', supply: 19_900_000, price: 45, volatility: 0.015, color: '#8dc351' },
 ];
 
 export const coinById = (id: string) => COINS.find((c) => c.id === id);
@@ -154,7 +170,9 @@ export function cryptoSummary(state: GameState) {
 
 // --- Kjøp og salg (ingen minstegrense) ---------------------------------------------
 /** Antall mynter rundes til 8 desimaler (som ekte krypto). */
-const roundCoins = (x: number) => Math.floor(x * 1e8 + 1e-6) / 1e8;
+// (Store antall, f.eks. milliarder Shiba Inu, rundes til 2 desimaler så tallene holder seg nøyaktige.)
+const roundCoins = (x: number) =>
+  x >= 1e6 ? Math.floor(x * 100 + 1e-6) / 100 : Math.floor(x * 1e8 + 1e-6) / 1e8;
 
 export function maxBuyableCoins(state: GameState, def: CoinDef): number {
   return Math.max(0, roundCoins(Math.min(state.balance / coinMarket(state, def).price, coinsAvailable(state, def))));

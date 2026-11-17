@@ -28,7 +28,7 @@ import {
 import { capacityOf, carsOf, modelById, type CarClass } from '../game/taxi';
 import { maxCars, renderCarShop, renderFleet, renderTaxiDetail, type FleetSort } from './taxiViews';
 import type { GameState } from '../game/state';
-import { formatDuration, formatInt, formatMoney, formatMoneyRounded } from '../ui/format';
+import { formatDuration, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
 import { html, type Page } from './page';
@@ -370,7 +370,7 @@ export function createBusinessPage(state: GameState): Page {
         <button class="biz-cat" data-action="category" data-category="${c.id}">
           <span class="biz-icon lg cat-${c.color}">${CATEGORY_ICON[c.id]}</span>
           <strong>${c.name}</strong>
-          <span>Fra ${formatInt(cheapestIn(c.id))} kr</span>
+          <span>Fra ${formatMoneyWhole(cheapestIn(c.id))}</span>
         </button>`,
     ).join('');
     return `

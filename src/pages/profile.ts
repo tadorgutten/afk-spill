@@ -306,7 +306,7 @@ export function createProfilePage(state: GameState): Page & { openTaxes(): void 
     const note = acc.suspended
       ? 'Fristen har gått ut. Utbyttet er stanset, og du kan ikke handle aksjer før skatten og boten er betalt.'
       : scheme === 'simplified' && owed === 0
-        ? 'Aksjeporteføljen din er under 3 mill. kr, så skatten trekkes automatisk fra utbyttet.'
+        ? 'Aksjeporteføljen din er under $ 30 mill., så skatten trekkes automatisk fra utbyttet.'
         : 'Betal skatten før fristen, ellers stanses utbyttet og du får en bot.';
 
     return `
@@ -460,7 +460,7 @@ export function createProfilePage(state: GameState): Page & { openTaxes(): void 
         <div class="podium">${podium}</div>
       </div>
       <div class="rich-list">${rows}</div>
-      <p class="rich-source">Formue fra Forbes sanntidsliste 15. nov. 2026 (1 dollar = 10 kr).</p>
+      <p class="rich-source">Formue fra Forbes sanntidsliste 15. nov. 2026.</p>
     `;
   }
 

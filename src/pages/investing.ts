@@ -51,6 +51,7 @@ import {
   formatPercent,
   formatPrice,
   formatPriceChange,
+  priceNumber,
   formatSignedPercent,
   formatSmallPercent,
 } from '../ui/format';
@@ -719,12 +720,12 @@ export function createInvestingPage(state: GameState): Page {
     const owned = ownedCoins(state);
     const rows = owned.map((def) => coinRow(def, 'owned')).join('');
     return `
-      <div class="crypto-card">
+      <button class="crypto-card" data-action="coins">
         <div class="crypto-card-label">Total kryptoverdi</div>
         <div class="crypto-card-value">${formatMoney(c.value)}</div>
         <div class="crypto-card-change ${trend(diff)}">${diff >= 0 ? '▲' : '▼'} ${formatChange(Math.abs(diff), pct).slice(2)}</div>
-        <button class="crypto-card-buy" data-action="coins">Kjøp</button>
-      </div>
+        <span class="crypto-card-buy">Kjøp</span>
+      </button>
       <h2 class="crypto-heading">Mynter</h2>
       ${owned.length ? `<div class="stock-list">${rows}</div>` : `<p class="crypto-empty">Du eier ingen kryptovaluta.</p>`}
     `;
@@ -807,7 +808,7 @@ export function createInvestingPage(state: GameState): Page {
           <span class="coin-hero-change ${trend(change.diff)}">${change.diff >= 0 ? '▲' : '▼'} ${formatPriceChange(change.diff, change.pct).slice(2)}</span>
         </div>
       </div>
-      ${stockChart(c.history, state.crypto.lastSample, c.price, (v) => formatPrice(v).replace(' kr', ''))}
+      ${stockChart(c.history, state.crypto.lastSample, c.price, (v) => priceNumber(v))}
       ${actions}
 
       <h2 class="details-title">Detaljer</h2>

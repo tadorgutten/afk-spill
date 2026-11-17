@@ -1,3 +1,11 @@
+/**
+ * PENGER VISES I DOLLAR, SOM I ORIGINALAPPEN.
+ * Internt er alle beløp i spillet (priser, saldo, inntekter, krav) 10x lavere enn originalen.
+ * Når et beløp vises, ganges det med MONEY_SCALE og får "$" foran: 0,26 internt → "$ 2,60".
+ * Alle beløp som vises, MÅ derfor gå gjennom funksjonene her.
+ */
+export const MONEY_SCALE = 10;
+
 /** Store tall forkortes: 1,2 mill., 3,4 mrd. osv. */
 const UNITS = [
   { size: 1e12, suffix: ' bill.' },
@@ -8,33 +16,51 @@ const UNITS = [
 const nb = (value: number, min: number, max: number) =>
   value.toLocaleString('nb-NO', { minimumFractionDigits: min, maximumFractionDigits: max });
 
-/** Et beløp med kroner: 2,50 kr / 1 000,00 kr / 1,2 mill. kr */
+/** Tallet uten "$" (allerede ganget opp). Brukes i grafer. */
+function amount(value: number): string {
+  const v = value * MONEY_SCALE;
+  const unit = UNITS.find((u) => Math.abs(v) >= u.size);
+  if (unit) return `${nb(v / unit.size, 0, 2)}${unit.suffix}`;
+  // Rund ned til hele cent, så saldoen aldri ser høyere ut enn den er
+  return nb(Math.floor(v * 100 + 1e-6) / 100, 2, 2);
+}
+
+/** Et beløp: $ 2,50 / $ 1 000,00 / $ 1,2 mill. */
 export function formatMoney(value: number): string {
-  const unit = UNITS.find((u) => Math.abs(value) >= u.size);
-  if (unit) return `${nb(value / unit.size, 0, 2)}${unit.suffix} kr`;
-  // Rund ned til hele øre, så saldoen aldri ser høyere ut enn den er
-  const ore = Math.floor(value * 100 + 1e-6) / 100;
-  return `${nb(ore, 2, 2)} kr`;
+  return `$ ${amount(value)}`;
 }
 
-/** Beløp rundet til nærmeste øre (0,672 → 0,67 kr, 0,705 → 0,71 kr). Brukes for per klikk og priser. */
+/** Beløp rundet til nærmeste cent. Brukes for per klikk og priser. */
 export function formatMoneyRounded(value: number): string {
-  if (Math.abs(value) >= 1e6) return formatMoney(value);
-  return `${nb(Math.round(value * 100 + 1e-9) / 100, 2, 2)} kr`;
+  const v = value * MONEY_SCALE;
+  if (Math.abs(v) >= 1e6) return formatMoney(value);
+  return `$ ${nb(Math.round(v * 100 + 1e-9) / 100, 2, 2)}`;
 }
 
-/** Fullt beløp uten forkortelse: 11 663 740 781,30 kr */
+/** Fullt beløp uten forkortelse: $ 116 637 407 813,00 */
 export function formatMoneyFull(value: number): string {
-  return `${nb(value, 2, 2)} kr`;
+  return `$ ${nb(value * MONEY_SCALE, 2, 2)}`;
 }
 
-/** Pris som kan være under 1 kr (krypto): 9 512,40 kr / 0,2513 kr / 0,001834 kr */
+/** Helt beløp uten desimaler: $ 20 000 */
+export function formatMoneyWhole(value: number): string {
+  return `$ ${formatInt(value * MONEY_SCALE)}`;
+}
+
+/** Pris uten "$", også for veldig små priser (krypto). Brukes i grafer. */
+export function priceNumber(value: number): string {
+  const v = value * MONEY_SCALE;
+  if (Math.abs(v) >= 1 || v === 0) return nb(Math.round(v * 100 + 1e-9) / 100, 2, 2);
+  return v.toLocaleString('nb-NO', { minimumSignificantDigits: 2, maximumSignificantDigits: 4 });
+}
+
+/** Pris som kan være under $ 1 (krypto): $ 95 124,00 / $ 0,2513 / $ 0,00001834 */
 export function formatPrice(value: number): string {
-  if (Math.abs(value) >= 1 || value === 0) return formatMoneyRounded(value);
-  return `${value.toLocaleString('nb-NO', { minimumSignificantDigits: 2, maximumSignificantDigits: 4 })} kr`;
+  if (Math.abs(value * MONEY_SCALE) >= 1e6) return formatMoney(value);
+  return `$ ${priceNumber(value)}`;
 }
 
-/** Endring i pris med fortegn, også for små priser: "− 0,0012 kr (0,65 %)" */
+/** Endring i pris med fortegn, også for små priser: "− $ 0,0012 (0,65 %)" */
 export function formatPriceChange(diff: number, pct: number): string {
   return `${diff >= 0 ? '+' : '−'} ${formatPrice(Math.abs(diff))} (${formatPercent(pct)})`;
 }
@@ -62,7 +88,7 @@ export function formatSmallPercent(value: number): string {
   return `${value.toLocaleString('nb-NO', { maximumSignificantDigits: 2 })} %`;
 }
 
-/** Endring med fortegn: "+ 0,31 kr (0,79 %)" / "− 7,79 kr (1,76 %)" */
+/** Endring med fortegn: "+ $ 0,31 (0,79 %)" / "− $ 7,79 (1,76 %)" */
 export function formatChange(diff: number, pct: number): string {
   const sign = diff >= 0 ? '+' : '−';
   return `${sign} ${formatMoney(Math.abs(diff))} (${formatPercent(pct)})`;

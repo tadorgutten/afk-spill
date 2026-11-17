@@ -1666,6 +1666,12 @@ body.nav-hidden #nav {
    ============================================================================ */
 .crypto-card {
   position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  border: 0;
+  cursor: pointer;
   padding: 22px 24px 24px;
   border-radius: 26px;
   background: linear-gradient(120deg, #4c66b0 0%, #2f3f78 55%, #1e2752 100%);
@@ -1696,7 +1702,7 @@ body.nav-hidden #nav {
 }
 
 .crypto-card-buy {
-  display: block;
+  display: table;
   margin: 14px 0 0 auto;
   padding: 12px 40px;
   border-radius: 14px;
