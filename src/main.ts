@@ -6,6 +6,7 @@ import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
 import { tickBusinesses } from './game/business';
 import { tickMarket } from './game/market';
+import { tickCrypto } from './game/crypto';
 import { showToast } from './ui/toast';
 import { initStorage, loadState, saveState } from './game/state';
 import { createBusinessPage } from './pages/business';
@@ -26,6 +27,7 @@ await initStorage(); // hent lagringen fra telefonen før spillet starter
 const state = loadState();
 // Ta igjen det som skjedde i aksjemarkedet mens appen var lukket (inkl. utbytte)
 tickMarket(state, Date.now());
+tickCrypto(state, Date.now());
 tickBusinesses(state, Date.now());
 checkTaxes(state);
 
@@ -89,6 +91,7 @@ let lastCardCheck = 0;
 function loop() {
   const now = Date.now();
   tickMarket(state, now);
+  tickCrypto(state, now);
   tickBusinesses(state, now); // inntekt fra bedriftene + ferdige utvidelser
 
   // Bankkort: lås opp nye kort når formuen er stor nok (sjekkes én gang i sekundet)

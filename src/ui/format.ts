@@ -28,6 +28,23 @@ export function formatMoneyFull(value: number): string {
   return `${nb(value, 2, 2)} kr`;
 }
 
+/** Pris som kan være under 1 kr (krypto): 9 512,40 kr / 0,2513 kr / 0,001834 kr */
+export function formatPrice(value: number): string {
+  if (Math.abs(value) >= 1 || value === 0) return formatMoneyRounded(value);
+  return `${value.toLocaleString('nb-NO', { minimumSignificantDigits: 2, maximumSignificantDigits: 4 })} kr`;
+}
+
+/** Endring i pris med fortegn, også for små priser: "− 0,0012 kr (0,65 %)" */
+export function formatPriceChange(diff: number, pct: number): string {
+  return `${diff >= 0 ? '+' : '−'} ${formatPrice(Math.abs(diff))} (${formatPercent(pct)})`;
+}
+
+/** Antall mynter: 26 798,00 / 0,0105 / 0,00001234 */
+export function formatCoins(value: number): string {
+  if (value >= 1 || value === 0) return nb(value, 2, 4);
+  return value.toLocaleString('nb-NO', { maximumSignificantDigits: 4, maximumFractionDigits: 8 });
+}
+
 /** Heltall med mellomrom: 294 999 989 */
 export function formatInt(value: number): string {
   return Math.floor(value).toLocaleString('nb-NO');

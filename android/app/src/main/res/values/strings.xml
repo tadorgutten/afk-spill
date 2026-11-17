@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">AFK-spill</string>
-    <string name="title_activity_main">AFK-spill</string>
+    <string name="app_name">Pengebingen</string>
+    <string name="title_activity_main">Pengebingen</string>
     <string name="package_name">no.afkspill.app</string>
     <string name="custom_url_scheme">no.afkspill.app</string>
 </resources>

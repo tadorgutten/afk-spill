@@ -28,11 +28,29 @@ import { PAGE_MAX_WIDTH, PAGE_ZOOM } from '../ui/zoom';
 import { stockById, type StockDef } from '../game/stockData';
 import { stockChart } from '../ui/chart';
 import {
+  buyCoins,
+  coinById,
+  coinCap,
+  coinChange,
+  coinHolding,
+  coinMarket,
+  COINS,
+  coinsAvailable,
+  cryptoSummary,
+  cryptoVersion,
+  maxBuyableCoins,
+  ownedCoins,
+  sellCoins,
+} from '../game/crypto';
+import {
   formatChange,
+  formatCoins,
   formatInt,
   formatMoney,
   formatMoneyFull,
   formatPercent,
+  formatPrice,
+  formatPriceChange,
   formatSignedPercent,
   formatSmallPercent,
 } from '../ui/format';
@@ -55,7 +73,11 @@ type View =
   | { name: 'market'; sort: SortKey }
   | { name: 'stock'; id: string }
   | { name: 'trade'; mode: 'buy' | 'sell'; id: string }
-  | { name: 'list'; kind: ListKind };
+  | { name: 'list'; kind: ListKind }
+  // Krypto
+  | { name: 'coins' }
+  | { name: 'coin'; id: string }
+  | { name: 'ctrade'; mode: 'buy' | 'sell'; id: string };
 
 /** Egne lister: "Stabil inntekt" og "Vekstpotensial". */
 type ListKind = 'income' | 'growth';
@@ -76,7 +98,9 @@ export function createInvestingPage(state: GameState): Page {
 
   let stack: View[] = [{ name: 'home' }];
   let tab: Tab = 'shares';
-  let renderedVersion = -1;
+  let renderedVersion = '';
+  /** Endres når aksje- eller kryptoprisene endres. */
+  const pricesVersion = () => `${marketVersion()}-${cryptoVersion()}`;
 
   const current = () => stack[stack.length - 1];
 
@@ -105,7 +129,7 @@ export function createInvestingPage(state: GameState): Page {
     if (view.name === 'home') {
       element.innerHTML = renderHome();
       fitPagerHeight();
-      renderedVersion = marketVersion();
+      renderedVersion = pricesVersion();
       return;
     }
 
@@ -120,15 +144,22 @@ export function createInvestingPage(state: GameState): Page {
             ? renderMarket(view.sort)
             : view.name === 'list'
               ? renderList(view.kind)
-              : renderStock(view.id);
+              : view.name === 'coins'
+                ? renderCoins()
+                : view.name === 'coin'
+                  ? renderCoin(view.id)
+                  : view.name === 'ctrade'
+                    ? renderCoinTrade(view.mode, view.id)
+                    : renderStock(view.id);
     element.innerHTML = `${back}<div class="inv-zoom inv-pad">${content}</div>`;
 
     // Kjøp/salg tegnes bare én gang (ellers ville tallet man skriver inn forsvinne)
     if (view.name === 'trade') bindTrade(view.mode, view.id);
+    if (view.name === 'ctrade') bindCoinTrade(view.mode, view.id);
 
     const newChips = element.querySelector('.chips');
     if (newChips) newChips.scrollLeft = chipScroll;
-    renderedVersion = marketVersion();
+    renderedVersion = pricesVersion();
   }
 
   // =========================================================================
@@ -278,6 +309,15 @@ export function createInvestingPage(state: GameState): Page {
       case 'sell':
         if (def) go({ name: 'trade', mode: action as 'buy' | 'sell', id: def.id });
         return;
+      // Krypto
+      case 'coins':
+        return go({ name: 'coins' });
+      case 'coin':
+        return go({ name: 'coin', id: id! });
+      case 'cbuy':
+      case 'csell':
+        if (id && coinById(id)) go({ name: 'ctrade', mode: action === 'cbuy' ? 'buy' : 'sell', id });
+        return;
     }
   });
 
@@ -380,7 +420,11 @@ export function createInvestingPage(state: GameState): Page {
     // Alle tre fanene tegnes ved siden av hverandre, så man kan sveipe mellom dem
     const panels = TABS.map((t) => {
       const content =
-        t.id === 'shares' ? renderSharesTab() : `<div class="coming-soon">${t.label} kommer snart</div>`;
+        t.id === 'shares'
+          ? renderSharesTab()
+          : t.id === 'crypto'
+            ? renderCryptoTab()
+            : `<div class="coming-soon">${t.label} kommer snart</div>`;
       return `<div class="inv-panel"><div class="inv-zoom inv-pad">${content}</div></div>`;
     }).join('');
 
@@ -663,6 +707,210 @@ export function createInvestingPage(state: GameState): Page {
     `;
   }
 
+  // =========================================================================
+  // Krypto
+  // =========================================================================
+
+  /** Fanen Krypto: totalverdi med Kjøp-knapp, og myntene du eier. */
+  function renderCryptoTab(): string {
+    const c = cryptoSummary(state);
+    const diff = c.value - c.invested;
+    const pct = c.invested > 0 ? (diff / c.invested) * 100 : 0;
+    const owned = ownedCoins(state);
+    const rows = owned.map((def) => coinRow(def, 'owned')).join('');
+    return `
+      <div class="crypto-card">
+        <div class="crypto-card-label">Total kryptoverdi</div>
+        <div class="crypto-card-value">${formatMoney(c.value)}</div>
+        <div class="crypto-card-change ${trend(diff)}">${diff >= 0 ? '▲' : '▼'} ${formatChange(Math.abs(diff), pct).slice(2)}</div>
+        <button class="crypto-card-buy" data-action="coins">Kjøp</button>
+      </div>
+      <h2 class="crypto-heading">Mynter</h2>
+      ${owned.length ? `<div class="stock-list">${rows}</div>` : `<p class="crypto-empty">Du eier ingen kryptovaluta.</p>`}
+    `;
+  }
+
+  /** Én rad med en mynt. `owned` viser hvor mye du eier, `market` viser prisen. */
+  function coinRow(def: (typeof COINS)[number], kind: 'owned' | 'market'): string {
+    const price = coinMarket(state, def).price;
+    const h = coinHolding(state, def);
+    if (kind === 'owned') {
+      const value = h.owned * price;
+      const pct = h.invested > 0 ? ((value - h.invested) / h.invested) * 100 : 0;
+      return `
+        <button class="stock-row" data-action="coin" data-id="${def.id}">
+          ${stockLogo(def)}
+          <div class="stock-row-info"><strong>${def.name}</strong><span>${formatCoins(h.owned)} ${def.ticker}</span></div>
+          <div class="stock-row-right"><strong>${formatMoney(value)}</strong><span class="${trend(pct)}">${formatSignedPercent(pct)}</span></div>
+        </button>`;
+    }
+    const change = coinChange(state, def);
+    return `
+      <button class="stock-row" data-action="coin" data-id="${def.id}">
+        ${stockLogo(def)}
+        <div class="stock-row-info"><strong>${def.name}</strong><span>${h.owned > 0 ? `Du eier ${formatCoins(h.owned)} ${def.ticker}` : def.ticker}</span></div>
+        <div class="stock-row-right"><strong>${formatPrice(price)}</strong><span class="${trend(change.pct)}">${formatSignedPercent(change.pct)}</span></div>
+      </button>`;
+  }
+
+  /** Alle myntene man kan kjøpe. */
+  function renderCoins(): string {
+    return `
+      ${subHeader('Kryptomarkedet')}
+      <div class="stock-list">${COINS.map((def) => coinRow(def, 'market')).join('')}</div>
+    `;
+  }
+
+  /** Én mynt med graf og detaljer. */
+  function renderCoin(id: string): string {
+    const def = coinById(id);
+    if (!def) return subHeader();
+    const c = coinMarket(state, def);
+    const h = coinHolding(state, def);
+    const change = coinChange(state, def);
+    const owns = h.owned > 0;
+
+    const actions = owns
+      ? `<div class="stock-actions two">
+           <button class="action-btn primary" data-action="csell" data-id="${def.id}">Selg</button>
+           <button class="action-btn secondary" data-action="cbuy" data-id="${def.id}">Kjøp flere</button>
+         </div>`
+      : `<div class="stock-actions">
+           <button class="action-btn primary" data-action="cbuy" data-id="${def.id}">Kjøp</button>
+         </div>`;
+
+    let mine = '';
+    if (owns) {
+      const value = h.owned * c.price;
+      const diff = value - h.invested;
+      const pct = h.invested > 0 ? (diff / h.invested) * 100 : 0;
+      mine = `
+        <div class="detail">
+          <span class="detail-label">Verdi av dine mynter</span>
+          <strong class="detail-value">${formatMoney(value)}</strong>
+          <span class="detail-change ${trend(diff)}">${formatChange(diff, pct)}</span>
+        </div>
+        <div class="detail">
+          <span class="detail-label">Du eier</span>
+          <strong class="detail-value">${formatCoins(h.owned)} ${def.ticker}</strong>
+        </div>
+        <hr class="detail-divider" />`;
+    }
+
+    return `
+      ${subHeader()}
+      <div class="coin-hero">
+        ${stockLogo(def, 'lg')}
+        <div class="coin-hero-info">
+          <span class="coin-hero-name">${def.name}</span>
+          <strong class="coin-hero-price">${formatPrice(c.price)}</strong>
+          <span class="coin-hero-change ${trend(change.diff)}">${change.diff >= 0 ? '▲' : '▼'} ${formatPriceChange(change.diff, change.pct).slice(2)}</span>
+        </div>
+      </div>
+      ${stockChart(c.history, state.crypto.lastSample, c.price, (v) => formatPrice(v).replace(' kr', ''))}
+      ${actions}
+
+      <h2 class="details-title">Detaljer</h2>
+      ${mine}
+      <div class="detail">
+        <span class="detail-label">Markedsverdi</span>
+        <strong class="detail-value">${formatMoneyFull(coinCap(state, def))}</strong>
+      </div>
+      <div class="detail">
+        <span class="detail-label">Tilgjengelig for kjøp</span>
+        <strong class="detail-value">${formatCoins(coinsAvailable(state, def))} ${def.ticker}</strong>
+      </div>
+    `;
+  }
+
+  /** Kjøp / selg mynter. Ingen minstegrense – desimaler er lov. */
+  function renderCoinTrade(mode: 'buy' | 'sell', id: string): string {
+    const def = coinById(id)!;
+    const isBuy = mode === 'buy';
+    return `
+      ${subHeader()}
+      <h1 class="trade-title">${isBuy ? 'Kjøp kryptovaluta' : 'Selg kryptovaluta'}</h1>
+      <div class="trade-balance">Saldo: <strong data-t-balance></strong></div>
+
+      <div class="trade-stock">
+        ${stockLogo(def)}
+        <div class="trade-stock-info">
+          <strong>${def.name}</strong>
+          <span>${isBuy ? 'Tilgjengelig' : `Du eier <span data-t-owned></span> ${def.ticker}`}</span>
+        </div>
+        <div class="trade-stock-price">
+          <strong data-t-price></strong>
+          <span data-t-change></span>
+        </div>
+      </div>
+
+      <label class="trade-label" for="trade-qty">Antall ${def.ticker}:</label>
+      <div class="trade-qty">
+        <input id="trade-qty" data-t-qty type="text" inputmode="decimal" autocomplete="off" placeholder="0" />
+        <button class="trade-max" data-t-max>Maks</button>
+      </div>
+      <div class="trade-available" data-t-available></div>
+
+      <div class="trade-summary">Sum: <strong data-t-sum></strong></div>
+      <button class="trade-confirm" data-t-confirm>${isBuy ? 'Kjøp' : 'Selg'}</button>
+    `;
+  }
+
+  function bindCoinTrade(mode: 'buy' | 'sell', id: string) {
+    const def = coinById(id)!;
+    const isBuy = mode === 'buy';
+    const q = <T extends HTMLElement = HTMLElement>(sel: string) => element.querySelector<T>(sel)!;
+    const input = q<HTMLInputElement>('[data-t-qty]');
+    const confirmBtn = q<HTMLButtonElement>('[data-t-confirm]');
+
+    const max = () => (isBuy ? maxBuyableCoins(state, def) : coinHolding(state, def).owned);
+    /** Trykker man Maks, brukes det nøyaktige tallet (ikke det avrundede som vises). */
+    let useMax = false;
+    const amount = () => {
+      if (useMax) return max();
+      const n = Number(input.value.replace(/\s/g, '').replace(',', '.'));
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    };
+
+    const refresh = () => {
+      const price = coinMarket(state, def).price;
+      const change = coinChange(state, def);
+      q('[data-t-balance]').textContent = formatMoney(state.balance);
+      q('[data-t-price]').textContent = formatPrice(price);
+      const changeEl = q('[data-t-change]');
+      changeEl.textContent = `${change.diff >= 0 ? '▲' : '▼'} ${formatPercent(change.pct)}`;
+      changeEl.className = trend(change.diff);
+      q('[data-t-available]').textContent = isBuy
+        ? `Du har råd til ${formatCoins(max())} ${def.ticker}`
+        : `Du kan selge opptil ${formatCoins(max())} ${def.ticker}`;
+      if (!isBuy) q('[data-t-owned]').textContent = formatCoins(coinHolding(state, def).owned);
+      q('[data-t-sum]').textContent = formatMoney(amount() * price);
+      confirmBtn.disabled = amount() <= 0 || amount() > max() + 1e-9;
+    };
+
+    input.addEventListener('input', () => {
+      useMax = false;
+      refresh();
+    });
+    q('[data-t-max]').addEventListener('click', () => {
+      useMax = true;
+      input.value = String(max()).replace('.', ',');
+      refresh();
+    });
+    confirmBtn.addEventListener('click', () => {
+      const price = coinMarket(state, def).price;
+      const n = Math.min(amount(), max());
+      const count = isBuy ? buyCoins(state, def, n) : sellCoins(state, def, n);
+      if (count > 0) {
+        showToast(`${isBuy ? 'Kjøpte' : 'Solgte'} ${formatCoins(count)} ${def.ticker} for ${formatMoney(count * price)}`);
+        back();
+      }
+    });
+
+    trade = { refresh };
+    refresh();
+  }
+
   return {
     id: 'investing',
     label: 'Investering',
@@ -683,7 +931,7 @@ export function createInvestingPage(state: GameState): Page {
       // Tegn på nytt bare når prisene har endret seg (én gang i minuttet)
       // Kjøp/salg-siden: bare oppdater tallene (behold det man har skrevet inn)
       if (trade) return trade.refresh();
-      if (!pressing && marketVersion() !== renderedVersion) render();
+      if (!pressing && pricesVersion() !== renderedVersion) render();
     },
   };
 }

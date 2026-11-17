@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 /** Innstillinger for Android-appen. */
 const config: CapacitorConfig = {
   appId: 'no.afkspill.app', // unik ID for appen (kan endres før den legges ut i Play Store)
-  appName: 'AFK-spill',
+  appName: 'Pengebingen',
   webDir: 'dist', // mappa Vite bygger spillet til
   backgroundColor: '#ffffff',
   server: {

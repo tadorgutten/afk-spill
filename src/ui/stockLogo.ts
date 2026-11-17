@@ -1,17 +1,24 @@
-import { STOCKS, type StockDef } from '../game/stockData';
+import { STOCKS } from '../game/stockData';
+import { COINS } from '../game/crypto';
 
 /**
- * Logo for en aksje.
+ * Logo for en aksje eller mynt.
  *
- * Har du et logobilde, legg det i mappa public/logos/ med aksjens id som navn,
- * f.eks. public/logos/tesla.png – da brukes bildet automatisk.
- * Ellers vises et rundt merke med selskapets farge og forkortelse (f.eks. TSLA).
+ * Har du et logobilde, legg det i mappa public/logos/ med id-en som navn,
+ * f.eks. public/logos/tesla.png eller public/logos/bitcoin.png – da brukes bildet automatisk.
+ * Ellers vises et rundt merke med farge og forkortelse (f.eks. TSLA).
  */
+interface LogoDef {
+  id: string;
+  ticker: string;
+  color: string;
+}
+
 const availableLogos = new Set<string>();
 
 /** Sjekker én gang ved oppstart hvilke logobilder som finnes. */
 export function initLogos() {
-  for (const def of STOCKS) {
+  for (const def of [...STOCKS, ...COINS]) {
     const img = new Image();
     img.onload = () => availableLogos.add(def.id);
     img.src = `logos/${def.id}.png`;
@@ -27,7 +34,7 @@ function isLight(hex: string): boolean {
   return 0.299 * r + 0.587 * g + 0.114 * b > 170;
 }
 
-export function stockLogo(def: StockDef, size: 'sm' | 'lg' = 'sm'): string {
+export function stockLogo(def: LogoDef, size: 'sm' | 'lg' = 'sm'): string {
   if (availableLogos.has(def.id)) {
     return `<div class="stock-logo stock-logo-${size} has-image"><img src="logos/${def.id}.png" alt=""></div>`;
   }

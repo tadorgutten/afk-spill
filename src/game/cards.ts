@@ -1,5 +1,6 @@
 import { businessesValue } from './business';
 import { portfolioSummary } from './market';
+import { cryptoSummary } from './crypto';
 import type { GameState } from './state';
 
 /*
@@ -117,9 +118,15 @@ export function assetsValue(_state: GameState): number {
   return 0;
 }
 
-/** Formue = saldo + aksjer + bedrifter (kapitalisering) + eiendeler. */
+/** Formue = saldo + aksjer + krypto + bedrifter (kapitalisering) + eiendeler. */
 export function fortune(state: GameState): number {
-  return state.balance + portfolioSummary(state).value + businessesValue(state) + assetsValue(state);
+  return (
+    state.balance +
+    portfolioSummary(state).value +
+    cryptoSummary(state).value +
+    businessesValue(state) +
+    assetsValue(state)
+  );
 }
 
 /** Hvor mange kort formuen holder til nå (minst 1 – Basis har alle). */

@@ -4,6 +4,7 @@ import type { Business } from './business';
 import type { TaxAccount } from './taxes';
 import { MAX_LEVEL } from './click';
 import { createMarket, ensureMarket, type Holding, type MarketState } from './market';
+import { createCrypto, ensureCrypto, type CryptoState } from './crypto';
 
 /**
  * Spillets tilstand: alt som skal huskes mellom økter.
@@ -19,6 +20,10 @@ export interface GameState {
   holdings: Record<string, Holding>;
   /** Prisene i aksjemarkedet. */
   market: MarketState;
+  /** Mynter spilleren eier (mynt-id → antall og hva de kostet). */
+  cryptoHoldings: Record<string, Holding>;
+  /** Prisene i kryptomarkedet. */
+  crypto: CryptoState;
 
   // --- Statistikk ---
   totalEarned: number;
@@ -57,8 +62,8 @@ export interface GameState {
 
 const SAVE_KEY = 'afk-game-save-v3';
 
-/** Alt unntatt markedet (som er tyngre å lage). */
-function baseState(): Omit<GameState, 'market'> {
+/** Alt unntatt markedene (som er tyngre å lage). */
+function baseState(): Omit<GameState, 'market' | 'crypto'> {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const year = String((now.getFullYear() + 3) % 100).padStart(2, '0');
@@ -66,6 +71,7 @@ function baseState(): Omit<GameState, 'market'> {
     balance: 0,
     clickLevel: 1,
     holdings: {},
+    cryptoHoldings: {},
     totalEarned: 0,
     totalClicks: 0,
     dividendsEarned: 0,
@@ -85,7 +91,7 @@ function baseState(): Omit<GameState, 'market'> {
 }
 
 export function createDefaultState(): GameState {
-  return { ...baseState(), market: createMarket(Date.now()) };
+  return { ...baseState(), market: createMarket(Date.now()), crypto: createCrypto(Date.now()) };
 }
 
 /** Henter lagret spill, eller lager et nytt hvis det ikke finnes. */
@@ -96,6 +102,7 @@ export function loadState(): GameState {
     // Slår sammen med standardverdier, så nye felter får en verdi i gamle lagringer
     const state = { ...baseState(), ...(JSON.parse(raw) as Partial<GameState>) } as GameState;
     ensureMarket(state, Date.now());
+    ensureCrypto(state, Date.now());
     // Gamle lagringer kan ha høyere nivå enn dagens maks
     state.clickLevel = Math.max(1, Math.min(MAX_LEVEL, Math.floor(state.clickLevel) || 1));
     return state;

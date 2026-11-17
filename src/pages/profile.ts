@@ -3,6 +3,7 @@ import { CATEGORY_ICON } from './business';
 import { fortune } from '../game/cards';
 import { MAX_LEVEL } from '../game/click';
 import { ownedStocks, portfolioSummary } from '../game/market';
+import { cryptoSummary } from '../game/crypto';
 import { fortuneNok, RICH_LIST } from '../game/richList';
 import type { GameState } from '../game/state';
 import {
@@ -143,7 +144,7 @@ export function createProfilePage(state: GameState): Page & { openTaxes(): void 
       realestate: 0,
       transport: 0,
       collections: 0,
-      crypto: 0,
+      crypto: cryptoSummary(state).value,
       home: 0,
     };
   }
