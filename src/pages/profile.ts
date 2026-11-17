@@ -4,6 +4,7 @@ import { fortune } from '../game/cards';
 import { MAX_LEVEL } from '../game/click';
 import { ownedStocks, portfolioSummary } from '../game/market';
 import { cryptoSummary } from '../game/crypto';
+import { realEstateSummary } from '../game/realEstate';
 import { fortuneNok, RICH_LIST } from '../game/richList';
 import type { GameState } from '../game/state';
 import {
@@ -141,7 +142,7 @@ export function createProfilePage(state: GameState): Page & { openTaxes(): void 
       balance: state.balance,
       business: businessesValue(state),
       stocks: portfolioSummary(state).value,
-      realestate: 0,
+      realestate: realEstateSummary(state).value,
       transport: 0,
       collections: 0,
       crypto: cryptoSummary(state).value,
@@ -203,12 +204,14 @@ export function createProfilePage(state: GameState): Page & { openTaxes(): void 
         <h2>Statistikk</h2>
         ${stat('Antall bedrifter', formatInt(s.businesses.length))}
         ${stat('Selskaper du eier aksjer i', formatInt(ownedStocks(s).length))}
+        ${stat('Eiendommer', formatInt(Object.keys(s.properties).length))}
         ${stat('Klikknivå', `${s.clickLevel} av ${MAX_LEVEL}`)}
         ${stat('Antall klikk', formatInt(s.totalClicks))}
         <h3>Tjent</h3>
         ${stat('I klikkeren', formatMoney(s.clickEarned))}
         ${stat('I bedrifter', formatMoney(s.businessEarned))}
         ${stat('På utbytte', formatMoney(s.dividendsEarned))}
+        ${stat('På leieinntekter', formatMoney(s.rentEarned))}
         ${stat('På aksjehandel', `${s.tradingProfit < 0 ? '−' : ''}${formatMoney(Math.abs(s.tradingProfit))}`)}
         <h3>Betalt</h3>
         ${stat('Skatt og bøter', formatMoney(s.taxesPaid))}
@@ -306,7 +309,7 @@ export function createProfilePage(state: GameState): Page & { openTaxes(): void 
     const note = acc.suspended
       ? 'Fristen har gått ut. Utbyttet er stanset, og du kan ikke handle aksjer før skatten og boten er betalt.'
       : scheme === 'simplified' && owed === 0
-        ? 'Aksjeporteføljen din er under $ 30 mill., så skatten trekkes automatisk fra utbyttet.'
+        ? 'Aksjeporteføljen din er under $ 30 M, så skatten trekkes automatisk fra utbyttet.'
         : 'Betal skatten før fristen, ellers stanses utbyttet og du får en bot.';
 
     return `

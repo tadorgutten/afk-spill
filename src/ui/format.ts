@@ -6,11 +6,11 @@
  */
 export const MONEY_SCALE = 10;
 
-/** Store tall forkortes: 1,2 mill., 3,4 mrd. osv. */
+/** Store tall forkortes på engelsk: 1,2 M (million), 3,4 B (milliard), 1 T (billion). */
 const UNITS = [
-  { size: 1e12, suffix: ' bill.' },
-  { size: 1e9, suffix: ' mrd.' },
-  { size: 1e6, suffix: ' mill.' },
+  { size: 1e12, suffix: ' T' },
+  { size: 1e9, suffix: ' B' },
+  { size: 1e6, suffix: ' M' },
 ];
 
 const nb = (value: number, min: number, max: number) =>
@@ -25,7 +25,7 @@ function amount(value: number): string {
   return nb(Math.floor(v * 100 + 1e-6) / 100, 2, 2);
 }
 
-/** Et beløp: $ 2,50 / $ 1 000,00 / $ 1,2 mill. */
+/** Et beløp: $ 2,50 / $ 1 000,00 / $ 1,2 M */
 export function formatMoney(value: number): string {
   return `$ ${amount(value)}`;
 }

@@ -264,7 +264,7 @@ export function createEarningsPage(state: GameState): Page {
   };
 }
 
-/** Krav til formue: "$ 100 000", "$ 15 mill.", "$ 1 bill.". */
+/** Krav til formue: "$ 100 000", "$ 15 M", "$ 1 T". */
 function formatRequirement(value: number): string {
   return value * MONEY_SCALE >= 1e6 ? formatMoney(value).replace(',00', '') : formatMoneyWhole(value);
 }

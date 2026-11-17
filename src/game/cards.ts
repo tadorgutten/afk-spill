@@ -1,6 +1,7 @@
 import { businessesValue } from './business';
 import { portfolioSummary } from './market';
 import { cryptoSummary } from './crypto';
+import { realEstateSummary } from './realEstate';
 import type { GameState } from './state';
 
 /*
@@ -124,6 +125,7 @@ export function fortune(state: GameState): number {
     state.balance +
     portfolioSummary(state).value +
     cryptoSummary(state).value +
+    realEstateSummary(state).value +
     businessesValue(state) +
     assetsValue(state)
   );

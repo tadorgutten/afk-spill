@@ -27,6 +27,16 @@ import { canTradeStocks } from '../game/taxes';
 import { PAGE_MAX_WIDTH, PAGE_ZOOM } from '../ui/zoom';
 import { stockById, type StockDef } from '../game/stockData';
 import { stockChart } from '../ui/chart';
+import { buyProperty, buyUpgrade, propertyById, sellProperty, upgradesOf } from '../game/realEstate';
+import {
+  renderBuyConfirm as reBuyConfirm,
+  renderMarket as reMarket,
+  renderMine as reMine,
+  renderProperty as reProperty,
+  renderRealEstateTab,
+  type MarketSort,
+  type MineSort,
+} from './realEstateViews';
 import {
   buyCoins,
   coinById,
@@ -78,7 +88,12 @@ type View =
   // Krypto
   | { name: 'coins' }
   | { name: 'coin'; id: string }
-  | { name: 'ctrade'; mode: 'buy' | 'sell'; id: string };
+  | { name: 'ctrade'; mode: 'buy' | 'sell'; id: string }
+  // Eiendom
+  | { name: 'estates'; sort: MarketSort }
+  | { name: 'mine'; sort: MineSort }
+  | { name: 'property'; id: string }
+  | { name: 'pbuy'; id: string };
 
 /** Egne lister: "Stabil inntekt" og "Vekstpotensial". */
 type ListKind = 'income' | 'growth';
@@ -98,8 +113,27 @@ export function createInvestingPage(state: GameState): Page {
   const element = html(`<section class="page investing"></section>`);
 
   let stack: View[] = [{ name: 'home' }];
-  let tab: Tab = 'shares';
+  // For testing i nettleseren: ?side=investing&fane=realestate (eller crypto) åpner en annen fane,
+  // og &vis=estates / mine åpner eiendomsmarkedet / Min eiendom.
+  const params = new URLSearchParams(location.search);
+  let tab: Tab = TABS.some((t) => t.id === params.get('fane')) ? (params.get('fane') as Tab) : 'shares';
+  let testView = params.get('vis'); // brukes bare første gang
   let renderedVersion = '';
+  /** Eiendommen der Selg er trykket én gang (venter på bekreftelse). */
+  let sellArmed: string | null = null;
+  let sellTimer = 0;
+
+  /** Eiendom: saldo og "har råd"-status oppdateres hele tiden (uten å tegne siden på nytt). */
+  function refreshRealEstate() {
+    const balance = formatMoneyFull(state.balance);
+    element.querySelectorAll<HTMLElement>('[data-re-balance]').forEach((el) => {
+      if (el.textContent !== balance) el.textContent = balance;
+    });
+    element.querySelectorAll<HTMLButtonElement>('[data-re-cost]').forEach((el) => {
+      const ok = state.balance + 1e-6 >= Number(el.dataset.reCost);
+      if (el.disabled === ok) el.disabled = !ok;
+    });
+  }
   /** Endres når aksje- eller kryptoprisene endres. */
   const pricesVersion = () => `${marketVersion()}-${cryptoVersion()}`;
 
@@ -151,12 +185,21 @@ export function createInvestingPage(state: GameState): Page {
                   ? renderCoin(view.id)
                   : view.name === 'ctrade'
                     ? renderCoinTrade(view.mode, view.id)
-                    : renderStock(view.id);
+                    : view.name === 'estates'
+                      ? reMarket(state, view.sort)
+                      : view.name === 'mine'
+                        ? reMine(state, view.sort)
+                        : view.name === 'property'
+                          ? reProperty(state, view.id, sellArmed === view.id)
+                          : view.name === 'pbuy'
+                            ? reBuyConfirm(state, view.id)
+                            : renderStock(view.id);
     element.innerHTML = `${back}<div class="inv-zoom inv-pad">${content}</div>`;
 
     // Kjøp/salg tegnes bare én gang (ellers ville tallet man skriver inn forsvinne)
     if (view.name === 'trade') bindTrade(view.mode, view.id);
     if (view.name === 'ctrade') bindCoinTrade(view.mode, view.id);
+    refreshRealEstate();
 
     const newChips = element.querySelector('.chips');
     if (newChips) newChips.scrollLeft = chipScroll;
@@ -302,6 +345,55 @@ export function createInvestingPage(state: GameState): Page {
         if (view.name === 'market') view.sort = sort as SortKey;
         return render();
       }
+      // Eiendom
+      case 're-market':
+        return go({ name: 'estates', sort: 'asc' });
+      case 're-mine':
+        return go({ name: 'mine', sort: 'desc' });
+      case 're-sort': {
+        const view = current();
+        if (view.name === 'estates') view.sort = sort as MarketSort;
+        if (view.name === 'mine') view.sort = sort as MineSort;
+        return render();
+      }
+      case 're-buy':
+        return go({ name: 'pbuy', id: id! });
+      case 're-open':
+        return go({ name: 'property', id: id! });
+      case 're-confirm': {
+        const p = propertyById(id!);
+        if (!p) return;
+        if (!buyProperty(state, p)) return showToast('Du har ikke råd til denne eiendommen');
+        showToast(`Du kjøpte en eiendom i ${p.location}!`);
+        stack.pop(); // bort med kjøpsbekreftelsen – tilbake-pila går til markedet
+        return go({ name: 'property', id: p.id });
+      }
+      case 're-upgrade': {
+        const p = propertyById(id!);
+        const i = Number(target.dataset.index);
+        if (!p) return;
+        if (!buyUpgrade(state, p, i)) return showToast('Du har ikke råd til denne forbedringen');
+        showToast(`${upgradesOf(p)[i].name}: inntekten økte!`);
+        return render();
+      }
+      case 're-sell': {
+        const p = propertyById(id!);
+        if (!p) return;
+        // Første trykk: be om bekreftelse. Andre trykk (innen 4 sek.): selg.
+        if (sellArmed !== p.id) {
+          sellArmed = p.id;
+          clearTimeout(sellTimer);
+          sellTimer = window.setTimeout(() => {
+            sellArmed = null;
+            if (current().name === 'property') render();
+          }, 4000);
+          return render();
+        }
+        sellArmed = null;
+        const got = sellProperty(state, p);
+        showToast(`Solgt for ${formatMoneyFull(got)}`);
+        return back();
+      }
       case 'list':
         return go({ name: 'list', kind: target.dataset.list as ListKind });
       case 'stock':
@@ -425,7 +517,7 @@ export function createInvestingPage(state: GameState): Page {
           ? renderSharesTab()
           : t.id === 'crypto'
             ? renderCryptoTab()
-            : `<div class="coming-soon">${t.label} kommer snart</div>`;
+            : renderRealEstateTab(state);
       return `<div class="inv-panel"><div class="inv-zoom inv-pad">${content}</div></div>`;
     }).join('');
 
@@ -920,6 +1012,10 @@ export function createInvestingPage(state: GameState): Page {
     onShow() {
       // Start alltid på oversikten når man kommer til siden
       stack = [{ name: 'home' }];
+      if (testView === 'estates') stack.push({ name: 'estates', sort: 'asc' });
+      if (testView === 'mine') stack.push({ name: 'mine', sort: 'desc' });
+      if (testView && state.properties[testView]) stack.push({ name: 'property', id: testView });
+      testView = null;
       render();
     },
     onBack() {
@@ -932,6 +1028,7 @@ export function createInvestingPage(state: GameState): Page {
       // Tegn på nytt bare når prisene har endret seg (én gang i minuttet)
       // Kjøp/salg-siden: bare oppdater tallene (behold det man har skrevet inn)
       if (trade) return trade.refresh();
+      refreshRealEstate();
       if (!pressing && pricesVersion() !== renderedVersion) render();
     },
   };

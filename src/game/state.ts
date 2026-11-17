@@ -5,6 +5,7 @@ import type { TaxAccount } from './taxes';
 import { MAX_LEVEL } from './click';
 import { createMarket, ensureMarket, type Holding, type MarketState } from './market';
 import { createCrypto, ensureCrypto, type CryptoState } from './crypto';
+import type { OwnedProperty } from './realEstate';
 
 /**
  * Spillets tilstand: alt som skal huskes mellom økter.
@@ -24,6 +25,12 @@ export interface GameState {
   cryptoHoldings: Record<string, Holding>;
   /** Prisene i kryptomarkedet. */
   crypto: CryptoState;
+  /** Eiendommer spilleren eier (eiendom-id → kjøpte forbedringer). */
+  properties: Record<string, OwnedProperty>;
+  /** Sist leieinntekten ble betalt ut (ms). */
+  realEstateUpdate: number;
+  /** Tjent på leieinntekter. */
+  rentEarned: number;
 
   // --- Statistikk ---
   totalEarned: number;
@@ -72,6 +79,9 @@ function baseState(): Omit<GameState, 'market' | 'crypto'> {
     clickLevel: 1,
     holdings: {},
     cryptoHoldings: {},
+    properties: {},
+    realEstateUpdate: Date.now(),
+    rentEarned: 0,
     totalEarned: 0,
     totalClicks: 0,
     dividendsEarned: 0,
