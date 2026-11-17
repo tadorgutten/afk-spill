@@ -1,0 +1,11 @@
+Legg logobilder for aksjene her (valgfritt).
+
+Filnavnet må være aksjens id + .png, for eksempel:
+  tesla.png
+  apple.png
+  cocacola.png
+  mcdonalds.png
+
+Alle id-ene står i src/game/stockData.ts (feltet "id").
+Finnes det ikke noe bilde, vises et farget merke med forkortelsen (f.eks. TSLA).
+Kvadratiske bilder med gjennomsiktig eller hvit bakgrunn ser best ut.

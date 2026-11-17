@@ -1,0 +1,1016 @@
+/* =========================================================================
+ * PROFIL, SKATT og VERDENS RIKESTE (src/pages/profile.ts)
+ * ========================================================================= */
+.profile {
+  --soft: #f3f5f9;
+  min-height: var(--page-height);
+  padding: calc(env(safe-area-inset-top) + 20px) 18px calc(var(--page-nav-space) + 28px);
+}
+
+.profile button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile .shake {
+  animation: shake 0.35s;
+}
+
+.prof-title {
+  margin: 0 0 20px;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* Tilbake-pila svever øverst til venstre */
+.profile .prof-back {
+  position: fixed;
+  z-index: 5;
+  top: calc(env(safe-area-inset-top) + 18px);
+  left: 10px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  transition: box-shadow 0.2s;
+}
+
+body.scrolled .profile .prof-back {
+  box-shadow: 0 2px 10px rgba(20, 30, 60, 0.18);
+}
+
+.prof-back svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Pila oppå en farget topp: ingen hvit sirkel før man scroller */
+body:not(.scrolled) .profile .prof-back.in-hero {
+  background: transparent;
+}
+
+body:not(.scrolled) .profile .prof-back.light {
+  color: #fff;
+}
+
+.prof-page-title {
+  margin: 64px 0 24px;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.prof-page-title.small {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* --- Formue --- */
+.prof-fortune {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prof-fortune div {
+  display: flex;
+  flex-direction: column;
+}
+
+.prof-fortune strong {
+  font-size: 34px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.prof-fortune span {
+  font-size: 17px;
+  color: #6b7383;
+}
+
+.prof-avatar {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3ccfae, #253f7d);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(20, 30, 60, 0.2);
+}
+
+.prof-avatar svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Fargestripe: hva formuen består av */
+.prof-bar {
+  display: flex;
+  gap: 4px;
+  height: 14px;
+  margin: 20px 0 16px;
+}
+
+.prof-bar span {
+  min-width: 6px;
+  border-radius: 999px;
+}
+
+.prof-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.prof-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 10px 20px;
+  border-radius: 14px;
+  background: var(--soft);
+  border-left: 8px solid var(--c);
+}
+
+.prof-tile span {
+  font-size: 14px;
+  color: #6b7383;
+}
+
+.prof-tile strong {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.prof-divider {
+  width: 60%;
+  margin: 26px auto;
+  border: none;
+  border-top: 2px solid #e6e9ef;
+}
+
+/* --- Kort: Skatt og Verdens rikeste --- */
+.profile .prof-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--soft);
+}
+
+.prof-card-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prof-card-text strong {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.prof-card-text > span {
+  font-size: 15px;
+  color: #6b7383;
+}
+
+.prof-card-text b {
+  color: #2f8f5b;
+}
+
+.prof-bank {
+  display: flex;
+  color: #4f7cf0;
+}
+
+.prof-bank svg {
+  width: 64px;
+  height: 64px;
+}
+
+.prof-tax-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prof-tax-status svg {
+  width: 16px;
+  height: 16px;
+}
+
+.prof-tax-status.ok {
+  color: #2f8f5b !important;
+}
+
+.prof-tax-status.warn {
+  color: #c27a12 !important;
+}
+
+.prof-tax-status.bad {
+  color: #e5484d !important;
+}
+
+.prof-badge {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e5484d;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.profile .prof-rich {
+  overflow: hidden;
+  background: linear-gradient(120deg, #eef1f6, #d8dee9);
+}
+
+.prof-rich-art svg {
+  width: 110px;
+  height: 74px;
+}
+
+/* --- Statistikk --- */
+.prof-stats {
+  margin-top: 8px;
+  padding: 22px 22px 14px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #3ccfae 0%, #2a8a93 35%, #253f7d 72%, #1d1d5e 100%);
+  color: #fff;
+}
+
+.prof-stats h2 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.prof-stats h3 {
+  margin: 18px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.prof-stat-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 16px;
+}
+
+.prof-stat-row strong {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* =========================================================================
+ * SKATT
+ * ========================================================================= */
+.profile[data-view='taxes'],
+.profile[data-view='rich'] {
+  padding-top: 0;
+}
+
+.tax-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 -18px;
+  padding: calc(env(safe-area-inset-top) + 76px) 18px 22px;
+  background: #eef1f6;
+}
+
+/* Stor, blek bank i bakgrunnen */
+.tax-hero-bank {
+  position: absolute;
+  top: -10px;
+  right: -40px;
+  display: flex;
+  color: #d6def0;
+  pointer-events: none;
+}
+
+.tax-hero-bank svg {
+  width: 280px;
+  height: 280px;
+}
+
+.profile .tax-info-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 18px);
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--text);
+}
+
+.tax-info-btn svg {
+  width: 30px;
+  height: 30px;
+}
+
+.tax-hero-row {
+  position: relative;
+  display: flex;
+  gap: 16px;
+}
+
+.tax-debt {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tax-debt span,
+.tax-side span {
+  font-size: 15px;
+  color: #6b7383;
+}
+
+.tax-debt strong {
+  overflow-wrap: anywhere;
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tax-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 14px;
+  border-left: 2px solid #4f7cf0;
+}
+
+.tax-side b {
+  margin-bottom: 8px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.tax-section {
+  margin: 26px 0 12px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.tax-empty {
+  margin: 0;
+  color: #7b8394;
+}
+
+.tax-item {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  background: #eef1f6;
+}
+
+.tax-item-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #dfe5ef;
+}
+
+.tax-item-head .biz-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.tax-item-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: #4f7cf0;
+}
+
+.tax-item-icon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.tax-item-name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tax-item-name strong {
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tax-item-name > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: #6b7383;
+}
+
+.tax-item-name svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tax-item .ok,
+.info-lead.ok {
+  color: #2f9e5a;
+}
+
+.tax-item .bad {
+  color: #e5484d;
+}
+
+.tax-item .round-chevron {
+  background: #c9d2e2;
+  color: #fff;
+}
+
+.tax-item-foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+.tax-item-foot > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tax-item-foot > span > svg {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  color: #4f7cf0;
+}
+
+.tax-item-foot > span:last-child > svg {
+  color: #e5726b;
+}
+
+.tax-item-foot b {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tax-item-foot small {
+  font-size: 14px;
+  color: #6b7383;
+}
+
+/* --- Skatt på aksjer --- */
+.tax-page-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 64px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #eef0f4;
+}
+
+.tax-page-head h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.tax-owed {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: #f8dadb;
+}
+
+.tax-owed-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 17px;
+  color: #7b6466;
+}
+
+.tax-owed-row svg {
+  width: 32px;
+  height: 32px;
+  color: #e5726b;
+}
+
+.tax-owed strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tax-owed hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1.5px solid #ec9a9a;
+}
+
+.tax-due {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-size: 20px;
+}
+
+.tax-due svg {
+  width: 30px;
+  height: 30px;
+  color: #e5726b;
+}
+
+.tax-note {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #7b8394;
+}
+
+.profile .tax-pay {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #e1615b;
+  color: #fff;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.profile .tax-pay:disabled {
+  background: #d4d6db;
+  cursor: default;
+}
+
+.tax-balance {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 15px;
+  color: #7b8394;
+}
+
+.tax-balance b {
+  color: var(--text);
+}
+
+.tax-rate-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.tax-rate {
+  display: block;
+  margin: 10px 0 14px;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.tax-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 16px;
+  color: #4b5262;
+}
+
+.tax-line b {
+  font-variant-numeric: tabular-nums;
+}
+
+.tax-line .up {
+  color: #2f9e5a;
+}
+
+.tax-line .down {
+  color: #b33b35;
+}
+
+/* --- Om skattesystemet --- */
+.info-intro {
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: #eef1f6;
+}
+
+.info-intro svg {
+  width: 40px;
+  height: 40px;
+  color: #4f7cf0;
+}
+
+.info-intro p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.info-h {
+  margin: 24px 0 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.info-sub {
+  margin: 2px 0 0;
+  font-size: 16px;
+  color: #7b8394;
+}
+
+.info-lead {
+  margin: 14px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.info-text {
+  margin: 12px 0 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.profile .info-toggle {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 46px;
+  margin-top: 14px;
+  border-radius: 12px;
+  background: #eef2fa;
+  color: #a9bce6;
+}
+
+.info-toggle svg {
+  width: 28px;
+  height: 28px;
+  transition: transform 0.2s;
+}
+
+.info-toggle.open svg {
+  transform: rotate(180deg);
+}
+
+.info-line {
+  margin: 24px 0 0;
+  border: none;
+  border-top: 4px solid #4f7cf0;
+}
+
+.info-group {
+  padding: 14px 0;
+  border-bottom: 1.5px solid #eef0f4;
+}
+
+.info-group-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  font-size: 19px;
+}
+
+.info-group-head svg {
+  width: 36px;
+  height: 36px;
+  color: #4f7cf0;
+}
+
+.info-penalty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 16px;
+  color: #b8952a;
+}
+
+.info-penalty svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.info-rate {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: #f3f5f9;
+}
+
+.info-rate strong {
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.info-h3 {
+  margin: 20px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.info-asset {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1.5px solid #eef0f4;
+}
+
+.info-asset .biz-icon {
+  width: 46px;
+  height: 46px;
+}
+
+.info-asset > span:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-asset strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.info-asset small {
+  font-size: 15px;
+  color: #7b8394;
+}
+
+/* =========================================================================
+ * VERDENS RIKESTE
+ * ========================================================================= */
+.rich-hero {
+  position: relative;
+  margin: 0 -18px;
+  padding: calc(env(safe-area-inset-top) + 70px) 12px 70px;
+  background: linear-gradient(180deg, #1f4d38, #2f7a55 60%, #f4f6f8);
+}
+
+.profile .rich-edit {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 18px);
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: #fff;
+}
+
+.rich-edit svg {
+  width: 26px;
+  height: 26px;
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr 1fr;
+  align-items: end;
+  gap: 8px;
+}
+
+.podium-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.podium-name {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.podium-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 10px 4px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, #6a6f76, #2c2f33);
+  color: #fff;
+  text-align: center;
+}
+
+.p1 .podium-box {
+  padding: 12px 4px 26px;
+  background: linear-gradient(160deg, #b9a160, #2c2f33);
+}
+
+.p3 .podium-box {
+  background: linear-gradient(160deg, #9a6a45, #2c2f33);
+}
+
+.podium-box span {
+  font-size: 14px;
+}
+
+.podium-box strong {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rich-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.rich-avatar.lg {
+  width: 64px;
+  height: 64px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  font-size: 22px;
+}
+
+.rich-avatar.you {
+  background: linear-gradient(135deg, #3ccfae, #253f7d);
+}
+
+.rich-avatar svg {
+  width: 55%;
+  height: 55%;
+}
+
+.rich-list {
+  position: relative;
+  margin: -40px 0 0;
+  padding: 8px 14px;
+  border-radius: 22px;
+  background: #f4f6f8;
+}
+
+.rich-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.rich-row:last-child {
+  border-bottom: none;
+}
+
+.rich-row.you {
+  margin: 0 -8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #e2f3ea;
+}
+
+.rich-rank {
+  width: 34px;
+  flex-shrink: 0;
+  font-size: 15px;
+  color: #4b5262;
+}
+
+.rich-name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rich-name strong {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rich-name span {
+  overflow: hidden;
+  font-size: 14px;
+  color: #7b8394;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rich-value {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rich-source {
+  margin: 14px 4px 0;
+  font-size: 13px;
+  color: #9aa1ae;
+}
+
+/* =========================================================================
+ * REDIGER PROFIL
+ * ========================================================================= */
+.prof-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prof-form-gap {
+  height: 18px;
+}
+
+.prof-input {
+  width: 100%;
+  padding: 18px 20px;
+  border: 2px solid #dbe2ec;
+  border-radius: 20px;
+  outline: none;
+  background: #fff;
+  font: inherit;
+  font-size: 18px;
+  color: var(--text);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.prof-input:focus {
+  border-color: #4f7cf0;
+}
+
+.profile .prof-save {
+  display: block;
+  width: 100%;
+  margin-top: 40px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #4f7cf0;
+  color: #fff;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profile .prof-save:disabled {
+  background: #bfc6e0;
+  cursor: default;
+}

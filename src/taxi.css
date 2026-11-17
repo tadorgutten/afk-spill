@@ -1,0 +1,580 @@
+/* =========================================================================
+ * TAXISELSKAP (src/pages/taxiViews.ts)
+ * ========================================================================= */
+.cat-yellow {
+  background: linear-gradient(135deg, #f7d85a, #efb53c);
+}
+
+/* --- Utvid kapasiteten --- */
+.taxi-title {
+  margin: 26px 0 2px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.taxi-balance {
+  margin: 0 0 14px;
+  font-size: 15px;
+  color: #8a93a6;
+}
+
+.taxi-balance b {
+  font-weight: 600;
+}
+
+.taxi-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.business .taxi-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 4px;
+  border-radius: 16px;
+  background: #ececec;
+  box-shadow: 0 3px 8px rgba(20, 30, 60, 0.1);
+  text-align: center;
+  transition: transform 0.1s;
+}
+
+.business .taxi-option:active {
+  transform: scale(0.97);
+}
+
+.business .taxi-option.poor {
+  opacity: 0.55;
+}
+
+.taxi-option strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.taxi-option span {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Utvidelse pågår --- */
+.taxi-expanding {
+  display: flex;
+  flex-direction: column;
+  margin-top: 22px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: #fffaf0;
+}
+
+.taxi-expanding-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.taxi-expanding-head svg {
+  width: 30px;
+  height: 30px;
+  color: #efb53c;
+}
+
+.taxi-expanding-head h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.taxi-expanding strong {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.taxi-expanding span {
+  font-size: 15px;
+  color: #6b7383;
+}
+
+/* --- Bilpark og kapasitet --- */
+.taxi-fleet-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.business .taxi-fleet {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 10px 10px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(20, 30, 60, 0.1);
+}
+
+.taxi-fleet-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.taxi-fleet-head strong {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.taxi-fleet-head span {
+  font-size: 15px;
+  color: #efb53c;
+}
+
+.taxi-fleet-bar {
+  height: 4px;
+  margin: 10px 10px 12px;
+  border-radius: 999px;
+  background: #e2e4e8;
+}
+
+.taxi-fleet-bar span {
+  display: block;
+  min-width: 8px;
+  height: 100%;
+  border-radius: 999px;
+  background: #efb53c;
+}
+
+.taxi-cars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, #efb53c, #f7d85a 55%, #f4f4f4);
+}
+
+.taxi-cars span {
+  font-size: 16px;
+}
+
+.taxi-cars strong {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.taxi-capacity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 10px 14px;
+  border-radius: 20px;
+  background: #f1f1f1;
+  overflow: hidden;
+}
+
+/* Parkeringsplass med en bil */
+.taxi-parking {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 8px 6px;
+  border-bottom: 2px dashed #d4d4d4;
+  color: #d9d9d9;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.car-top {
+  width: 28px;
+  height: 50px;
+}
+
+.taxi-capacity > span {
+  font-size: 16px;
+}
+
+.taxi-capacity strong {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.business .taxi-buy {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f6d55c;
+  color: #1c2230;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  transition: transform 0.1s;
+}
+
+.business .taxi-buy:active {
+  transform: scale(0.98);
+}
+
+/* --- Velg en bil / Bilpark --- */
+.taxi-page-head {
+  margin: 64px 0 12px;
+}
+
+.taxi-page-head h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.taxi-page-head p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: #4b5262;
+}
+
+.taxi-page-head b {
+  font-weight: 700;
+}
+
+/* Knapper som kan scrolles sidelengs */
+.taxi-chips {
+  display: flex;
+  gap: 8px;
+  margin: 0 -18px 10px;
+  padding: 0 18px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.taxi-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.business .taxi-chip {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #ececec;
+  color: #6b7383;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.business .taxi-chip.big {
+  padding: 9px 18px;
+  background: #dedede;
+  color: #2a2f3a;
+  font-weight: 600;
+}
+
+.business .taxi-chip.active {
+  background: #f6d55c;
+  color: #1c2230;
+}
+
+.car-list,
+.fleet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.business .car-card {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: #f3f3f3;
+  transition: transform 0.1s;
+}
+
+.business .car-card:active {
+  transform: scale(0.985);
+}
+
+.business .car-card.poor {
+  opacity: 0.6;
+}
+
+.car-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.car-card-head strong {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Merke for bilklassen */
+.car-badge {
+  flex-shrink: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #fff;
+}
+
+.cls-economy {
+  background: #f2cd3e;
+}
+
+.cls-comfort {
+  background: #ddc76a;
+}
+
+.cls-comfortplus {
+  background: #c9c9c9;
+}
+
+.cls-business {
+  background: #b58a7c;
+}
+
+.cls-premier {
+  background: #8a3a26;
+}
+
+.cls-elite {
+  background: #1d1d1d;
+}
+
+.car-card-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.car-art {
+  flex-shrink: 0;
+  width: 46%;
+  max-width: 190px;
+  height: auto;
+}
+
+.car-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.car-card-info em {
+  font-style: normal;
+  color: #8a93a6;
+}
+
+.car-card-info strong {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bilene du eier */
+.fleet-car {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 16px;
+  border-radius: 22px;
+  background: #f3f3f3;
+}
+
+.fleet-car .car-art {
+  width: 150px;
+}
+
+.fleet-car-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fleet-car-info strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.fleet-income {
+  font-size: 14px;
+  color: #8a93a6;
+}
+
+.fleet-income b {
+  margin-right: 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1c2230;
+}
+
+.fleet-class {
+  font-size: 14px;
+  color: #8a93a6;
+}
+
+.fleet-km {
+  grid-column: 1 / 3;
+  text-align: right;
+  font-size: 13px;
+  color: #8a93a6;
+}
+
+.fleet-km-bar {
+  height: 3px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: #d4d4d4;
+  overflow: hidden;
+}
+
+.fleet-km-bar span {
+  display: block;
+  height: 100%;
+  background: #efb53c;
+}
+
+/* --- Kjøpspanelet nederst (Velg en bil) --- */
+.business .car-card.selected {
+  background: #e4e4e4;
+  box-shadow: inset 0 0 0 2px #f2cd3e;
+}
+
+/* Plass under lista, så den nederste bilen ikke skjules bak panelet */
+.car-list.with-panel {
+  padding-bottom: 200px;
+}
+
+.buy-panel {
+  position: fixed;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 14px 18px calc(env(safe-area-inset-bottom) + 18px);
+  border-top: 1px solid #e6e6e6;
+  background: #fff;
+  box-shadow: 0 -6px 20px rgba(20, 30, 60, 0.08);
+}
+
+.buy-panel-title {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+
+.buy-panel-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: end;
+}
+
+.buy-panel-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.qty {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.business .qty button {
+  height: 48px;
+  border-radius: 4px;
+  background: #f1f1f1;
+  font-size: 24px;
+  text-align: center;
+}
+
+.qty strong {
+  font-size: 26px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.business .qty-max {
+  padding: 8px;
+  border-radius: 6px;
+  background: #dcdcdc;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.buy-panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buy-panel-right > span {
+  text-align: right;
+  font-size: 17px;
+}
+
+.buy-panel-right b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.business .buy-panel-buy {
+  padding: 16px;
+  border-radius: 14px;
+  background: #f6d55c;
+  font-size: 19px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- Bilder av bilene --- */
+.car-img {
+  flex-shrink: 0;
+  width: 38%;
+  max-width: 160px;
+  height: 80px;
+  object-fit: contain;
+  /* Hvit bakgrunn i bildet blir usynlig mot det grå kortet */
+  mix-blend-mode: multiply;
+}
+
+/* Bilder der fronten peker mot høyre: speilvend, så alle peker mot venstre */
+.car-img {
+  transform: scale(var(--s, 1));
+}
+
+.car-img.flip {
+  transform: scale(calc(var(--s, 1) * -1), var(--s, 1));
+}
+
+.fleet-car .car-img {
+  width: 112px;
+  height: 60px;
+}
+
+/* Teksten (rekkevidde, inntekt og pris) litt lenger til høyre */
+.car-card-info {
+  flex: 1;
+  padding-left: 34px;
+}
