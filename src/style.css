@@ -1664,7 +1664,7 @@ body.nav-hidden #nav {
 /* ============================================================================
    Krypto
    ============================================================================ */
-.crypto-card {
+.investing .crypto-card {
   position: relative;
   display: block;
   width: 100%;
@@ -2118,4 +2118,12 @@ body.nav-hidden #nav {
 
 .investing .re-confirm-btn:disabled {
   opacity: 0.5;
+}
+
+.re-confirm-photo {
+  margin-top: 20px;
+}
+
+.re-confirm-photo + .re-confirm {
+  margin-top: 10px;
 }

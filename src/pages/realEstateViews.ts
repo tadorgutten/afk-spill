@@ -192,6 +192,7 @@ export function renderBuyConfirm(_state: GameState, id: string): string {
   return `
     <div class="sub-header"></div>
     <h1 class="trade-title">Kjøpsbekreftelse</h1>
+    <img class="re-photo re-confirm-photo" src="${photo(def)}" alt="" />
     <div class="re-confirm">
       <div class="re-confirm-row"><span>Sted</span><strong>${def.location}</strong></div>
       <div class="re-confirm-row"><span>Pris</span><strong>${formatMoneyFull(priceOf(def))}</strong></div>
