@@ -25,6 +25,7 @@ import {
   typeById,
   typesIn,
   isTaxi,
+  engineOf,
   buyCar,
   expandCapacity,
   type Business,
@@ -32,6 +33,10 @@ import {
 } from '../game/business';
 import { capacityOf, carsOf, fleetOf, modelById, type CarClass } from '../game/taxi';
 import { maxCars, renderCarShop, renderFleet, renderTaxiDetail, type FleetSort } from './taxiViews';
+import { levelOf, MAX_UNIT_LEVEL, startUnitBuild, unitById, unitsOf } from '../game/units';
+import { buyOrderCapacity, doneCount, orderCapacity, ordersOf, startOrder } from '../game/orders';
+import { renderUnitsDetail } from './unitViews';
+import { renderOrdersDetail } from './orderViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -61,7 +66,18 @@ type View =
   | { name: 'fleet'; id: string; sort: FleetSort; filter: CarClass | null };
 
 /** Ikon for hver kategori. */
-export const CATEGORY_ICON: Record<BusinessCategoryId, string> = { shop: icons.basket, taxi: icons.taxi, shipping: icons.truck };
+export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
+  shop: icons.basket,
+  taxi: icons.taxi,
+  shipping: icons.truck,
+  factory: icons.factory,
+  construction: icons.crane,
+  dealer: icons.dealer,
+  it: icons.monitor,
+  bank: icons.bank,
+  airline: icons.plane,
+  ships: icons.ship,
+};
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
 function coinStack(n: number): string {
@@ -109,6 +125,9 @@ export function createBusinessPage(state: GameState): Page {
     const viewed = 'id' in view ? find(view.id) : undefined;
     if (viewed && isTaxi(viewed)) element.dataset.fleet = fleetOf(viewed);
     else delete element.dataset.fleet;
+    // Fargetema for sidene til en bedrift (se empire.css)
+    if (viewed) element.dataset.theme = typeById(viewed.type).category;
+    else delete element.dataset.theme;
     const backBtn = `<button class="biz-back" data-action="back" aria-label="Tilbake">${icons.back}</button>`;
 
     switch (view.name) {
@@ -127,7 +146,11 @@ export function createBusinessPage(state: GameState): Page {
         break;
       case 'detail': {
         const b = find(view.id);
-        element.innerHTML = !b ? '' : isTaxi(b) ? renderTaxiDetail(state, b, heroHtml(b)) : renderDetail(b);
+        if (!b) element.innerHTML = '';
+        else if (isTaxi(b)) element.innerHTML = renderTaxiDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'units') element.innerHTML = renderUnitsDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'orders') element.innerHTML = renderOrdersDetail(state, b, heroHtml(b));
+        else element.innerHTML = renderDetail(b);
         break;
       }
       case 'carShop': {
@@ -226,6 +249,46 @@ export function createBusinessPage(state: GameState): Page {
       }
 
       // --- Taxi ---
+      // --- Avdelinger (fabrikk, IT, bank) ---
+      case 'unit-build': {
+        const b = find(id);
+        if (!b) return;
+        const result = startUnitBuild(state, b, target.dataset.unit!);
+        if (result === 'ok') {
+          const u = unitById(b, target.dataset.unit!)!;
+          showToast(`${u.name} ${levelOf(b, u.id) === 0 ? 'bygges' : 'oppgraderes'}`);
+          return render();
+        }
+        shake(target);
+        return showToast(result === 'busy' ? 'Vent til byggingen som pågår er ferdig' : 'Du har ikke nok penger');
+      }
+
+      // --- Oppdrag (byggefirma, bilforhandler) ---
+      case 'order-start': {
+        const b = find(id);
+        if (!b) return;
+        const result = startOrder(state, b, target.dataset.item!);
+        if (result === 'ok') return render();
+        shake(target);
+        return showToast(result === 'full' ? 'Alle plassene er opptatt – kjøp mer kapasitet' : 'Du har ikke nok penger');
+      }
+      case 'order-cap': {
+        const b = find(id);
+        if (!b) return;
+        if (!buyOrderCapacity(state, b)) {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        return render();
+      }
+      case 'order-auto': {
+        const b = find(id);
+        if (!b) return;
+        b.auto = !b.auto;
+        showToast(b.auto ? 'Starter på nytt automatisk' : 'Automatisk start er slått av');
+        return render();
+      }
+
       case 'expand-cap': {
         const b = find(id);
         if (!b) return;
@@ -458,6 +521,23 @@ export function createBusinessPage(state: GameState): Page {
       </div>`;
   }
 
+  /** Den lille statistikken på en bedrift i lista (kjøretøy, trinn, avdelinger, oppdrag). */
+  function rowStat(b: Business): string {
+    const t = typeById(b.type);
+    switch (engineOf(b)) {
+      case 'fleet':
+        return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
+      case 'units': {
+        const levels = unitsOf(b).reduce((sum, u) => sum + levelOf(b, u.id), 0);
+        return `<span>${icons.stage} Nivå ${levels} av ${unitsOf(b).length * MAX_UNIT_LEVEL}</span>`;
+      }
+      case 'orders':
+        return `<span>${icons.clock} ${ordersOf(b).length}/${orderCapacity(b)} · ${doneCount(b)} ferdige</span>`;
+      default:
+        return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
+    }
+  }
+
   function renderRow(b: Business): string {
     const t = typeById(b.type);
     const expanding = b.expansionEnd !== null;
@@ -467,7 +547,7 @@ export function createBusinessPage(state: GameState): Page {
         <span class="biz-row-name"><strong>${escapeHtml(b.name)}</strong><span>${t.name}</span></span>
         <span class="round-chevron">${icons.chevronRight}</span>
         <span class="biz-row-stats">
-          ${isTaxi(b) ? `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>` : `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`}
+          ${rowStat(b)}
           ${expanding ? `<span class="biz-row-timer">${icons.clock} ${formatDuration((b.expansionEnd! - Date.now()) / 1000, false)}</span>` : ''}
         </span>
         <span class="biz-row-income"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>

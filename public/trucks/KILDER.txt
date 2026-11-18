@@ -1,7 +1,7 @@
-Bildene av lastebilene er hentet fra pngimg.com (gjennomsiktig bakgrunn, lisens CC BY-NC 4.0).
-isuzu.png    https://pngimg.com/uploads/truck/truck_PNG16266.png (forminsket)
-man-tgm.png  https://pngimg.com/uploads/truck/truck_PNG16225.png
-daf-cf.png   https://pngimg.com/uploads/truck/truck_PNG16222.png
-volvo-fh.png https://pngimg.com/uploads/truck/truck_PNG16272.png
-actros.png   https://pngimg.com/uploads/truck/truck_PNG16243.png
+Bildene av kjøretøyene er hentet fra pngimg.com (gjennomsiktig bakgrunn, lisens CC BY-NC 4.0).
+trafic.png  https://pngimg.com/uploads/renault/renault_PNG71.png
+master.png  https://pngimg.com/uploads/renault/renault_PNG16.png
+isuzu.png   https://pngimg.com/uploads/truck/truck_PNG16266.png (forminsket)
+daf-cf.png  https://pngimg.com/uploads/truck/truck_PNG16222.png
+scania.png  https://pngimg.com/uploads/truck/truck_PNG16223.png
 Alle er beskåret (gjennomsiktige kanter fjernet).

@@ -4,6 +4,7 @@ import {
   capacityOptions,
   classesFor,
   FLEET_TEXT,
+  FLEET_USAGE,
   fleetOf,
   modelsFor,
   capacityOf,
@@ -34,6 +35,9 @@ const FLEET_SORTS: { key: FleetSort; label: string }[] = [
   { key: 'km-asc', label: 'Kjørt kortest' },
   { key: 'income-desc', label: 'Høyest inntekt' },
 ];
+
+/** Ikon for hver flåte. */
+const FLEET_ICON: Record<FleetKind, string> = { taxi: icons.taxi, shipping: icons.truck, airline: icons.plane, ships: icons.ship };
 
 /** Enkel tegning av en bil fra siden, i bilens farge. */
 export function carArt(color: string): string {
@@ -78,7 +82,7 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
   const expansion = expanding
     ? `
       <div class="taxi-expanding">
-        <div class="taxi-expanding-head">${fleet === 'shipping' ? icons.truck : icons.taxi}<h2>Utvidelse pågår</h2></div>
+        <div class="taxi-expanding-head">${FLEET_ICON[fleet]}<h2>Utvidelse pågår</h2></div>
         <strong>${formatDuration((b.expansionEnd! - Date.now()) / 1000)}</strong>
         <span>Gjenstående tid · +${b.pendingPlaces ?? 0} plasser</span>
       </div>`
@@ -109,7 +113,7 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
         <div class="taxi-cars"><span>${text.count}:</span><strong>${cars}</strong></div>
       </button>
       <div class="taxi-capacity">
-        <div class="taxi-parking"><span>P</span>${carArtTop()}<span>P</span></div>
+        <div class="taxi-parking"><span>P</span>${fleet === 'taxi' ? carArtTop() : `<span class="taxi-parking-icon">${FLEET_ICON[fleet]}</span>`}<span>P</span></div>
         <span>Kapasitet:</span>
         <strong>${capacity}</strong>
       </div>
@@ -178,19 +182,20 @@ export function renderCarShop(
       <p>Saldo: <b>${formatMoney(state.balance)}</b> · ${free > 0 ? `${free} ledige plasser` : 'Ingen ledige plasser'}</p>
     </div>
     ${classChips(fleet, 'shop-filter', filter)}
-    <div class="car-list ${selected ? 'with-panel' : ''}">${models.map((m) => carCard(m, state.balance >= m.price, m.id === selected)).join('')}</div>
+    <div class="car-list ${selected ? 'with-panel' : ''}">${models.map((m) => carCard(m, fleet, state.balance >= m.price, m.id === selected)).join('')}</div>
     ${panel}
   `;
 }
 
-function carCard(m: CarModel, affordable: boolean, selected: boolean): string {
+function carCard(m: CarModel, fleet: FleetKind, affordable: boolean, selected: boolean): string {
+  const usage = FLEET_USAGE[fleet];
   return `
     <button class="car-card ${affordable ? '' : 'poor'} ${selected ? 'selected' : ''}" data-action="select-car" data-model="${m.id}">
       <div class="car-card-head"><strong>${m.name}</strong>${classBadge(m.carClass)}</div>
       <div class="car-card-body">
         ${carImage(m)}
         <div class="car-card-info">
-          <span><em>Rekkevidde:</em> ${formatInt(m.range)} km</span>
+          <span><em>${usage.rangeLabel}:</em> ${formatInt(m.range)} ${usage.unit}</span>
           <span><em>Inntekt/t:</em> ${formatMoneyRounded(m.income)}</span>
           <strong>${formatMoneyRounded(m.price)}</strong>
         </div>
@@ -231,7 +236,7 @@ export function renderFleet(b: Business, sort: FleetSort, filter: CarClass | nul
             </div>
             ${carImage(m)}
             <div class="fleet-km">
-              <span>${formatInt(c.km)} km av ${formatInt(m.range)} km</span>
+              <span>${formatInt(c.km)} av ${formatInt(m.range)} ${FLEET_USAGE[fleet].unit}</span>
               <div class="fleet-km-bar"><span style="width:${pct.toFixed(1)}%"></span></div>
             </div>
           </div>`;
