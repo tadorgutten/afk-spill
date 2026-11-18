@@ -108,4 +108,39 @@ export const icons = {
     '<path d="M18 11V10a2 2 0 0 0-4 0"/><path d="M14 10V9a2 2 0 0 0-4 0v1"/><path d="M10 9.5V4a2 2 0 0 0-4 0v10"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
     1.4,
   ),
+  // --- Bilforhandler ---
+  /** Bil med åpent panser (bilforhandler) */
+  dealer: svg('<path d="M2.5 18v-5.5l2-5h8.5l3.5 5h3.5a1.5 1.5 0 0 1 1.5 1.5v4h-2"/><path d="M12.5 7.5 20 3.5"/><path d="M5 12.5h11"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M9 18h6"/>', 1.6),
+  /** Motor */
+  engine: svg('<path d="M6 9h2V7h6v2h3l2 2h2v6h-2l-2 2H8l-2-2H4v-6h2Z"/><path d="M2 11v5M10 4h4M12 4v3"/><path d="m12.5 10-2 3h3l-2 3"/>', 1.5),
+  /** Girkasse (tannhjul) */
+  transmission: svg('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/><circle cx="12" cy="12" r="6.5"/>', 1.5),
+  /** Understell (hjul og aksler) */
+  chassis: svg('<rect x="3" y="2.5" width="4" height="6" rx="1"/><rect x="17" y="2.5" width="4" height="6" rx="1"/><rect x="3" y="15.5" width="4" height="6" rx="1"/><rect x="17" y="15.5" width="4" height="6" rx="1"/><path d="M7 5.5h10M7 18.5h10M12 5.5v13"/>', 1.5),
+  /** Karosseri (bildør) */
+  carBody: svg('<path d="M3 20V12l6-7h12v15Z"/><path d="M3.5 12.5H21"/><path d="M15 15.5h3"/><path d="M3 18h18"/>', 1.5),
+  /** Elektrisk anlegg (kretskort) */
+  electrics: svg('<rect x="5" y="6" width="14" height="12" rx="2"/><path d="M8 6V3M12 6V3M16 6V3M8 21v-3M12 21v-3M16 21v-3"/><path d="M8.5 12h7M8.5 12l2-2M8.5 12l2 2M15.5 12l-2-2M15.5 12l-2 2"/>', 1.4),
+  /** Interiør (bilsete) */
+  seat: svg('<path d="M9 2.5h6l-.5 9h-5Z"/><path d="M7.5 13.5h9l1 5.5h-11Z"/><path d="M10 6h4M10 9h4M9 15.5l6 2M15 15.5l-6 2"/><path d="M7 19v2.5M17 19v2.5"/>', 1.4),
+  /** Skiftenøkkel */
+  wrench: svg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>', 1.6),
+  /** Skrutrekker og skiftenøkkel (verksted) */
+  tools: svg('<path d="m3 21 8-8"/><path d="M11 13 9 11l1-1 2 2"/><path d="M13.5 6.8a4.5 4.5 0 0 1 5.7-4.3l-2.7 2.7.5 2.3 2.3.5 2.7-2.7a4.5 4.5 0 0 1-5.7 5.7L8.5 18.8a1.8 1.8 0 0 1-2.6-2.6Z"/>', 1.6),
+  /** Bilutstilling (bygg med glassvegg) */
+  showroom: svg('<path d="M3 21V4h18v17"/><path d="M3 9h18M8 9v12M12 9v12M16 9v12M3 15h18"/><path d="M2 21h20"/>', 1.4),
+  /** Ferdigheter (person i et tannhjul) */
+  skills: svg('<circle cx="12" cy="9" r="2.6"/><path d="M7.5 17a4.5 4.5 0 0 1 9 0"/><circle cx="12" cy="12" r="9.5" stroke-dasharray="2.5 2.5"/><circle cx="12" cy="2.5" r="1.2"/><circle cx="21.5" cy="12" r="1.2"/><circle cx="2.5" cy="12" r="1.2"/>', 1.4),
+  /** Tre prikker i en sirkel (venter) */
+  dotsCircle: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>', 2),
+  /** Ramme (kapasitet) */
+  frame: svg('<path d="M3 8V4h4M17 4h4v4M21 16v4h-4M7 20H3v-4"/><rect x="7.5" y="7.5" width="9" height="9" rx="1"/>', 1.6),
+  /** Speedometer (treffsikkerhet) */
+  gauge: svg('<path d="M3.5 17a8.5 8.5 0 1 1 17 0"/><path d="m12 17-3.5-5"/><circle cx="12" cy="17" r="1.2"/>', 1.5),
+  /** Søyler (neste nivå) */
+  levels: svg('<rect x="3" y="14" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="17" rx="1"/>', 1.5),
+  /** Skjerm med bil (diagnose) */
+  diagnostics: svg('<rect x="2.5" y="3.5" width="19" height="13" rx="1.5"/><path d="M8 21h8M12 16.5V21"/><path d="M6.5 12.5v-2l1.5-2.5h8l1.5 2.5v2Z"/><circle cx="9" cy="12.5" r=".8"/><circle cx="15" cy="12.5" r=".8"/>', 1.4),
+  /** Pengeseddel */
+  bill: svg('<rect x="2.5" y="6" width="19" height="12" rx="1"/><circle cx="12" cy="12" r="2.8"/><path d="M5.5 9v.01M18.5 15v.01"/>', 1.5),
 };

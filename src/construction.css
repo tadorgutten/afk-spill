@@ -673,3 +673,37 @@
 .con-summary b {
   font-weight: 700;
 }
+
+/* Maks 15 bygg samtidig */
+.con-full {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--con-soft);
+  color: #b3263b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.con-count-line {
+  margin: 0 0 12px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Maks 15 bygg samtidig */
+.con-full {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--con-soft);
+  color: #b3263b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.con-count-line {
+  margin: 0 0 12px;
+  color: #6b7280;
+  font-size: 14px;
+}

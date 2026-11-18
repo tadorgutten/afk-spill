@@ -3,6 +3,7 @@ import './business.css';
 import './taxi.css';
 import './empire.css';
 import './construction.css';
+import './dealer.css';
 import './profile.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';

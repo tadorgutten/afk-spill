@@ -33,6 +33,9 @@ export const RESOURCES: ResourceDef[] = [
   { id: 'concrete', name: 'Betong', unit: 'm³', price: 4.7 },
 ];
 
+/** Flest bygg man kan ha under bygging samtidig. */
+export const MAX_PROJECTS = 15;
+
 /** Gebyr når man kjøper akkurat det som mangler for et bygg ("Fyll på og bygg"). */
 export const QUICK_FEE = 0.07;
 

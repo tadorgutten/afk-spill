@@ -9,6 +9,7 @@ import {
   isReady,
   isUnlocked,
   maxAffordable,
+  MAX_PROJECTS,
   missingFor,
   projectsOf,
   QUICK_FEE,
@@ -174,6 +175,7 @@ export function renderBuildNew(b: Business, short: string | null): string {
   return `
     <h1 class="con-page-title big">Velg hva du vil bygge</h1>
     ${stockLine(b)}
+    ${building(b).length >= MAX_PROJECTS ? `<p class="con-full">Du kan ikke bygge flere enn ${MAX_PROJECTS} på en gang. Vent til et bygg er ferdig.</p>` : `<p class="con-count-line">Under bygging: <b>${building(b).length}/${MAX_PROJECTS}</b></p>`}
     <div class="con-types">${cards.join('')}</div>
     ${short ? `<button class="con-float-btn" data-action="c-procure" data-id="${b.id}" data-building="${short}">Fyll på ressurser</button>` : ''}`;
 }

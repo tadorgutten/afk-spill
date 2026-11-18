@@ -20,6 +20,8 @@ import {
   isConstructionType,
   isReady,
   isUnlocked,
+  MAX_PROJECTS,
+  building as underConstruction,
   missingFor,
   projectsOf,
   QUICK_FEE,
@@ -29,6 +31,7 @@ import {
   type Project,
   type Resources,
 } from './construction';
+import { DEALER_TYPE, isDealerType, newDealer, tickDealer, type DealerPay, type DealerState } from './dealer';
 
 /*
  * BEDRIFTER
@@ -46,6 +49,7 @@ import {
  *   - stage: butikk og fabrikk – utvid i trinn (her i denne fila)
  *   - fleet: taxi og fraktselskap – kjøp kjøretøy (taxi.ts)
  *   - build: byggefirma – kjøp ressurser, bygg og selg bygg (construction.ts)
+ *   - dealer: bilforhandler – kjøp brukte biler, reparer og selg dem (dealer.ts)
  *
  * Kapitalisering = alt du har puttet inn i bedriften (åpningskostnad + investeringer).
  * Legger du ned bedriften, får du tilbake 30 % av kapitaliseringen.
@@ -56,9 +60,10 @@ export type BusinessCategoryId =
   | 'taxi'
   | 'shipping'
   | 'factory'
-  | 'construction';
+  | 'construction'
+  | 'dealer';
 
-export type Engine = 'stage' | 'fleet' | 'build';
+export type Engine = 'stage' | 'fleet' | 'build' | 'dealer';
 
 export interface BusinessCategory {
   id: BusinessCategoryId;
@@ -98,6 +103,7 @@ export const CATEGORIES: BusinessCategory[] = [
   { id: 'shipping', name: 'Fraktselskap', chooseTitle: '', nameTitle: 'Skriv inn navnet på fraktselskapet', color: 'orange' },
   { id: 'factory', name: 'Fabrikk', chooseTitle: 'Velg type fabrikk', nameTitle: 'Skriv inn navnet på fabrikken', color: 'blue' },
   { id: 'construction', name: 'Byggefirma', chooseTitle: '', nameTitle: 'Skriv inn navnet på byggefirmaet', color: 'red' },
+  { id: 'dealer', name: 'Bilforhandler', chooseTitle: '', nameTitle: 'Skriv inn navnet på bilforhandleren', color: 'dark' },
 ];
 
 // Tallene er 1/10 av Business Empire sine (spillet har 10 ganger lavere verdier).
@@ -187,6 +193,19 @@ export const BUSINESS_TYPES: BusinessType[] = [
     name: 'Byggefirma',
     coins: 1,
     openingCost: 3540, // vises som $ 35 400
+    baseIncome: 0,
+    baseInvestment: 0,
+    growth: 0,
+    firstExpansionSec: 0,
+    timeGrowth: 1,
+  },
+  // Bilforhandler: inntekten kommer fra bilene som selges (se dealer.ts)
+  {
+    id: DEALER_TYPE,
+    category: 'dealer',
+    name: 'Bilforhandler',
+    coins: 1,
+    openingCost: 4000, // vises som $ 40 000
     baseIncome: 0,
     baseInvestment: 0,
     growth: 0,
@@ -292,6 +311,9 @@ export interface Business {
   /** Hvor mange av hvert bygg som er solgt (for å låse opp nye). */
   built?: Record<string, number>;
 
+  // --- Bare for bilforhandler ---
+  dealer?: DealerState;
+
   /** Hvor mange plasser utvidelsen som pågår gir. */
   pendingPlaces?: number;
 
@@ -312,6 +334,7 @@ export function incomeAt(type: BusinessType, stage: number): number {
 /** Hvordan bedriften tjener penger. */
 export function engineOf(b: Business): Engine {
   if (isFleetType(b.type)) return 'fleet';
+  if (isDealerType(b.type)) return 'dealer';
   return isConstructionType(b.type) ? 'build' : 'stage';
 }
 
@@ -324,7 +347,8 @@ export function incomePerHour(b: Business): number {
     case 'fleet':
       return fleetIncome(b);
     case 'build':
-      return 0; // byggefirmaet tjener penger når byggene selges
+    case 'dealer':
+      return 0; // tjener penger når byggene/bilene selges
     default:
       return incomeAt(typeById(b.type), b.stage);
   }
@@ -404,6 +428,8 @@ export function startBusiness(state: GameState, typeId: string, name: string): B
     b.resources = emptyResources();
     b.projects = [];
     b.built = {};
+  } else if (engineOf(b) === 'dealer') {
+    b.dealer = newDealer();
   }
   state.businesses.unshift(b); // nyeste øverst
   return b;
@@ -451,6 +477,14 @@ export function tickBusinesses(state: GameState, now: number) {
   for (const b of state.businesses) {
     // Byggefirma: byggene blir ferdige av seg selv, og selges når man trykker på dem
     if (engineOf(b) === 'build') continue;
+    // Bilforhandler: reparasjoner og utvidelser blir ferdige, og biler i utstillingen selges
+    if (engineOf(b) === 'dealer') {
+      for (const sale of tickDealer(b, now)) {
+        payGross(state, b, sale.price);
+        b.invested = Math.max(typeById(b.type).openingCost, b.invested - sale.cost);
+      }
+      continue;
+    }
     if (isTaxi(b)) {
       // Taxi: utvidelse gir flere plasser, og bilene kjører og tjener penger
       if (b.expansionEnd !== null && b.expansionEnd <= now) {
@@ -534,12 +568,13 @@ export function buyResources(state: GameState, b: Business, amounts: Resources, 
 /** Pris for å kjøpe det som mangler for et bygg (inkludert 7 % gebyr). */
 export const quickBuyCost = (b: Business, buildingId: string) => resourcesCost(missingFor(b, buildingById(buildingId))) * (1 + QUICK_FEE);
 
-export type StartProjectResult = 'ok' | 'locked' | 'resources' | 'money';
+export type StartProjectResult = 'ok' | 'locked' | 'resources' | 'money' | 'full';
 
 /** Starter et bygg. Med `buyMissing` kjøpes det som mangler først (med gebyr). */
 export function startProject(state: GameState, b: Business, buildingId: string, buyMissing = false, now = Date.now()): StartProjectResult {
   const def = buildingById(buildingId);
   if (!isUnlocked(b, def, now)) return 'locked';
+  if (underConstruction(b, now).length >= MAX_PROJECTS) return 'full';
   if (!hasResources(b, def)) {
     if (!buyMissing) return 'resources';
     if (!buyResources(state, b, missingFor(b, def), QUICK_FEE)) return 'money';
@@ -559,4 +594,21 @@ export function sellProject(state: GameState, b: Business, projectId: string, no
   const before = state.balance;
   payGross(state, b, buildingById(p.building).price);
   return state.balance - before;
+}
+
+// --- Bilforhandler: betaling ------------------------------------------------------------
+/** Hvordan bilforhandleren betaler. `capital` = pengene blir en del av bedriften (kapitalisering). */
+export function dealerPay(state: GameState, b: Business): DealerPay {
+  return {
+    spend(amount, capital) {
+      if (amount <= 0) return true;
+      if (state.balance < amount) return false;
+      state.balance -= amount;
+      if (capital) b.invested += amount;
+      return true;
+    },
+    earn(gross) {
+      payGross(state, b, gross);
+    },
+  };
 }

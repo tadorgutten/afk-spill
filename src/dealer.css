@@ -1,0 +1,1103 @@
+/* =========================================================================
+ * BILFORHANDLER (src/pages/dealerViews.ts) – mørkegrått tema
+ * ========================================================================= */
+.cat-dark {
+  background: linear-gradient(135deg, #4a4c52, #2b2d31);
+}
+
+.business[data-theme='dealer'] {
+  --dl-dark: #3d3e42;
+  --dl-card: #e3e8ec;
+  --dl-btn: #4e5573;
+}
+
+/* --- Forsiden --------------------------------------------------------------- */
+.business .dl-service-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-top: 28px;
+  padding: 0 0 18px;
+  border-radius: 28px;
+  background: linear-gradient(120deg, #e4e7eb, #aab2be);
+  text-align: left;
+}
+
+.dl-tab {
+  display: block;
+  width: max-content;
+  margin: 0 auto 6px;
+  padding: 10px 34px 12px;
+  border-radius: 0 0 22px 22px;
+  background: var(--dl-dark);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dl-dot {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #e2556a;
+}
+
+.dl-service-body {
+  display: grid;
+  grid-template-columns: 44% 1fr;
+  align-items: center;
+}
+
+.dl-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0 10px 0 14px;
+}
+
+.dl-ring svg {
+  width: 100%;
+  max-width: 160px;
+}
+
+.dl-ring div {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dl-ring strong {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.dl-ring span {
+  color: #5b6270;
+  font-size: 14px;
+}
+
+.dl-service-stats > div {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(80, 90, 105, 0.18);
+}
+
+.dl-service-stats > div:last-child {
+  border-bottom: none;
+}
+
+.dl-service-stats svg {
+  grid-row: 1 / 3;
+  width: 30px;
+  height: 30px;
+  color: #4b5160;
+}
+
+.dl-service-stats span {
+  color: #4b5160;
+  font-size: 14px;
+}
+
+.dl-service-stats b {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.business .dl-showroom-band {
+  display: block;
+  width: calc(100% + 36px);
+  margin: 26px -18px 0;
+  padding: 20px 18px 22px;
+  background: linear-gradient(145deg, #57bb90 0%, #2f6e55 55%, #0f241b 100%);
+  color: #fff;
+  text-align: left;
+}
+
+.dl-showroom-band h2 {
+  margin: 0 0 14px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.dl-show-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 12px;
+}
+
+.dl-show-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.dl-show-grid .dl-show-b {
+  background: linear-gradient(160deg, #1f5a6b, #13284a);
+}
+
+.dl-show-grid b {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.dl-show-grid span {
+  font-size: 16px;
+}
+
+.dl-show-total {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: rgba(30, 32, 36, 0.55);
+}
+
+.dl-show-total svg {
+  width: 46px;
+  height: 46px;
+  flex: none;
+}
+
+.dl-show-total div {
+  display: flex;
+  flex-direction: column;
+}
+
+.dl-show-total b {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.dl-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.business .dl-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 186px;
+  padding: 18px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--dl-card);
+  text-align: left;
+}
+
+.dl-market-tile .dl-market-art {
+  width: 118%;
+  margin: -6px 0 0 -26px;
+}
+
+.dl-market-tile strong {
+  margin-top: auto;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.dl-spec-tile strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dl-seg-bar {
+  width: 100%;
+  height: 10px;
+  margin: 26px 0 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--a) 50%, var(--b) 50%);
+}
+
+.dl-spec-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.dl-spec-tile small {
+  margin-top: auto;
+  color: #8a909a;
+  font-size: 14px;
+}
+
+.dl-h2 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.business .dl-icon-tile {
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 170px;
+  text-align: center;
+}
+
+.dl-icon-tile svg {
+  width: 74px;
+  height: 74px;
+  color: #26282c;
+}
+
+.dl-icon-tile strong {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.dl-icon-tile small {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #4b5160;
+  font-size: 13px;
+}
+
+.dl-icon-tile small svg {
+  width: 14px;
+  height: 14px;
+}
+
+.business .dl-skills-btn {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: var(--dl-card);
+}
+
+.dl-skills-btn svg {
+  width: 60px;
+  height: 60px;
+}
+
+.dl-skills-btn strong {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* --- Lister ----------------------------------------------------------------- */
+.dl-page-title {
+  margin: 58px 0 18px;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.dl-page-title.tight {
+  margin-bottom: 4px;
+}
+
+.dl-sub {
+  margin: 0 0 6px;
+  color: #4b5160;
+  font-size: 15px;
+}
+
+.dl-refresh {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 16px;
+  color: #8a909a;
+  font-size: 13px;
+}
+
+.dl-refresh svg {
+  width: 14px;
+  height: 14px;
+}
+
+.dl-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.business .dl-chip {
+  padding: 9px 18px;
+  border-radius: 20px;
+  background: var(--dl-card);
+  font-size: 15px;
+}
+
+.business .dl-chip.active {
+  background: var(--dl-dark);
+  color: #fff;
+}
+
+.dl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.business .dl-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--dl-card);
+}
+
+.dl-card-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.dl-card-top .dl-img {
+  width: 100%;
+  height: 84px;
+}
+
+.dl-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px 14px;
+  background: var(--dl-dark);
+  color: #fff;
+}
+
+.dl-card-bottom.sale {
+  background: #4fac85;
+}
+
+.dl-card-bottom.busy {
+  background: var(--dl-btn);
+}
+
+.dl-card-bottom b {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dl-card-bottom span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.dl-card-bottom svg {
+  width: 13px;
+  height: 13px;
+}
+
+.dl-img {
+  display: block;
+  object-fit: contain;
+}
+
+.dl-market {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.business .dl-market-row {
+  display: grid;
+  grid-template-columns: 44% 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 14px 10px;
+  border-radius: 22px;
+  background: var(--dl-card);
+}
+
+.dl-market-img .dl-img {
+  width: 100%;
+  height: 92px;
+}
+
+.dl-market-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.dl-market-text strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.dl-market-text span {
+  margin-top: 6px;
+  color: #8a909a;
+  font-size: 13px;
+}
+
+.dl-market-text b {
+  margin-top: 6px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+/* Tilstandsstrek: fylt opp til laveste mulige, lysere til høyeste mulige */
+.dl-bar {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.dl-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--c);
+  opacity: 0.25;
+}
+
+.dl-bar .lo,
+.dl-bar .mid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--c);
+}
+
+.dl-bar .mid {
+  opacity: 0.6;
+}
+
+/* --- Bilsidene (mørk bakgrunn) ---------------------------------------------- */
+.business[data-view='dCar'],
+.business[data-view='dMarketCar'] {
+  background: var(--dl-dark);
+  color: #fff;
+}
+
+.dl-car-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: calc(-20px - env(safe-area-inset-top)) -18px 0;
+  padding: calc(env(safe-area-inset-top) + 28px) 18px 26px;
+  border-radius: 0 0 36px 36px;
+  background: var(--dl-card);
+  color: var(--text);
+}
+
+.dl-car-balance {
+  margin: 0 0 18px 40px;
+  font-size: 14px;
+}
+
+.dl-car-balance b {
+  font-weight: 500;
+}
+
+.dl-img.big {
+  width: 92%;
+  height: 190px;
+}
+
+.dl-car-name {
+  margin-top: 14px;
+  font-size: 22px;
+}
+
+.dl-car-price {
+  margin-top: 6px;
+  font-size: 30px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.dl-parts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 22px 0 14px;
+}
+
+.dl-part {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  gap: 12px 10px;
+  padding: 14px 14px 16px;
+  border-radius: 16px;
+  background: #36373b;
+}
+
+.dl-part svg {
+  width: 30px;
+  height: 30px;
+  color: #e9eaec;
+}
+
+.dl-part span {
+  font-size: 16px;
+}
+
+.dl-part .dl-bar {
+  grid-column: 1 / -1;
+}
+
+.dl-note,
+.dl-hint {
+  margin: 0 0 16px;
+  color: #b4b8c0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.business[data-view='dCar'] .dl-hint,
+.business[data-view='dMarketCar'] .dl-hint {
+  margin-top: 12px;
+}
+
+.dl-warn {
+  margin: 12px 0 0;
+  color: #ffb4a8;
+  font-size: 14px;
+}
+
+.dl-diag {
+  margin: 8px 0 0;
+  padding: 18px;
+  border-radius: 26px;
+  background: #4a4f63;
+}
+
+.dl-diag-head {
+  display: flex;
+  gap: 14px;
+}
+
+.dl-diag-head svg {
+  width: 64px;
+  height: 64px;
+  flex: none;
+}
+
+.dl-diag-head h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.dl-diag-head p {
+  margin: 0;
+  color: #d6d9e2;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.business .dl-diag-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #57607d;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+}
+
+.business .dl-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--dl-btn);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.business .dl-btn:disabled {
+  color: #2f3342;
+  cursor: default;
+}
+
+.business .dl-btn.poor,
+.business .dl-diag-btn.poor {
+  opacity: 0.6;
+}
+
+.dl-dark-h2 {
+  margin: 26px 0 14px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.dl-rep-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.business .dl-rep {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background: #36373b;
+  color: #e9eaec;
+  transition: background 0.15s;
+}
+
+.dl-rep svg {
+  width: 70%;
+  height: 70%;
+}
+
+.business .dl-rep.on {
+  background: var(--dl-card);
+  color: #2a2b2e;
+}
+
+.business .dl-rep.done {
+  background: #4caf63;
+  color: #fff;
+  cursor: default;
+}
+
+.business .dl-rep.working {
+  background: var(--dl-btn);
+  color: #fff;
+  animation: dl-pulse 1.4s ease-in-out infinite;
+}
+
+.business .dl-rep:disabled:not(.done):not(.working) {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@keyframes dl-pulse {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.dl-rep-info {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 6px 0;
+  margin-top: 18px;
+  font-size: 18px;
+}
+
+.dl-rep-info b {
+  font-weight: 700;
+}
+
+.dl-repairing {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #36373b;
+  color: #d6d9e2;
+  font-size: 15px;
+}
+
+.dl-repairing strong {
+  color: #fff;
+  font-size: 24px;
+}
+
+.dl-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dl-progress.light {
+  background: #d5dae2;
+}
+
+.dl-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 8px;
+  background: #3f7cf4;
+}
+
+.dl-all-done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  color: #7fd492;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dl-all-done svg {
+  width: 22px;
+  height: 22px;
+}
+
+.dl-stats {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px 10px;
+  font-size: 18px;
+}
+
+.dl-stats b {
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dl-stats i {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: #5c5e64;
+}
+
+.dl-stats .neg {
+  color: #e25a52;
+}
+
+.dl-stats .pos {
+  color: #5cc874;
+}
+
+.dl-waiting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  color: #b4b8c0;
+  font-size: 15px;
+}
+
+.dl-waiting svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Spesialisering --------------------------------------------------------- */
+.dl-segs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.business .dl-seg {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--dl-card);
+  text-align: left;
+}
+
+.dl-seg h2 {
+  margin: 0;
+  padding: 18px 22px;
+  background: #cfd5da;
+  color: #fff;
+  font-size: 23px;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.dl-seg.active h2 {
+  background: var(--dl-dark);
+}
+
+.dl-seg-body {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 22px 20px;
+}
+
+.dl-seg-body p {
+  margin: 0 0 16px;
+  color: #6b7383;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.dl-seg-price {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dl-seg-price svg {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  color: #4b5160;
+}
+
+.dl-seg-price div {
+  display: flex;
+  flex-direction: column;
+}
+
+.dl-seg-price b {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.dl-seg-price span {
+  color: #6b7383;
+  font-size: 14px;
+}
+
+.dl-seg .dl-seg-bar {
+  width: 50%;
+  margin: 20px auto 0;
+}
+
+.dl-seg-time {
+  margin-top: 20px;
+  font-size: 26px;
+}
+
+.dl-seg-left {
+  margin: 4px 0 12px;
+  color: #6b7383;
+  font-size: 14px;
+}
+
+.business .dl-change {
+  position: sticky;
+  bottom: 16px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--dl-dark);
+  color: #6f737b;
+  font-size: 21px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.business .dl-change.ready {
+  color: #fff;
+}
+
+/* --- Utvidelse -------------------------------------------------------------- */
+.dl-exp-hero {
+  margin: calc(-20px - env(safe-area-inset-top)) -18px 0;
+  padding: calc(env(safe-area-inset-top) + 24px) 18px 6px;
+  color: #fff;
+}
+
+.dl-exp-hero.service {
+  background: linear-gradient(180deg, #2a2f3d, #1c1d24);
+}
+
+.dl-exp-hero.showroom {
+  background: linear-gradient(180deg, #e8eaec, #bfc2c0);
+}
+
+.dl-exp-hero h1 {
+  margin: 4px 0 6px 50px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.dl-exp-hero.showroom h1 {
+  color: #26282c;
+}
+
+.dl-exp-art {
+  display: block;
+  width: 100%;
+}
+
+.dl-exp-now {
+  margin: 14px 0;
+  font-size: 15px;
+}
+
+.dl-exp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.business .dl-exp-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: #2c3350;
+  color: #fff;
+  text-align: left;
+}
+
+.business[data-view='dExpand'] .dl-exp-card.poor {
+  opacity: 0.6;
+}
+
+.dl-exp-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 74px;
+  flex: none;
+}
+
+.dl-exp-icons svg {
+  width: 34px;
+  height: 34px;
+  padding: 5px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.dl-exp-icons.n1 svg {
+  width: 48px;
+  height: 48px;
+  padding: 8px;
+}
+
+.dl-exp-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.dl-exp-card strong {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dl-exp-card span {
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+.dl-exp-card b {
+  margin-top: 6px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.dl-exp-card .dl-progress {
+  margin-top: 10px;
+}
+
+.dl-exp-balance {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 15px;
+}
+
+/* --- Ferdigheter ------------------------------------------------------------ */
+.dl-skill {
+  margin: 0 -18px;
+  padding: 18px 22px 20px;
+}
+
+.dl-skill:nth-child(even) {
+  background: #eef1f6;
+}
+
+.dl-skill-head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.dl-skill-head svg {
+  width: 44px;
+  height: 44px;
+  color: #6b7383;
+}
+
+.dl-skill-head h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.dl-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.dl-skill-row svg {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  color: #6b7383;
+}
+
+.dl-skill-row div {
+  display: flex;
+  flex-direction: column;
+}
+
+.dl-skill-row b {
+  font-size: 22px;
+}
+
+.dl-skill-row span {
+  color: #6b7383;
+  font-size: 15px;
+}
+
+.business[data-view='dExpand'][data-kind='service'] {
+  background: #1c1d24;
+  color: #fff;
+}
+
+.business[data-view='dExpand'][data-kind='showroom'] {
+  background: #bfc2c0;
+}
+
+.business[data-view='dExpand'][data-kind='showroom'] .dl-exp-card {
+  background: #8f9290;
+}
+
+/* Hvit tekst og hvite ikoner på den mørke toppen */
+.biz-hero.cat-dark,
+.biz-hero.cat-dark .biz-hero-icon,
+.business .biz-hero.cat-dark .biz-hero-btn {
+  color: #fff;
+}
+
+.biz-icon.cat-dark {
+  color: #fff;
+}

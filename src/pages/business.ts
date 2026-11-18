@@ -31,13 +31,42 @@ import {
   buyResources,
   sellProject,
   startProject,
+  dealerPay,
   type Business,
   type BusinessCategoryId,
 } from '../game/business';
 import { capacityOf, carsOf, fleetOf, modelById, type CarClass } from '../game/taxi';
 import { maxCars, renderCarShop, renderFleet, renderTaxiDetail, type FleetSort } from './taxiViews';
-import { buildingById, building as underConstruction, emptyResources, readyForSale, readyValue, RESOURCES } from '../game/construction';
+import { buildingById, building as underConstruction, MAX_PROJECTS, emptyResources, readyForSale, readyValue, RESOURCES } from '../game/construction';
 import { renderBuildNew, renderConstructionDetail, renderProcure, renderProjects, renderResources } from './constructionViews';
+import {
+  buyDiagnostics,
+  buyMarketCar,
+  carById,
+  changeSegment,
+  dealerModel,
+  expandDealer,
+  forSale,
+  inService,
+  marketOf,
+  putUpForSale,
+  showroomValue,
+  startRepair,
+  type PartId,
+  type SegmentId,
+} from '../game/dealer';
+import {
+  renderDealerDetail,
+  renderExpand,
+  renderMarket,
+  renderMarketCar,
+  renderOwnedCar,
+  renderService,
+  renderShowroom,
+  renderSkills,
+  renderSpec,
+  type ServiceFilter,
+} from './dealerViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyFull, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -67,7 +96,15 @@ type View =
   | { name: 'fleet'; id: string; sort: FleetSort; filter: CarClass | null }
   | { name: 'projects'; id: string }
   | { name: 'buildNew'; id: string; short: string | null }
-  | { name: 'resources'; id: string };
+  | { name: 'resources'; id: string }
+  | { name: 'dService'; id: string; filter: ServiceFilter }
+  | { name: 'dShowroom'; id: string }
+  | { name: 'dMarket'; id: string }
+  | { name: 'dMarketCar'; id: string; car: string }
+  | { name: 'dCar'; id: string; car: string; sel: PartId[] }
+  | { name: 'dSpec'; id: string; pick: SegmentId | null }
+  | { name: 'dExpand'; id: string; kind: 'service' | 'showroom' }
+  | { name: 'dSkills'; id: string };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -76,6 +113,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   shipping: icons.truck,
   factory: icons.factory,
   construction: icons.hook,
+  dealer: icons.dealer,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -152,6 +190,7 @@ export function createBusinessPage(state: GameState): Page {
         if (!b) element.innerHTML = '';
         else if (isTaxi(b)) element.innerHTML = renderTaxiDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'build') element.innerHTML = renderConstructionDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'dealer') element.innerHTML = renderDealerDetail(b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -185,6 +224,61 @@ export function createBusinessPage(state: GameState): Page {
         const b = find(view.id);
         element.innerHTML = b ? backBtn + renderResources(state, b) : '';
         bindResourceInputs();
+        break;
+      }
+      // --- Bilforhandler ---
+      case 'dService': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderService(b, view.filter) : '';
+        break;
+      }
+      case 'dShowroom': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderShowroom(b) : '';
+        break;
+      }
+      case 'dMarket': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderMarket(state, b) : '';
+        break;
+      }
+      case 'dMarketCar': {
+        const b = find(view.id);
+        const m = b && marketOf(b).find((x) => x.id === view.car);
+        if (!b || !m) {
+          // Lista er laget på nytt (ny time): bilen finnes ikke lenger
+          stack.pop();
+          showToast('Bilen er ikke lenger i markedet');
+          return renderView();
+        }
+        element.innerHTML = backBtn + renderMarketCar(state, b, m);
+        break;
+      }
+      case 'dCar': {
+        const b = find(view.id);
+        const c = b && carById(b, view.car);
+        if (!b || !c) {
+          stack.pop();
+          showToast('Bilen er solgt');
+          return renderView();
+        }
+        element.innerHTML = backBtn + renderOwnedCar(state, b, c, view.sel);
+        break;
+      }
+      case 'dSpec': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderSpec(b, view.pick) : '';
+        break;
+      }
+      case 'dExpand': {
+        const b = find(view.id);
+        element.dataset.kind = view.kind;
+        element.innerHTML = b ? backBtn + renderExpand(state, b, view.kind) : '';
+        break;
+      }
+      case 'dSkills': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderSkills(b) : '';
         break;
       }
       case 'settings': {
@@ -306,6 +400,10 @@ export function createBusinessPage(state: GameState): Page {
         const b = find(id);
         if (!b || view.name !== 'buildNew') return;
         const result = startProject(state, b, target.dataset.building!);
+        if (result === 'full') {
+          shake(target);
+          return showToast(`Du kan ikke bygge flere enn ${MAX_PROJECTS} på en gang`);
+        }
         if (result === 'resources') {
           view.short = target.dataset.building!;
           shake(target);
@@ -329,6 +427,10 @@ export function createBusinessPage(state: GameState): Page {
         const b = find(id);
         if (!b || view.name !== 'buildNew') return;
         const result = startProject(state, b, target.dataset.building!, true);
+        if (result === 'full') {
+          shake(target);
+          return showToast(`Du kan ikke bygge flere enn ${MAX_PROJECTS} på en gang`);
+        }
         if (result !== 'ok') {
           shake(target);
           return showToast('Du har ikke nok penger');
@@ -356,6 +458,115 @@ export function createBusinessPage(state: GameState): Page {
         showToast('Ressursene er fylt på');
         return back();
       }
+
+      // --- Bilforhandler ---
+      case 'd-service':
+        return go({ name: 'dService', id, filter: 'all' });
+      case 'd-showroom':
+        return go({ name: 'dShowroom', id });
+      case 'd-market':
+        return go({ name: 'dMarket', id });
+      case 'd-mcar':
+        return go({ name: 'dMarketCar', id, car: target.dataset.car! });
+      case 'd-car':
+        return go({ name: 'dCar', id, car: target.dataset.car!, sel: [] });
+      case 'd-filter':
+        if (view.name === 'dService') view.filter = target.dataset.filter as ServiceFilter;
+        return render();
+      case 'd-diag': {
+        const b = find(id);
+        if (!b) return;
+        const result = buyDiagnostics(b, dealerPay(state, b), target.dataset.car!);
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'ok') showToast('Diagnosen er utført');
+        return render();
+      }
+      case 'd-buy': {
+        const b = find(id);
+        if (!b) return;
+        const m = marketOf(b).find((x) => x.id === target.dataset.car);
+        const result = buyMarketCar(b, dealerPay(state, b), target.dataset.car!);
+        if (result === 'full') {
+          shake(target);
+          return showToast('Verkstedet er fullt');
+        }
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result !== 'ok') return render();
+        showToast(`Du kjøpte ${dealerModel(m!.model).name}`);
+        // Tilbake til forsiden av bilforhandleren
+        stack = [{ name: 'home' }, { name: 'detail', id }];
+        render();
+        window.scrollTo(0, 0);
+        return;
+      }
+      case 'd-part': {
+        if (view.name !== 'dCar') return;
+        const part = target.dataset.part as PartId;
+        view.sel = view.sel.includes(part) ? view.sel.filter((p) => p !== part) : [...view.sel, part];
+        return render();
+      }
+      case 'd-repair': {
+        const b = find(id);
+        if (!b || view.name !== 'dCar') return;
+        const result = startRepair(b, dealerPay(state, b), view.car, view.sel);
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'ok') {
+          view.sel = [];
+          showToast('Reparasjonen har startet');
+        }
+        return render();
+      }
+      case 'd-sell': {
+        const b = find(id);
+        if (!b) return;
+        const result = putUpForSale(b, target.dataset.car!);
+        if (result === 'full') {
+          shake(target);
+          return showToast('Utstillingen er full');
+        }
+        if (result !== 'ok') return render();
+        showToast('Bilen står nå i utstillingen');
+        return back();
+      }
+      case 'd-spec':
+        return go({ name: 'dSpec', id, pick: null });
+      case 'd-spec-pick':
+        if (view.name === 'dSpec') view.pick = target.dataset.seg as SegmentId;
+        return render();
+      case 'd-spec-change': {
+        if (view.name !== 'dSpec') return;
+        const b = find(view.id);
+        if (!b) return;
+        if (changeSegment(b, target.dataset.seg as SegmentId)) {
+          view.pick = null;
+          showToast('Spesialiseringen byttes – det tar 15 minutter');
+        }
+        return render();
+      }
+      case 'd-expand':
+        return go({ name: 'dExpand', id, kind: target.dataset.kind as 'service' | 'showroom' });
+      case 'd-expand-buy': {
+        const b = find(id);
+        if (!b) return;
+        const result = expandDealer(b, dealerPay(state, b), target.dataset.kind as 'service' | 'showroom', Number(target.dataset.index));
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'ok') showToast('Utvidelsen har startet');
+        return render();
+      }
+      case 'd-skills':
+        return go({ name: 'dSkills', id });
 
       case 'expand-cap': {
         const b = find(id);
@@ -594,6 +805,7 @@ export function createBusinessPage(state: GameState): Page {
     const t = typeById(b.type);
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
+    if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
     return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
   }
 
@@ -611,6 +823,8 @@ export function createBusinessPage(state: GameState): Page {
         </span>
         ${engineOf(b) === 'build'
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(readyValue(b))}</b> klart for salg</span>`
+          : engineOf(b) === 'dealer'
+          ? `<span class="biz-row-income"><b>${formatMoneyRounded(showroomValue(b))}</b> til salgs</span>`
           : `<span class="biz-row-income"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
       </button>`;
   }
@@ -821,6 +1035,8 @@ export function createBusinessPage(state: GameState): Page {
       // Sider med skrivefelt tegnes ikke på nytt (da ville teksten man skriver forsvinne).
       const view = current().name;
       if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources') return;
+      // Bruktbilmarkedet (100 bilder) og ferdighetene endrer seg ikke av seg selv
+      if (view === 'dMarket' || view === 'dMarketCar' || view === 'dSkills') return;
       if (view === 'settings' && confirmClose) return;
       if (!pressing && performance.now() - lastRender > 1000) render();
     },
