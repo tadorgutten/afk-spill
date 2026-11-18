@@ -2,7 +2,7 @@ import { activeCard, CARDS, cardById, fortune, unlockedCount } from '../game/car
 import { buyClickUpgrade, click, isMaxLevel, perClick, upgradeCost } from '../game/click';
 import type { GameState } from '../game/state';
 import { bankCard } from '../ui/bankCard';
-import { formatMoney, formatMoneyRounded, formatMoneyWhole, MONEY_SCALE } from '../ui/format';
+import { formatBalance, formatMoney, formatMoneyRounded, formatMoneyWhole, MONEY_SCALE } from '../ui/format';
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
 import { html, type Page } from './page';
@@ -139,7 +139,7 @@ export function createEarningsPage(state: GameState): Page {
     useBtn.disabled = inUse || !available;
     setText(useBtn, available ? 'Bruk dette kortet' : `Krever ${formatRequirement(cardById(detailId!).requirement)} i formue`);
     const balance = detailCardEl.querySelector<HTMLElement>('[data-card-balance]');
-    if (balance) setText(balance, formatMoney(s.balance));
+    if (balance) setBalance(balance, s.balance);
   }
 
   /**
@@ -189,8 +189,7 @@ export function createEarningsPage(state: GameState): Page {
       listKey = key;
     }
     setText(fortuneEl, formatMoney(f));
-    const text = formatMoney(s.balance);
-    listEl.querySelectorAll<HTMLElement>('[data-card-balance]').forEach((el) => setText(el, text));
+    listEl.querySelectorAll<HTMLElement>('[data-card-balance]').forEach((el) => setBalance(el, s.balance));
     const bar = listEl.querySelector<HTMLElement>('[data-card-progress]');
     if (bar) bar.style.transform = `scaleX(${Math.min(1, f / Number(bar.dataset.req))})`;
   }
@@ -249,7 +248,7 @@ export function createEarningsPage(state: GameState): Page {
       // Fremdriften følger saldoen: bruker man penger (f.eks. på aksjer), går den ned igjen
       const progress = max ? 1 : Math.min(1, s.balance / cost);
 
-      setText(balanceEl, formatMoney(s.balance));
+      setBalance(balanceEl, s.balance);
       setText(perClickEl, formatMoneyRounded(perClick(level)));
       setText(levelEl, String(level));
       // Hvor mye mer hvert klikk gir på neste nivå
@@ -267,6 +266,22 @@ export function createEarningsPage(state: GameState): Page {
 /** Krav til formue: "$ 100 000", "$ 15 M", "$ 1 T". */
 function formatRequirement(value: number): string {
   return value * MONEY_SCALE >= 1e6 ? formatMoney(value).replace(',00', '') : formatMoneyWhole(value);
+}
+
+/**
+ * Saldoen på kortet: hele tallet (ikke forkortet). Er tallet for langt for kortet,
+ * krymper skriften akkurat nok til at alt får plass.
+ */
+function setBalance(el: HTMLElement, value: number) {
+  const text = formatBalance(value);
+  if (el.textContent === text) return;
+  const grew = text.length !== (el.textContent ?? '').length;
+  el.textContent = text;
+  if (!grew) return; // samme lengde: samme størrelse som før
+  el.style.fontSize = '';
+  const base = parseFloat(getComputedStyle(el).fontSize);
+  if (!el.clientWidth || el.scrollWidth <= el.clientWidth) return;
+  el.style.fontSize = `${Math.max(12, Math.floor(base * (el.clientWidth / el.scrollWidth) * 10) / 10)}px`;
 }
 
 /** Endrer teksten bare når den faktisk er ny (oppdateringen kjører hver skjermoppdatering). */

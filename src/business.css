@@ -769,3 +769,254 @@ body.scrolled .business .biz-back {
 .biz-note + .biz-blue-btn.tight {
   margin-top: 14px;
 }
+
+/* =========================================================================
+ * BEDRIFTSPLASSER: knappen øverst og vinduet "Kjøp plasser til bedrifter"
+ * ========================================================================= */
+.biz-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.biz-title-row .biz-title {
+  margin: 0;
+}
+
+.business .biz-slots-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--biz-soft);
+  color: var(--biz-blue);
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.biz-slots-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.slots-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 20px 16px;
+  background: rgba(20, 24, 32, 0.55);
+}
+
+.slots-backdrop.animate {
+  animation: slots-fade 0.2s ease-out;
+}
+
+@keyframes slots-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.slots-modal {
+  width: 100%;
+  max-width: 440px;
+  padding: 26px 20px 22px;
+  border-radius: 30px;
+  background: #fff;
+}
+
+.slots-backdrop.animate .slots-modal {
+  animation: slots-pop 0.25s ease-out;
+}
+
+@keyframes slots-pop {
+  from {
+    transform: scale(0.94);
+  }
+}
+
+.slots-modal h2 {
+  margin: 0 0 2px 8px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.slots-balance {
+  margin: 0 0 18px 8px;
+  font-size: 15px;
+  color: #3a4150;
+}
+
+.slots-balance b {
+  font-variant-numeric: tabular-nums;
+}
+
+.slots-label {
+  margin: 4px 0 10px 12px;
+  font-size: 16px;
+  color: #7b8394;
+}
+
+.slots-card {
+  position: relative;
+  min-height: 140px;
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #e3eeff, #f3f7ff);
+  overflow: hidden;
+}
+
+.slots-card-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 60%;
+  font-size: 16px;
+  color: #6b7383;
+}
+
+.slots-card-text strong {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1d2230;
+  font-variant-numeric: tabular-nums;
+}
+
+.slots-card-text strong.slots-time {
+  font-size: 22px;
+}
+
+.slots-chip {
+  margin-bottom: 8px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 15px;
+  color: #7b8394;
+}
+
+.slots-art {
+  position: absolute;
+  right: 4px;
+  top: 8px;
+  width: 46%;
+  max-width: 180px;
+}
+
+.slots-progress {
+  position: relative;
+  z-index: 1;
+  height: 5px;
+  margin-top: 30px;
+  border-radius: 999px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.slots-progress span {
+  display: block;
+  height: 100%;
+  background: var(--biz-blue);
+  transition: width 0.4s;
+}
+
+.slots-pct {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 6px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--biz-blue);
+}
+
+.business .slots-buy {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--biz-blue);
+  color: #fff;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.business .slots-buy.poor {
+  opacity: 0.55;
+}
+
+.slots-note {
+  margin: 8px 0 18px;
+  text-align: center;
+  font-size: 13px;
+  color: #9aa1ad;
+}
+
+.slots-next-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.slots-next {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px 4px;
+  border-radius: 14px;
+  background: var(--biz-soft);
+  font-size: 13px;
+  color: #3a4150;
+  white-space: nowrap;
+}
+
+.slots-next strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d2230;
+}
+
+.slots-sep {
+  width: 2px;
+  margin: 2px 2px;
+  border-radius: 2px;
+  background: var(--biz-blue);
+}
+
+.slots-lock svg {
+  width: 18px;
+  height: 18px;
+  color: #6b7383;
+}
+
+.business .slots-x {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.85);
+  color: #fff;
+}
+
+.slots-x svg {
+  width: 30px;
+  height: 30px;
+}

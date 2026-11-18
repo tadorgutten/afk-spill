@@ -5,6 +5,19 @@
   background: linear-gradient(135deg, #f7d85a, #efb53c);
 }
 
+/* Fraktselskap: samme sider som taxi, men oransje */
+.cat-orange {
+  background: linear-gradient(135deg, #f4b48e, #e3895f);
+}
+
+.business[data-fleet='shipping'] {
+  --fleet: #e3895f;
+  --fleet-light: #f4b48e;
+  --fleet-btn: #eba584;
+  --fleet-soft: #fff5ef;
+  --fleet-ring: #e3895f;
+}
+
 /* --- Utvid kapasiteten --- */
 .taxi-title {
   margin: 26px 0 2px;
@@ -66,7 +79,7 @@
   margin-top: 22px;
   padding: 18px 20px;
   border-radius: 18px;
-  background: #fffaf0;
+  background: var(--fleet-soft, #fffaf0);
 }
 
 .taxi-expanding-head {
@@ -79,7 +92,7 @@
 .taxi-expanding-head svg {
   width: 30px;
   height: 30px;
-  color: #efb53c;
+  color: var(--fleet, #efb53c);
 }
 
 .taxi-expanding-head h2 {
@@ -130,7 +143,7 @@
 
 .taxi-fleet-head span {
   font-size: 15px;
-  color: #efb53c;
+  color: var(--fleet, #efb53c);
 }
 
 .taxi-fleet-bar {
@@ -145,7 +158,7 @@
   min-width: 8px;
   height: 100%;
   border-radius: 999px;
-  background: #efb53c;
+  background: var(--fleet, #efb53c);
 }
 
 .taxi-cars {
@@ -154,7 +167,7 @@
   align-items: center;
   padding: 10px;
   border-radius: 16px;
-  background: linear-gradient(160deg, #efb53c, #f7d85a 55%, #f4f4f4);
+  background: linear-gradient(160deg, var(--fleet, #efb53c), var(--fleet-light, #f7d85a) 55%, #f4f4f4);
 }
 
 .taxi-cars span {
@@ -211,7 +224,7 @@
   margin-top: 20px;
   padding: 16px;
   border-radius: 16px;
-  background: #f6d55c;
+  background: var(--fleet-btn, #f6d55c);
   color: #1c2230;
   text-align: center;
   font-size: 18px;
@@ -276,7 +289,7 @@
 }
 
 .business .taxi-chip.active {
-  background: #f6d55c;
+  background: var(--fleet-btn, #f6d55c);
   color: #1c2230;
 }
 
@@ -348,6 +361,14 @@
 
 .cls-elite {
   background: #1d1d1d;
+}
+
+.cls-city {
+  background: #eba584;
+}
+
+.cls-long {
+  background: #4f6152;
 }
 
 .car-card-body {
@@ -446,13 +467,13 @@
 .fleet-km-bar span {
   display: block;
   height: 100%;
-  background: #efb53c;
+  background: var(--fleet, #efb53c);
 }
 
 /* --- Kjøpspanelet nederst (Velg en bil) --- */
 .business .car-card.selected {
   background: #e4e4e4;
-  box-shadow: inset 0 0 0 2px #f2cd3e;
+  box-shadow: inset 0 0 0 2px var(--fleet-ring, #f2cd3e);
 }
 
 /* Plass under lista, så den nederste bilen ikke skjules bak panelet */
@@ -542,7 +563,7 @@
 .business .buy-panel-buy {
   padding: 16px;
   border-radius: 14px;
-  background: #f6d55c;
+  background: var(--fleet-btn, #f6d55c);
   font-size: 19px;
   font-weight: 600;
   text-align: center;

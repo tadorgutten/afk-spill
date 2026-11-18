@@ -109,6 +109,7 @@ button {
   font-weight: 800;
   letter-spacing: -0.5px;
   white-space: nowrap;
+  overflow: hidden; /* hele saldoen vises – skriften krympes i earnings.ts så den får plass */
   font-variant-numeric: tabular-nums;
 }
 
@@ -362,10 +363,22 @@ button {
   transition: box-shadow 0.2s, background 0.2s;
 }
 
-/* Mens man drar: pillen "løftes" litt */
+/* Mens man drar: pillen blir "flytende glass" som ligger OPPÅ de svarte ikonene
+   (størrelse og strekk styres i src/ui/nav.ts) */
 #nav.dragging .nav-indicator {
-  background: #dfe8ff;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(222, 233, 255, 0.45));
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.8);
+  backdrop-filter: blur(1.5px) saturate(1.8);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 2px rgba(37, 99, 235, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 6px 18px rgba(37, 99, 235, 0.22);
+}
+
+.nav-indicator {
+  will-change: transform;
 }
 
 #nav {
@@ -388,6 +401,7 @@ button {
   inset: 8px;
   display: grid;
   grid-template-columns: repeat(var(--tabs, 5), 1fr);
+  z-index: 2;
   color: var(--accent);
   pointer-events: none;
 }

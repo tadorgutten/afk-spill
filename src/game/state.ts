@@ -65,6 +65,10 @@ export interface GameState {
   businesses: Business[];
   /** Sist bedriftene betalte ut inntekt (ms). */
   businessUpdate: number;
+  /** Hvor mange bedrifter man kan eie (starter på 5, maks 20). */
+  businessSlots: number;
+  /** Når plassen som bygges nå er ferdig (ms), eller null. */
+  slotExpansionEnd: number | null;
 }
 
 const SAVE_KEY = 'afk-game-save-v3';
@@ -97,6 +101,8 @@ function baseState(): Omit<GameState, 'market' | 'crypto'> {
     selectedCard: 'base',
     businesses: [],
     businessUpdate: Date.now(),
+    businessSlots: 5,
+    slotExpansionEnd: null,
   };
 }
 
@@ -110,7 +116,10 @@ export function loadState(): GameState {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return createDefaultState();
     // Slår sammen med standardverdier, så nye felter får en verdi i gamle lagringer
-    const state = { ...baseState(), ...(JSON.parse(raw) as Partial<GameState>) } as GameState;
+    const saved = JSON.parse(raw) as Partial<GameState>;
+    const state = { ...baseState(), ...saved } as GameState;
+    // Gamle lagringer (før bedriftsplasser fantes) beholder alle bedriftene sine
+    if (saved.businessSlots === undefined) state.businessSlots = Math.max(5, state.businesses.length);
     ensureMarket(state, Date.now());
     ensureCrypto(state, Date.now());
     // Gamle lagringer kan ha høyere nivå enn dagens maks

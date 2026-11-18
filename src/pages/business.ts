@@ -9,8 +9,13 @@ import {
   expectedGrowth,
   incomePerHour,
   isMaxStage,
-  MAX_BUSINESSES,
+  MAX_SLOTS,
   MAX_STAGE,
+  SLOT_SECONDS,
+  buySlot,
+  nextSlot,
+  slotPrice,
+  slotsFull,
   renameBusiness,
   renameCost,
   startBusiness,
@@ -25,7 +30,7 @@ import {
   type Business,
   type BusinessCategoryId,
 } from '../game/business';
-import { capacityOf, carsOf, modelById, type CarClass } from '../game/taxi';
+import { capacityOf, carsOf, fleetOf, modelById, type CarClass } from '../game/taxi';
 import { maxCars, renderCarShop, renderFleet, renderTaxiDetail, type FleetSort } from './taxiViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
@@ -56,7 +61,7 @@ type View =
   | { name: 'fleet'; id: string; sort: FleetSort; filter: CarClass | null };
 
 /** Ikon for hver kategori. */
-export const CATEGORY_ICON: Record<BusinessCategoryId, string> = { shop: icons.basket, taxi: icons.taxi };
+export const CATEGORY_ICON: Record<BusinessCategoryId, string> = { shop: icons.basket, taxi: icons.taxi, shipping: icons.truck };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
 function coinStack(n: number): string {
@@ -85,6 +90,10 @@ export function createBusinessPage(state: GameState): Page {
 
   let lastRender = 0;
   let confirmClose = false;
+  /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
+  let slotsOpen = false;
+  /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
+  let slotsAnimate = false;
 
   /** Tegner visningen på nytt (når man bytter visning, og én gang i sekundet for tall som endres). */
   function render() {
@@ -97,11 +106,14 @@ export function createBusinessPage(state: GameState): Page {
     lastRender = performance.now();
     const view = current();
     element.dataset.view = view.name;
+    const viewed = 'id' in view ? find(view.id) : undefined;
+    if (viewed && isTaxi(viewed)) element.dataset.fleet = fleetOf(viewed);
+    else delete element.dataset.fleet;
     const backBtn = `<button class="biz-back" data-action="back" aria-label="Tilbake">${icons.back}</button>`;
 
     switch (view.name) {
       case 'home':
-        element.innerHTML = renderHome();
+        element.innerHTML = renderHome() + (slotsOpen ? renderSlots() : '');
         break;
       case 'categories':
         element.innerHTML = backBtn + renderCategories();
@@ -179,10 +191,33 @@ export function createBusinessPage(state: GameState): Page {
       case 'back':
         return back();
       case 'start':
-        if (state.businesses.length >= MAX_BUSINESSES) {
-          return showToast(`Du kan ha maks ${MAX_BUSINESSES} bedrifter`);
+        if (slotsFull(state)) {
+          showToast('Alle plassene er i bruk – kjøp flere plasser');
+          slotsOpen = true;
+          slotsAnimate = true;
+          return render();
         }
         return go({ name: 'categories' });
+
+      // --- Bedriftsplasser ---
+      case 'slots':
+        slotsOpen = true;
+        slotsAnimate = true;
+        return render();
+      case 'slots-close':
+        // Trykk på den mørke bakgrunnen eller krysset (ikke inne i vinduet)
+        if (target.classList.contains('slots-backdrop') && e.target !== target) return;
+        slotsOpen = false;
+        return render();
+      case 'buy-slot': {
+        const result = buySlot(state);
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'ok') showToast(`Plass ${nextSlot(state)} bygges – klar om 4 timer`);
+        return render();
+      }
       case 'category': {
         // Kategorier med bare én type (taxi) går rett til navnet
         const types = typesIn(category as BusinessCategoryId);
@@ -334,7 +369,10 @@ export function createBusinessPage(state: GameState): Page {
       ? state.businesses.map(renderRow).join('')
       : `<p class="biz-empty">Du eier ingen bedrifter.</p>`;
     return `
-      <h1 class="biz-title">Bedrifter</h1>
+      <div class="biz-title-row">
+        <h1 class="biz-title">Bedrifter</h1>
+        <button class="biz-slots-btn" data-action="slots">${icons.slots}<span>Bedriftsplasser</span></button>
+      </div>
       <div class="biz-total">
         <strong>${formatMoney(totalIncomePerHour(state))}</strong>
         <span>Total inntekt per time</span>
@@ -342,10 +380,82 @@ export function createBusinessPage(state: GameState): Page {
       <button class="biz-start" data-action="start">Start en bedrift</button>
       <div class="biz-list-head">
         <h2>Mine bedrifter</h2>
-        <span>${state.businesses.length}/${MAX_BUSINESSES}</span>
+        <span>${state.businesses.length}/${state.businessSlots}</span>
       </div>
       <div class="biz-list">${list}</div>
     `;
+  }
+
+  /** Vinduet der man kjøper flere bedriftsplasser. */
+  function renderSlots(): string {
+    const animate = slotsAnimate;
+    slotsAnimate = false;
+    const building = state.slotExpansionEnd !== null;
+    const slot = nextSlot(state);
+    let main: string;
+    if (building) {
+      const left = Math.max(0, (state.slotExpansionEnd! - Date.now()) / 1000);
+      const pct = Math.min(100, Math.max(0, Math.floor((1 - left / SLOT_SECONDS) * 100)));
+      main = `
+        <p class="slots-label">Plass ${slot} bygges</p>
+        <div class="slots-card">
+          <div class="slots-card-text">
+            <span>Gjenstående tid</span>
+            <strong class="slots-time">${formatDuration(left, false)}</strong>
+          </div>
+          ${slotsArt()}
+          <div class="slots-progress"><span style="width:${pct}%"></span></div>
+          <span class="slots-pct">${pct} %</span>
+        </div>`;
+    } else if (state.businessSlots >= MAX_SLOTS) {
+      main = `
+        <div class="slots-card">
+          <div class="slots-card-text">
+            <span class="slots-chip">Alle plasser</span>
+            <strong class="slots-time">${MAX_SLOTS} av ${MAX_SLOTS}</strong>
+            <span>Du har kjøpt alle plassene</span>
+          </div>
+          ${slotsArt()}
+        </div>`;
+    } else {
+      const price = slotPrice(slot);
+      main = `
+        <div class="slots-card">
+          <div class="slots-card-text">
+            <span class="slots-chip">Plass ${slot}</span>
+            <span>Pris:</span>
+            <strong>${formatMoney(price)}</strong>
+          </div>
+          ${slotsArt()}
+        </div>
+        <button class="slots-buy ${state.balance >= price ? '' : 'poor'}" data-action="buy-slot">Kjøp</button>
+        <p class="slots-note">Det tar 4 timer før plassen er klar.</p>`;
+    }
+
+    // De neste plassene etter den man kjøper nå, og den siste (låst)
+    const upcoming: string[] = [];
+    for (let n = slot + 1; n <= Math.min(slot + 2, MAX_SLOTS - 1); n++) {
+      upcoming.push(`<div class="slots-next"><strong>Plass ${n}</strong><span>${formatMoney(slotPrice(n))}</span></div>`);
+    }
+    const showLast = slot < MAX_SLOTS;
+    const sep = upcoming.length ? '<span class="slots-sep"></span>' : '';
+    const last = showLast ? `${sep}<div class="slots-next"><strong>Plass ${MAX_SLOTS}</strong><span class="slots-lock">${icons.lock}</span></div>` : '';
+    const next = upcoming.length || showLast
+      ? `
+        <p class="slots-label">Neste utvidelser</p>
+        <div class="slots-next-row">${upcoming.join('')}${last}</div>`
+      : '';
+
+    return `
+      <div class="slots-backdrop ${animate ? 'animate' : ''}" data-action="slots-close">
+        <div class="slots-modal">
+          <h2>Kjøp plasser til bedrifter</h2>
+          <p class="slots-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>
+          ${main}
+          ${next}
+        </div>
+        <button class="slots-x" data-action="slots-close" aria-label="Lukk">${icons.close}</button>
+      </div>`;
   }
 
   function renderRow(b: Business): string {
@@ -357,7 +467,7 @@ export function createBusinessPage(state: GameState): Page {
         <span class="biz-row-name"><strong>${escapeHtml(b.name)}</strong><span>${t.name}</span></span>
         <span class="round-chevron">${icons.chevronRight}</span>
         <span class="biz-row-stats">
-          ${isTaxi(b) ? `<span>${icons.taxi} ${carsOf(b).length}/${capacityOf(b)}</span>` : `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`}
+          ${isTaxi(b) ? `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>` : `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`}
           ${expanding ? `<span class="biz-row-timer">${icons.clock} ${formatDuration((b.expansionEnd! - Date.now()) / 1000, false)}</span>` : ''}
         </span>
         <span class="biz-row-income"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>
@@ -540,10 +650,16 @@ export function createBusinessPage(state: GameState): Page {
     onShow() {
       stack = [{ name: 'home' }];
       confirmClose = false;
+      slotsOpen = false;
       render();
     },
-    navHidden: () => stack.length > 1, // menyen vises bare på oversikten
+    navHidden: () => stack.length > 1 || slotsOpen, // menyen vises bare på oversikten
     onBack() {
+      if (slotsOpen && stack.length <= 1) {
+        slotsOpen = false;
+        render();
+        return true;
+      }
       if (stack.length <= 1) return false;
       back();
       return true;
@@ -557,6 +673,20 @@ export function createBusinessPage(state: GameState): Page {
       if (!pressing && performance.now() - lastRender > 1000) render();
     },
   };
+}
+
+/** Egen tegning: plattform med blokker og en gullmynt. */
+function slotsArt(): string {
+  return `<svg class="slots-art" viewBox="0 0 160 120" aria-hidden="true">
+    <path d="M80 112 10 78l70-34 70 34Z" fill="#eef4ff" stroke="#c9dafc" stroke-width="1.5"/>
+    <path d="M80 104 22 76l58-28 58 28Z" fill="none" stroke="#9db9f5" stroke-width="1.5" stroke-dasharray="2 5"/>
+    <path d="M48 78V64l22 11v14Z" fill="#dfe6ee"/><path d="M70 89V75l20-10v14Z" fill="#f5f7fa"/><path d="M48 64l20-10 22 11-20 10Z" fill="#fff" stroke="#dfe6ee"/>
+    <path d="M78 70V44l20 10v26Z" fill="#5fae9c"/><path d="M98 80V54l18-9v26Z" fill="#8fd1bf"/><path d="M78 44l18-9 20 10-18 9Z" fill="#b8e6d9"/>
+    <path d="M96 54V30l16 8v24Z" fill="#cfe9e3" opacity=".8"/><path d="M112 62V38l14-7v24Z" fill="#e8f6f2" opacity=".8"/><path d="M96 30l14-7 16 8-14 7Z" fill="#f1fbf8"/>
+    <ellipse cx="116" cy="20" rx="15" ry="16" fill="#e2a42a"/><ellipse cx="114" cy="19" rx="14" ry="15" fill="#f7c948"/>
+    <ellipse cx="114" cy="19" rx="10" ry="11" fill="none" stroke="#e2a42a" stroke-width="2"/>
+    <text x="114" y="25" text-anchor="middle" font-size="16" font-weight="800" font-family="system-ui, sans-serif" fill="#c9861a">$</text>
+  </svg>`;
 }
 
 /** Navn skrevet av spilleren vises som tekst, aldri som HTML. */

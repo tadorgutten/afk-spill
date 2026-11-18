@@ -42,6 +42,11 @@ export function formatMoneyFull(value: number): string {
   return `$ ${nb(value * MONEY_SCALE, 2, 2)}`;
 }
 
+/** Saldoen på bankkortet: hele tallet, rundet NED til hele cent ($ 5 811 882 056 158,12) */
+export function formatBalance(value: number): string {
+  return `$ ${nb(Math.floor(value * MONEY_SCALE * 100 + 1e-6) / 100, 2, 2)}`;
+}
+
 /** Helt beløp uten desimaler: $ 20 000 */
 export function formatMoneyWhole(value: number): string {
   return `$ ${formatInt(value * MONEY_SCALE)}`;

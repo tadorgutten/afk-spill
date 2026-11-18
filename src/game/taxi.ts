@@ -8,22 +8,63 @@ import type { Business } from './business';
  * - Du kjøper BILER. Hver bil tjener en fast sum per time.
  * - Hver bil kan kjøre et visst antall km (rekkevidde). Bilene kjører 100 km i minuttet
  *   (6 000 km i timen), også mens appen er lukket. Når en bil har kjørt ferdig, forsvinner den.
+ *
+ * FRAKTSELSKAP fungerer helt likt, men med lastebiler (klassene By og Langtransport),
+ * og det koster mer å utvide kapasiteten.
  */
+
+/** Hvilken "flåte" en bedrift har: taxi (biler) eller fraktselskap (lastebiler). */
+export type FleetKind = 'taxi' | 'shipping';
+
+/** Bedrifts-typen (id i BUSINESS_TYPES) for fraktselskap. */
+export const SHIPPING_TYPE = 'shipping';
+export const fleetOf = (b: Business): FleetKind => (b.type === SHIPPING_TYPE ? 'shipping' : 'taxi');
+
+/** Tekstene som er forskjellige for taxi og fraktselskap. */
+export const FLEET_TEXT: Record<
+  FleetKind,
+  { fleet: string; count: string; buy: string; choose: string; empty: string; emptyClass: string; hint: string; noun: string }
+> = {
+  taxi: {
+    fleet: 'Bilpark',
+    count: 'Biler',
+    buy: 'Kjøp en ny bil',
+    choose: 'Velg en bil',
+    empty: 'Bilparken er tom',
+    emptyClass: 'Ingen biler i denne klassen',
+    hint: 'Kjøp en bil for å begynne å tjene penger',
+    noun: 'bil',
+  },
+  shipping: {
+    fleet: 'Flåte',
+    count: 'Kjøretøy',
+    buy: 'Kjøp et nytt kjøretøy',
+    choose: 'Velg et kjøretøy',
+    empty: 'Flåten er tom',
+    emptyClass: 'Ingen kjøretøy i denne klassen',
+    hint: 'Kjøp et kjøretøy for å begynne å tjene penger',
+    noun: 'kjøretøy',
+  },
+};
 
 export const START_CAPACITY = 5;
 /** Kilometer hver bil kjører per time (100 km i minuttet). */
 export const KM_PER_HOUR = 6000;
 
-export type CarClass = 'economy' | 'comfort' | 'comfortplus' | 'business' | 'premier' | 'elite';
+export type CarClass = 'economy' | 'comfort' | 'comfortplus' | 'business' | 'premier' | 'elite' | 'city' | 'long';
 
-export const CAR_CLASSES: { id: CarClass; label: string }[] = [
-  { id: 'economy', label: 'Økonomi' },
-  { id: 'comfort', label: 'Komfort' },
-  { id: 'comfortplus', label: 'Komfort+' },
-  { id: 'business', label: 'Business' },
-  { id: 'premier', label: 'Premier' },
-  { id: 'elite', label: 'Elite' },
+export const CAR_CLASSES: { id: CarClass; label: string; fleet: FleetKind }[] = [
+  { id: 'economy', label: 'Økonomi', fleet: 'taxi' },
+  { id: 'comfort', label: 'Komfort', fleet: 'taxi' },
+  { id: 'comfortplus', label: 'Komfort+', fleet: 'taxi' },
+  { id: 'business', label: 'Business', fleet: 'taxi' },
+  { id: 'premier', label: 'Premier', fleet: 'taxi' },
+  { id: 'elite', label: 'Elite', fleet: 'taxi' },
+  { id: 'city', label: 'By', fleet: 'shipping' },
+  { id: 'long', label: 'Langtransport', fleet: 'shipping' },
 ];
+
+export const classesFor = (fleet: FleetKind) => CAR_CLASSES.filter((c) => c.fleet === fleet);
 
 export interface CarModel {
   id: string;
@@ -40,10 +81,12 @@ export interface CarModel {
   flip?: boolean;
   /** Gjør bildet større (over 1) eller mindre (under 1), så alle bilene ser like store ut. */
   scale?: number;
+  /** Bildet ligger et annet sted enn public/cars/<id>.png (f.eks. lastebilene). */
+  image?: string;
 }
 
-/** Bilde av bilen: public/cars/<id>.png */
-export const carImageUrl = (m: CarModel) => `cars/${m.id}.png`;
+/** Bilde av bilen: public/cars/<id>.png (lastebilene: public/trucks/<id>.png) */
+export const carImageUrl = (m: CarModel) => m.image ?? `cars/${m.id}.png`;
 
 // Inntekt per time er 1/10 av Business Empire sine tall.
 export const CAR_MODELS: CarModel[] = [
@@ -69,14 +112,38 @@ export const CAR_MODELS: CarModel[] = [
   { id: 'a8', name: 'Audi A8', carClass: 'premier', price: 12150, range: 298_000, income: 504, color: '#1d1f22', scale: 1.08 },
   // Elite – 1 305 kr/t
   { id: 'maybach', name: 'Mercedes-Maybach S-klasse', carClass: 'elite', price: 28000, range: 600_000, income: 1305, color: '#6b1a24' },
+
+  // --- Fraktselskap (lastebiler). Blir større og bedre nedover lista. ---
+  // By – 175 (vises som $ 1 750) per time
+  { id: 'isuzu', name: 'Isuzu N-serie', carClass: 'city', price: 3700, range: 1_280_000, income: 175, color: '#f2f2f2', image: 'trucks/isuzu.png', flip: true },
+  { id: 'man-tgm', name: 'MAN TGM', carClass: 'city', price: 4133.5, range: 1_340_000, income: 175, color: '#f2f2f2', image: 'trucks/man-tgm.png' },
+  // Langtransport – 380 (vises som $ 3 800) per time
+  { id: 'daf-cf', name: 'DAF CF', carClass: 'long', price: 10861.7, range: 1_940_000, income: 380, color: '#f2c200', image: 'trucks/daf-cf.png' },
+  { id: 'volvo-fh', name: 'Volvo FH', carClass: 'long', price: 11240.2, range: 2_100_000, income: 380, color: '#c9ccd1', image: 'trucks/volvo-fh.png' },
+  { id: 'actros', name: 'Mercedes-Benz Actros', carClass: 'long', price: 24500, range: 2_400_000, income: 800, color: '#d9dbde', image: 'trucks/actros.png' },
 ];
 
+export const modelsFor = (fleet: FleetKind) => {
+  const classes = new Set(classesFor(fleet).map((c) => c.id));
+  return CAR_MODELS.filter((m) => classes.has(m.carClass));
+};
+
 /** Utvidelse av kapasiteten: flere plasser, pris og hvor lang tid det tar. */
-export const CAPACITY_OPTIONS = [
-  { places: 5, price: 1750, seconds: 10 * 60 },
-  { places: 10, price: 5000, seconds: 20 * 60 },
-  { places: 20, price: 14000, seconds: 35 * 60 },
-];
+export const CAPACITY_OPTIONS: Record<FleetKind, { places: number; price: number; seconds: number }[]> = {
+  taxi: [
+    { places: 5, price: 1750, seconds: 10 * 60 },
+    { places: 10, price: 5000, seconds: 20 * 60 },
+    { places: 20, price: 14000, seconds: 35 * 60 },
+  ],
+  // Vises som $ 30 000 / $ 80 000 / $ 200 000
+  shipping: [
+    { places: 5, price: 3000, seconds: 10 * 60 },
+    { places: 10, price: 8000, seconds: 20 * 60 },
+    { places: 20, price: 20000, seconds: 35 * 60 },
+  ],
+};
+
+export const capacityOptions = (b: Business) => CAPACITY_OPTIONS[fleetOf(b)];
 
 export interface TaxiCar {
   id: string;

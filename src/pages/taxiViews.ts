@@ -1,9 +1,11 @@
 import type { Business } from '../game/business';
 import type { GameState } from '../game/state';
 import {
-  CAPACITY_OPTIONS,
-  CAR_CLASSES,
-  CAR_MODELS,
+  capacityOptions,
+  classesFor,
+  FLEET_TEXT,
+  fleetOf,
+  modelsFor,
   capacityOf,
   carsOf,
   classLabel,
@@ -12,6 +14,7 @@ import {
   carImageUrl,
   type CarClass,
   type CarModel,
+  type FleetKind,
 } from '../game/taxi';
 import { formatDuration, formatInt, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -54,8 +57,8 @@ export function carImage(m: CarModel): string {
 const classBadge = (c: CarClass) => `<span class="car-badge cls-${c}">${classLabel(c)}</span>`;
 
 /** Sideveis-scrollbare knapper for bilklassene. Trykk igjen på valgt klasse for å vise alle. */
-function classChips(action: string, selected: CarClass | null): string {
-  const chips = CAR_CLASSES.map(
+function classChips(fleet: FleetKind, action: string, selected: CarClass | null): string {
+  const chips = classesFor(fleet).map(
     (c) => `<button class="taxi-chip ${selected === c.id ? 'active' : ''}" data-action="${action}" data-class="${c.id}">${c.label}</button>`,
   ).join('');
   return `<div class="taxi-chips">${chips}</div>`;
@@ -69,11 +72,13 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
   const capacity = capacityOf(b);
   const pct = capacity > 0 ? Math.round((cars / capacity) * 100) : 0;
   const expanding = b.expansionEnd !== null;
+  const fleet = fleetOf(b);
+  const text = FLEET_TEXT[fleet];
 
   const expansion = expanding
     ? `
       <div class="taxi-expanding">
-        <div class="taxi-expanding-head">${icons.taxi}<h2>Utvidelse pågår</h2></div>
+        <div class="taxi-expanding-head">${fleet === 'shipping' ? icons.truck : icons.taxi}<h2>Utvidelse pågår</h2></div>
         <strong>${formatDuration((b.expansionEnd! - Date.now()) / 1000)}</strong>
         <span>Gjenstående tid · +${b.pendingPlaces ?? 0} plasser</span>
       </div>`
@@ -81,7 +86,7 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
       <h2 class="taxi-title">Utvid kapasiteten</h2>
       <p class="taxi-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>
       <div class="taxi-options">
-        ${CAPACITY_OPTIONS.map(
+        ${capacityOptions(b).map(
           (o, i) => `
           <button class="taxi-option ${state.balance >= o.price ? '' : 'poor'}" data-action="expand-cap" data-id="${b.id}" data-index="${i}">
             <strong>+${o.places} plasser</strong>
@@ -99,9 +104,9 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
     ${expansion}
     <div class="taxi-fleet-row">
       <button class="taxi-fleet" data-action="fleet" data-id="${b.id}">
-        <div class="taxi-fleet-head"><strong>Bilpark</strong><span>${pct} %</span></div>
+        <div class="taxi-fleet-head"><strong>${text.fleet}</strong><span>${pct} %</span></div>
         <div class="taxi-fleet-bar"><span style="width:${pct}%"></span></div>
-        <div class="taxi-cars"><span>Biler:</span><strong>${cars}</strong></div>
+        <div class="taxi-cars"><span>${text.count}:</span><strong>${cars}</strong></div>
       </button>
       <div class="taxi-capacity">
         <div class="taxi-parking"><span>P</span>${carArtTop()}<span>P</span></div>
@@ -109,7 +114,7 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
         <strong>${capacity}</strong>
       </div>
     </div>
-    <button class="taxi-buy" data-action="car-shop" data-id="${b.id}">Kjøp en ny bil</button>
+    <button class="taxi-buy" data-action="car-shop" data-id="${b.id}">${text.buy}</button>
   `;
 }
 
@@ -139,7 +144,8 @@ export function renderCarShop(
   qty: number,
 ): string {
   const free = capacityOf(b) - carsOf(b).length;
-  const models = CAR_MODELS.filter((m) => !filter || m.carClass === filter);
+  const fleet = fleetOf(b);
+  const models = modelsFor(fleet).filter((m) => !filter || m.carClass === filter);
 
   // Kjøpspanelet nederst (når man har trykket på en bil)
   let panel = '';
@@ -168,10 +174,10 @@ export function renderCarShop(
 
   return `
     <div class="taxi-page-head">
-      <h1>Velg en bil</h1>
+      <h1>${FLEET_TEXT[fleet].choose}</h1>
       <p>Saldo: <b>${formatMoney(state.balance)}</b> · ${free > 0 ? `${free} ledige plasser` : 'Ingen ledige plasser'}</p>
     </div>
-    ${classChips('shop-filter', filter)}
+    ${classChips(fleet, 'shop-filter', filter)}
     <div class="car-list ${selected ? 'with-panel' : ''}">${models.map((m) => carCard(m, state.balance >= m.price, m.id === selected)).join('')}</div>
     ${panel}
   `;
@@ -196,6 +202,8 @@ function carCard(m: CarModel, affordable: boolean, selected: boolean): string {
 // Bilpark
 // =========================================================================
 export function renderFleet(b: Business, sort: FleetSort, filter: CarClass | null): string {
+  const fleet = fleetOf(b);
+  const text = FLEET_TEXT[fleet];
   const sortChips = FLEET_SORTS.map(
     (s) => `<button class="taxi-chip big ${s.key === sort ? 'active' : ''}" data-action="fleet-sort" data-sort="${s.key}">${s.label}</button>`,
   ).join('');
@@ -234,14 +242,14 @@ export function renderFleet(b: Business, sort: FleetSort, filter: CarClass | nul
            <circle cx="32" cy="32" r="22" stroke="#e6e9ef" stroke-width="5"/>
            <path d="M32 10a22 22 0 1 1-21.5 17.4" stroke="#4f86f7" stroke-width="5"/>
          </svg>
-         <h2>${filter ? 'Ingen biler i denne klassen' : 'Bilparken er tom'}</h2>
-         <p>Kjøp en bil for å begynne å tjene penger</p>
+         <h2>${filter ? text.emptyClass : text.empty}</h2>
+         <p>${text.hint}</p>
        </div>`;
 
   return `
-    <div class="taxi-page-head"><h1>Bilpark</h1></div>
+    <div class="taxi-page-head"><h1>${text.fleet}</h1></div>
     <div class="taxi-chips">${sortChips}</div>
-    ${classChips('fleet-filter', filter)}
+    ${classChips(fleet, 'fleet-filter', filter)}
     <div class="fleet-list">${list}</div>
   `;
 }
