@@ -23,6 +23,7 @@ import { icons } from './ui/icons';
 import { createNav } from './ui/nav';
 import { initLogos } from './ui/stockLogo';
 import { initUpdater } from './ui/updater';
+import { finishIntro } from './ui/intro';
 
 applyZoom(); // hele appen litt mindre (se src/ui/zoom.ts)
 
@@ -70,6 +71,9 @@ window.addEventListener('open-taxes', () => {
 // For testing i nettleseren: legg til ?side=investing / business / profile i adressen.
 const startPage = new URLSearchParams(location.search).get('side') as PageId | null;
 showPage(startPage && pages.some((p) => p.id === startPage) ? startPage : 'earnings');
+
+// Spillet er klart: la åpningsskjermen (Torfor Studios) åpne seg inn til pengesiden
+finishIntro();
 
 // Finn logobilder i public/logos/ (vises automatisk ved neste oppdatering)
 initLogos();

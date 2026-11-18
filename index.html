@@ -9,8 +9,115 @@
     />
     <meta name="theme-color" content="#3ccfae" />
     <title>Pengebingen</title>
+    <!--
+      Åpningsskjermen (Torfor Studios). Ligger rett i HTML-en, så den vises med en gang
+      appen åpnes – før spillet er lastet. src/ui/intro.ts tar den bort med en animasjon.
+    -->
+    <style>
+      #intro {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        color: #fff;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        clip-path: circle(150% at 50% 50%);
+      }
+      /* Lastet på nytt pga. ny versjon: ingen åpningsskjerm */
+      html.no-intro #intro {
+        display: none;
+      }
+      .intro-logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .intro-name {
+        font-size: 52px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        animation: intro-name 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+      }
+      .intro-line {
+        width: 150px;
+        height: 2px;
+        margin: 12px 0 10px;
+        border-radius: 2px;
+        background: #fff;
+        transform-origin: center;
+        animation: intro-line 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s both;
+      }
+      .intro-studios {
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 9px;
+        margin-right: -9px; /* letter-spacing legger luft etter siste bokstav */
+        opacity: 0.85;
+        animation: intro-studios 0.8s ease-out 0.8s both;
+      }
+      @keyframes intro-name {
+        from {
+          opacity: 0;
+          filter: blur(10px);
+          letter-spacing: 14px;
+          transform: scale(0.92);
+        }
+      }
+      @keyframes intro-line {
+        from {
+          transform: scaleX(0);
+          opacity: 0;
+        }
+      }
+      @keyframes intro-studios {
+        from {
+          opacity: 0;
+          letter-spacing: 2px;
+          margin-right: -2px;
+          transform: translateY(6px);
+        }
+      }
+      /* Utgang: logoen løftes og blir borte, så lukker det svarte seg inn mot midten */
+      #intro.leaving .intro-logo {
+        transition:
+          transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.35s ease-in;
+        transform: scale(1.08);
+        opacity: 0;
+      }
+      #intro.leaving {
+        transition: clip-path 0.75s cubic-bezier(0.65, 0, 0.35, 1) 0.25s;
+        clip-path: circle(0% at 50% 50%);
+      }
+      /* Spillet bak "zoomer" rolig på plass mens det svarte trekker seg sammen */
+      body.intro-reveal #page,
+      body.intro-reveal #nav {
+        animation: intro-reveal 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      @keyframes intro-reveal {
+        from {
+          transform: scale(1.06);
+          opacity: 0.4;
+        }
+      }
+    </style>
+    <script>
+      // Etter en automatisk oppdatering (?v=...) skal ikke åpningsskjermen vises igjen
+      if (/[?&]v=/.test(location.search)) document.documentElement.classList.add('no-intro');
+    </script>
   </head>
   <body>
+    <div id="intro" aria-label="Torfor Studios">
+      <div class="intro-logo">
+        <div class="intro-name">Torfor</div>
+        <div class="intro-line"></div>
+        <div class="intro-studios">Studios</div>
+      </div>
+    </div>
     <main id="page"></main>
     <nav id="nav"></nav>
     <div id="toast" class="toast"></div>
