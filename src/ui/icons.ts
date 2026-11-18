@@ -47,6 +47,27 @@ export const icons = {
   truck: svg('<path d="M1.5 7h2M1 10h2.5M2 13h1.5"/><path d="M5 5h10v11H5Z"/><path d="M15 9h3.5l3 3.5V16H15"/><circle cx="8.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>', 1.6),
   /** Fabrikk med skorsteiner */
   factory: svg('<path d="M3 21h18"/><path d="M4 21V11h16v10"/><path d="M6 11V4h2.5v7M10.75 11V4h2.5v7M15.5 11V4H18v7"/><path d="M7 14.5h2M11 14.5h2M15 14.5h2M7 17.5h2M11 17.5h2M15 17.5h2"/>', 1.5),
+  // --- Byggefirma ---
+  /** Kranblokk med krok */
+  hook: svg('<rect x="6" y="2.5" width="12" height="7" rx=".5"/><path d="M12 9.5v4"/><path d="M12 13.5a3 3 0 1 1-3 3"/>', 1.5),
+  /** Murstein med murskje */
+  bricks: svg('<path d="M3 15h6M11 15h6M3 19h3M8 19h7M17 19h4M6 11h5"/><path d="m13 11 6-6M17 3l4 4-2 2-4-4Z"/>', 1.8),
+  /** Klokke med stiplet kant (under bygging) */
+  clockDashed: svg('<path d="M12 3a9 9 0 0 1 9 9"/><path d="M21 12a9 9 0 0 1-9 9" stroke-dasharray="2 3"/><path d="M12 21a9 9 0 0 1 0-18" /><path d="M12 7v5l3 2"/>', 1.6),
+  /** Hake i sirkel (ferdig) */
+  checkCircle: svg('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>', 1.6),
+  /** Bygningsarbeider med hjelm */
+  worker: svg('<path d="M7 9a5 5 0 0 1 10 0"/><path d="M5.5 9h13"/><path d="M12 4v2"/><path d="M8 10.5a4 4 0 0 0 8 0"/><path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><path d="M10 15v6M14 15v6"/>', 1.4),
+  /** Metallbarrer */
+  ingots: svg('<path d="M4 20h7l-1.5-5h-4Z"/><path d="M13 20h7l-1.5-5h-4Z"/><path d="M8.5 14h7L14 9h-4Z"/>', 1.4),
+  /** Tømmerstokker */
+  logs: svg('<rect x="3" y="5" width="18" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="3" y="15" width="18" height="4" rx="2"/><circle cx="5" cy="7" r=".8"/><circle cx="5" cy="12" r=".8"/><circle cx="5" cy="17" r=".8"/>', 1.4),
+  /** Betongblander */
+  mixer: svg('<path d="M6 6l9 3-2 6-8-3Z"/><path d="M15 9l3-2"/><path d="M9 14l-2 6"/><path d="M13 15l2 5"/><circle cx="7" cy="20" r="1.2"/><path d="M15 20h4"/>', 1.4),
+  /** Prislapp */
+  tag: svg('<path d="M3 12V4.5A1.5 1.5 0 0 1 4.5 3H12l9 9-9 9Z"/><circle cx="8" cy="8" r="1.4"/>', 1.6),
+  /** Dollartegn */
+  dollar: svg('<path d="M12 3v18"/><path d="M16.5 7.5A3.5 3 0 0 0 13 5h-2a3 3 0 0 0 0 6h2a3 3 0 0 1 0 6h-2a3.5 3 0 0 1-3.5-2.5"/>', 2.4),
   /** Byggekran (byggefirma) */
   /** Bil med prislapp (bilforhandler) */
   /** Skjerm (IT-selskap) */

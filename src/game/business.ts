@@ -13,6 +13,22 @@ import {
   START_CAPACITY_BY,
   type TaxiCar,
 } from './taxi';
+import {
+  buildingById,
+  emptyResources,
+  hasResources,
+  isConstructionType,
+  isReady,
+  isUnlocked,
+  missingFor,
+  projectsOf,
+  QUICK_FEE,
+  resourcesCost,
+  resourcesOf,
+  RESOURCES,
+  type Project,
+  type Resources,
+} from './construction';
 
 /*
  * BEDRIFTER
@@ -29,6 +45,7 @@ import {
  * Bedriftene har to ulike måter å tjene penger på ("motor"):
  *   - stage: butikk og fabrikk – utvid i trinn (her i denne fila)
  *   - fleet: taxi og fraktselskap – kjøp kjøretøy (taxi.ts)
+ *   - build: byggefirma – kjøp ressurser, bygg og selg bygg (construction.ts)
  *
  * Kapitalisering = alt du har puttet inn i bedriften (åpningskostnad + investeringer).
  * Legger du ned bedriften, får du tilbake 30 % av kapitaliseringen.
@@ -38,9 +55,10 @@ export type BusinessCategoryId =
   | 'shop'
   | 'taxi'
   | 'shipping'
-  | 'factory';
+  | 'factory'
+  | 'construction';
 
-export type Engine = 'stage' | 'fleet';
+export type Engine = 'stage' | 'fleet' | 'build';
 
 export interface BusinessCategory {
   id: BusinessCategoryId;
@@ -79,6 +97,7 @@ export const CATEGORIES: BusinessCategory[] = [
   { id: 'taxi', name: 'Taxiselskap', chooseTitle: '', nameTitle: 'Skriv inn navnet på taxiselskapet', color: 'yellow' },
   { id: 'shipping', name: 'Fraktselskap', chooseTitle: '', nameTitle: 'Skriv inn navnet på fraktselskapet', color: 'orange' },
   { id: 'factory', name: 'Fabrikk', chooseTitle: 'Velg type fabrikk', nameTitle: 'Skriv inn navnet på fabrikken', color: 'blue' },
+  { id: 'construction', name: 'Byggefirma', chooseTitle: '', nameTitle: 'Skriv inn navnet på byggefirmaet', color: 'red' },
 ];
 
 // Tallene er 1/10 av Business Empire sine (spillet har 10 ganger lavere verdier).
@@ -160,6 +179,19 @@ export const BUSINESS_TYPES: BusinessType[] = [
     investGrowth: 1.12,
     firstExpansionSec: 600,
     timeGrowth: 2,
+  },
+  // Byggefirma: inntekten kommer fra byggene som selges (se construction.ts)
+  {
+    id: 'construction',
+    category: 'construction',
+    name: 'Byggefirma',
+    coins: 1,
+    openingCost: 3540, // vises som $ 35 400
+    baseIncome: 0,
+    baseInvestment: 0,
+    growth: 0,
+    firstExpansionSec: 0,
+    timeGrowth: 1,
   },
   // Trinn 1 = $ 3 853/t, investering $ 27 748,50 (+15 % per trinn), +17 % inntekt per trinn,
   // første utvidelse 2 min, så 3 min 36 s, 6 min 29 s ... (×1,8 som lokal butikk)
@@ -252,6 +284,14 @@ export interface Business {
   capacity?: number;
   /** Bilene selskapet eier. */
   cars?: TaxiCar[];
+  // --- Bare for byggefirma ---
+  /** Lageret: byggere, metall, treverk og betong. */
+  resources?: Resources;
+  /** Bygg som pågår eller står klare for salg. */
+  projects?: Project[];
+  /** Hvor mange av hvert bygg som er solgt (for å låse opp nye). */
+  built?: Record<string, number>;
+
   /** Hvor mange plasser utvidelsen som pågår gir. */
   pendingPlaces?: number;
 
@@ -271,7 +311,8 @@ export function incomeAt(type: BusinessType, stage: number): number {
 
 /** Hvordan bedriften tjener penger. */
 export function engineOf(b: Business): Engine {
-  return isFleetType(b.type) ? 'fleet' : 'stage';
+  if (isFleetType(b.type)) return 'fleet';
+  return isConstructionType(b.type) ? 'build' : 'stage';
 }
 
 /** Taxi og fraktselskap: inntekten kommer fra kjøretøyene. */
@@ -279,7 +320,14 @@ export const isTaxi = (b: Business) => engineOf(b) === 'fleet';
 
 /** Inntekt per time. */
 export function incomePerHour(b: Business): number {
-  return engineOf(b) === 'fleet' ? fleetIncome(b) : incomeAt(typeById(b.type), b.stage);
+  switch (engineOf(b)) {
+    case 'fleet':
+      return fleetIncome(b);
+    case 'build':
+      return 0; // byggefirmaet tjener penger når byggene selges
+    default:
+      return incomeAt(typeById(b.type), b.stage);
+  }
 }
 
 /** Investeringen som trengs for å utvide fra dagens trinn. */
@@ -323,7 +371,9 @@ const RETIRED_ORDER_COST: Record<string, number> = {
 export function removeRetiredBusinesses(state: GameState): number {
   let refund = 0;
   state.businesses = state.businesses.filter((b) => {
-    if (BUSINESS_TYPES.some((t) => t.id === b.type)) return true;
+    // Det gamle byggefirmaet (med oppdrag) er byttet ut med et nytt
+    const oldConstruction = b.type === 'construction' && 'orders' in b;
+    if (!oldConstruction && BUSINESS_TYPES.some((t) => t.id === b.type)) return true;
     // Penger som stod i oppdrag (byggefirma/bilforhandler) som ikke var ferdige
     const orders = (b as Business & { orders?: { item: string }[] }).orders ?? [];
     refund += b.invested + orders.reduce((sum, o) => sum + (RETIRED_ORDER_COST[o.item] ?? 0), 0);
@@ -350,6 +400,10 @@ export function startBusiness(state: GameState, typeId: string, name: string): B
   if (engineOf(b) === 'fleet') {
     b.capacity = START_CAPACITY_BY[fleetOf(b)];
     b.cars = [];
+  } else if (engineOf(b) === 'build') {
+    b.resources = emptyResources();
+    b.projects = [];
+    b.built = {};
   }
   state.businesses.unshift(b); // nyeste øverst
   return b;
@@ -395,6 +449,8 @@ export function tickBusinesses(state: GameState, now: number) {
   state.businessUpdate = now;
   if (now <= from) return;
   for (const b of state.businesses) {
+    // Byggefirma: byggene blir ferdige av seg selv, og selges når man trykker på dem
+    if (engineOf(b) === 'build') continue;
     if (isTaxi(b)) {
       // Taxi: utvidelse gir flere plasser, og bilene kjører og tjener penger
       if (b.expansionEnd !== null && b.expansionEnd <= now) {
@@ -461,4 +517,46 @@ export function expandCapacity(state: GameState, b: Business, index: number, now
   b.pendingPlaces = opt.places;
   b.expansionEnd = now + opt.seconds * 1000;
   return true;
+}
+
+// --- Byggefirma: ressurser, bygg og salg ---------------------------------------------
+/** Kjøper ressurser til lageret. `fee` = gebyr (0,07 når man fyller på og bygger med en gang). */
+export function buyResources(state: GameState, b: Business, amounts: Resources, fee = 0): boolean {
+  const cost = resourcesCost(amounts) * (1 + fee);
+  if (cost <= 0 || state.balance < cost) return false;
+  state.balance -= cost;
+  b.invested += cost;
+  const store = resourcesOf(b);
+  for (const r of RESOURCES) store[r.id] += Math.max(0, Math.floor(amounts[r.id]));
+  return true;
+}
+
+/** Pris for å kjøpe det som mangler for et bygg (inkludert 7 % gebyr). */
+export const quickBuyCost = (b: Business, buildingId: string) => resourcesCost(missingFor(b, buildingById(buildingId))) * (1 + QUICK_FEE);
+
+export type StartProjectResult = 'ok' | 'locked' | 'resources' | 'money';
+
+/** Starter et bygg. Med `buyMissing` kjøpes det som mangler først (med gebyr). */
+export function startProject(state: GameState, b: Business, buildingId: string, buyMissing = false, now = Date.now()): StartProjectResult {
+  const def = buildingById(buildingId);
+  if (!isUnlocked(b, def, now)) return 'locked';
+  if (!hasResources(b, def)) {
+    if (!buyMissing) return 'resources';
+    if (!buyResources(state, b, missingFor(b, def), QUICK_FEE)) return 'money';
+  }
+  const store = resourcesOf(b);
+  for (const r of RESOURCES) store[r.id] -= def.need[r.id];
+  projectsOf(b).push({ id: `p${now.toString(36)}${Math.floor(Math.random() * 1e4)}`, building: def.id, start: now, end: now + def.hours * 3_600_000 });
+  return 'ok';
+}
+
+/** Selger et ferdig bygg. Gir tilbake det man fikk (etter 5 % skatt), eller 0. */
+export function sellProject(state: GameState, b: Business, projectId: string, now = Date.now()): number {
+  const p = projectsOf(b).find((x) => x.id === projectId);
+  if (!p || !isReady(p, now)) return 0;
+  b.projects = projectsOf(b).filter((x) => x !== p);
+  b.built = { ...b.built, [p.building]: (b.built?.[p.building] ?? 0) + 1 };
+  const before = state.balance;
+  payGross(state, b, buildingById(p.building).price);
+  return state.balance - before;
 }

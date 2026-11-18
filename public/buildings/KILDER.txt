@@ -1,0 +1,6 @@
+Bilder fra pngimg.com (gjennomsiktig bakgrunn, lisens CC BY-NC 4.0). Forminsket og beskåret.
+buildings/house.png	https://pngimg.com/uploads/house/house_PNG12.png
+buildings/office.png	https://pngimg.com/uploads/building/building_PNG11.png
+buildings/tradecenter.png	https://pngimg.com/uploads/building/building_PNG7.png
+buildings/apartments.png	https://pngimg.com/uploads/building/building_PNG3.png
+buildings/skyscraper.png	https://pngimg.com/uploads/building/building_PNG47.png

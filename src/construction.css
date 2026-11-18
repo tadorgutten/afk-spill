@@ -1,0 +1,675 @@
+/* =========================================================================
+ * BYGGEFIRMA (src/pages/constructionViews.ts) – rødt tema
+ * ========================================================================= */
+.cat-red {
+  background: linear-gradient(135deg, #ee7373, #d8465a);
+}
+
+.business[data-theme='construction'] {
+  --con: #d8465a;
+  --con-soft: #fbe9ec;
+}
+
+/* Farge per ressurs */
+.con-res-men {
+  --res: #e6a43a;
+}
+.con-res-metal {
+  --res: #6f7684;
+}
+.con-res-wood {
+  --res: #9a4a2a;
+}
+.con-res-concrete {
+  --res: #8a9099;
+}
+
+/* --- Oversikten --- */
+.con-values {
+  gap: 2px;
+}
+
+.con-values strong {
+  font-size: 30px;
+}
+
+.con-divider {
+  width: 34px;
+  height: 6px;
+  margin: 14px 0;
+  border-radius: 6px;
+  background: #e8ebf0;
+}
+
+.business .con-projects-card {
+  display: block;
+  width: 100%;
+  margin-top: 26px;
+  padding: 18px 20px 20px;
+  border-radius: 22px;
+  background: linear-gradient(110deg, #f1f3f8, #fbe4e8);
+  text-align: left;
+  color: inherit;
+}
+
+.con-projects-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1c7cf;
+  color: var(--con);
+}
+
+.con-projects-head svg {
+  width: 32px;
+  height: 32px;
+}
+
+.con-projects-head strong {
+  flex: 1;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.con-projects-head svg:last-child {
+  width: 22px;
+  height: 22px;
+}
+
+.con-projects-counts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 14px;
+}
+
+.con-projects-counts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.con-count {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9aa0aa;
+}
+
+.con-count.ready {
+  color: var(--con);
+}
+
+.con-count svg {
+  width: 30px;
+  height: 30px;
+}
+
+.con-count b {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1c2230;
+}
+
+.business .con-main-btn {
+  text-align: center;
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 17px;
+  border-radius: 16px;
+  background: var(--con, #d8465a);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+
+.business .con-main-btn.poor,
+.business .con-main-btn:disabled {
+  opacity: 0.55;
+}
+
+.con-hr {
+  margin: 26px 0 0;
+  border: 0;
+  border-top: 1px solid #eceef2;
+}
+
+.con-title {
+  margin: 22px 0 14px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.con-res-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.con-res-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(20, 30, 60, 0.08);
+}
+
+.con-res-tile svg {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  color: var(--res);
+}
+
+.con-res-tile div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.con-res-tile strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--res);
+}
+
+.con-res-tile span {
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.business .con-refill-btn {
+  text-align: center;
+  display: block;
+  margin: 18px auto 0;
+  padding: 15px 44px;
+  border-radius: 16px;
+  background: var(--con);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.business[data-theme='construction'] .biz-balance {
+  color: var(--con);
+}
+
+/* --- Sideoverskrifter --- */
+.con-page-title {
+  margin: 8px 0 18px 54px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.con-page-title.big {
+  margin: 58px 0 12px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.con-stock {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  gap: 8px 22px;
+  margin-bottom: 18px;
+  color: #3a404c;
+  font-size: 15px;
+}
+
+.con-stock span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.con-stock svg {
+  width: 22px;
+  height: 22px;
+  color: var(--res);
+}
+
+.con-stock b {
+  font-weight: 500;
+}
+
+/* --- Prosjektlista --- */
+.con-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 70px;
+  text-align: center;
+}
+
+.con-empty-art {
+  width: 84px;
+  height: 84px;
+}
+
+.con-empty h2 {
+  margin: 22px 0 10px;
+  font-size: 24px;
+  font-weight: 700;
+  max-width: 280px;
+}
+
+.con-empty p {
+  margin: 0;
+  font-size: 15px;
+  color: #3a404c;
+}
+
+.con-hint {
+  margin: -8px 0 14px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.con-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.business .con-project {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 116px;
+  padding: 16px 14px 16px 20px;
+  border-radius: 20px;
+  background: #f2f3f5;
+  text-align: left;
+  color: inherit;
+}
+
+.con-project-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.con-project-text strong {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.con-project-text span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.con-project-text svg {
+  width: 20px;
+  height: 20px;
+  color: #8a909b;
+}
+
+.con-sell-label {
+  color: #2fa35a;
+  font-weight: 600;
+}
+
+.con-sell {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #47c46b;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(71, 196, 107, 0.4);
+  animation: con-pulse 1.6s ease-in-out infinite;
+}
+
+.con-sell svg {
+  width: 28px;
+  height: 28px;
+}
+
+@keyframes con-pulse {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.con-project img {
+  flex-shrink: 0;
+  width: 120px;
+  height: 84px;
+  object-fit: contain;
+}
+
+/* --- Velg hva du vil bygge --- */
+.con-types {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 90px;
+}
+
+.business .con-type {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 130px;
+  padding: 18px 16px;
+  border: 2px solid transparent;
+  border-radius: 22px;
+  background: #f2f3f5;
+  text-align: left;
+  color: inherit;
+}
+
+.con-type > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.con-type img {
+  flex-shrink: 0;
+  width: 104px;
+  height: 84px;
+  object-fit: contain;
+}
+
+.con-type strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.business .con-type.short {
+  margin-top: 14px;
+  border-color: var(--con);
+  background: #f7dce1;
+}
+
+.con-short-label {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 18px;
+  border: 2px solid var(--con);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: #f7dce1;
+  color: var(--con);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.con-need {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  font-size: 15px;
+}
+
+.con-need span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.con-need svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--res, #8a909b);
+}
+
+.con-need .con-price svg {
+  color: #47c46b;
+}
+
+.con-type.locked {
+  color: #8a909b;
+}
+
+.con-locked-name {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.con-locked-name svg {
+  width: 22px;
+  height: 22px;
+}
+
+.con-req {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: #1c2230;
+  font-size: 16px;
+}
+
+.con-req b {
+  color: var(--con);
+  font-weight: 500;
+}
+
+.con-req-bar {
+  height: 10px;
+  margin-top: 8px;
+  border-radius: 10px;
+  background: #d5d8dd;
+  overflow: hidden;
+}
+
+.con-req-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background: var(--con);
+}
+
+.con-type.hidden-type div span {
+  font-size: 16px;
+}
+
+.con-big-lock {
+  display: grid;
+  place-items: center;
+  width: 104px;
+}
+
+.con-big-lock svg {
+  width: 56px;
+  height: 56px;
+}
+
+.business .con-float-btn {
+  text-align: center;
+  position: fixed;
+  z-index: 6;
+  left: 18px;
+  right: 18px;
+  bottom: calc(env(safe-area-inset-bottom) + 22px);
+  max-width: 524px;
+  margin: 0 auto;
+  padding: 17px;
+  border-radius: 16px;
+  background: var(--con);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(216, 70, 90, 0.35);
+}
+
+/* --- Vinduet: kjøp det som mangler --- */
+.con-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  background: rgba(20, 24, 32, 0.55);
+}
+
+.con-backdrop.animate {
+  animation: slots-fade 0.2s ease-out;
+}
+
+.con-backdrop.animate .con-modal {
+  animation: slots-pop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.con-modal {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 22px;
+  background: #f7d6dc;
+  overflow: hidden;
+}
+
+.con-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  font-size: 22px;
+}
+
+.con-modal-head svg {
+  width: 30px;
+  height: 30px;
+}
+
+.con-modal-body {
+  padding: 16px 20px 20px;
+  border-radius: 22px 22px 0 0;
+  background: #fff;
+}
+
+.con-modal-sub {
+  margin: 0 0 8px;
+  text-align: center;
+  color: #8a909b;
+  font-size: 16px;
+}
+
+.con-procure-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 2px solid #e6e8ec;
+  font-size: 17px;
+}
+
+.con-procure-row svg {
+  width: 24px;
+  height: 24px;
+  color: var(--res);
+}
+
+.con-procure-row span {
+  flex: 1;
+}
+
+.con-procure-row b {
+  font-weight: 600;
+}
+
+.con-modal-sum-label {
+  margin: 22px 0 4px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.con-modal-sum {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.con-modal-balance {
+  margin: 12px 0 0;
+  text-align: center;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.con-modal-balance.poor {
+  color: var(--con);
+}
+
+/* --- Fyll på ressurser --- */
+.con-res-balance {
+  margin: 0 0 18px;
+  font-size: 17px;
+}
+
+.con-input {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.con-input-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+}
+
+.con-input-name svg {
+  width: 30px;
+  height: 30px;
+  color: var(--res);
+}
+
+.con-input input {
+  margin-top: 8px;
+  padding: 8px 4px;
+  border: 0;
+  border-bottom: 2px solid #d5d8dd;
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 30px;
+  font-weight: 700;
+  outline: none;
+}
+
+.con-input input:focus {
+  border-bottom-color: var(--con);
+}
+
+.con-input-max {
+  margin-top: 6px;
+  color: #8a909b;
+  font-size: 14px;
+}
+
+.con-summary {
+  margin: 10px 0 0;
+  font-size: 20px;
+}
+
+.con-summary b {
+  font-weight: 700;
+}

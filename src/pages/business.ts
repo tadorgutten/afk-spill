@@ -28,13 +28,18 @@ import {
   engineOf,
   buyCar,
   expandCapacity,
+  buyResources,
+  sellProject,
+  startProject,
   type Business,
   type BusinessCategoryId,
 } from '../game/business';
 import { capacityOf, carsOf, fleetOf, modelById, type CarClass } from '../game/taxi';
 import { maxCars, renderCarShop, renderFleet, renderTaxiDetail, type FleetSort } from './taxiViews';
+import { buildingById, building as underConstruction, emptyResources, readyForSale, readyValue, RESOURCES } from '../game/construction';
+import { renderBuildNew, renderConstructionDetail, renderProcure, renderProjects, renderResources } from './constructionViews';
 import type { GameState } from '../game/state';
-import { formatDuration, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
+import { formatDuration, formatMoney, formatMoneyFull, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
 import { html, type Page } from './page';
@@ -59,7 +64,10 @@ type View =
   | { name: 'settings'; id: string }
   | { name: 'rename'; id: string }
   | { name: 'carShop'; id: string; filter: CarClass | null; selected: string | null; qty: number }
-  | { name: 'fleet'; id: string; sort: FleetSort; filter: CarClass | null };
+  | { name: 'fleet'; id: string; sort: FleetSort; filter: CarClass | null }
+  | { name: 'projects'; id: string }
+  | { name: 'buildNew'; id: string; short: string | null }
+  | { name: 'resources'; id: string };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -67,6 +75,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   taxi: icons.taxi,
   shipping: icons.truck,
   factory: icons.factory,
+  construction: icons.hook,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -87,6 +96,7 @@ export function createBusinessPage(state: GameState): Page {
   }
 
   function back() {
+    procureFor = null;
     if (stack.length > 1) stack.pop();
     // Bedriften kan ha blitt lagt ned: hopp over visninger for den
     while (stack.length > 1 && 'id' in current() && !find((current() as { id: string }).id)) stack.pop();
@@ -100,6 +110,9 @@ export function createBusinessPage(state: GameState): Page {
   let slotsOpen = false;
   /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
   let slotsAnimate = false;
+  /** Byggefirma: vinduet "kjøp det som mangler" for dette bygget (eller null). */
+  let procureFor: string | null = null;
+  let procureAnimate = false;
 
   /** Tegner visningen på nytt (når man bytter visning, og én gang i sekundet for tall som endres). */
   function render() {
@@ -138,6 +151,7 @@ export function createBusinessPage(state: GameState): Page {
         const b = find(view.id);
         if (!b) element.innerHTML = '';
         else if (isTaxi(b)) element.innerHTML = renderTaxiDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'build') element.innerHTML = renderConstructionDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -149,6 +163,28 @@ export function createBusinessPage(state: GameState): Page {
       case 'fleet': {
         const b = find(view.id);
         element.innerHTML = b ? backBtn + renderFleet(b, view.sort, view.filter) : '';
+        break;
+      }
+      case 'projects': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderProjects(b) : '';
+        break;
+      }
+      case 'buildNew': {
+        const b = find(view.id);
+        if (!b) {
+          element.innerHTML = '';
+          break;
+        }
+        const animate = procureAnimate;
+        procureAnimate = false;
+        element.innerHTML = backBtn + renderBuildNew(b, view.short) + (procureFor ? renderProcure(state, b, procureFor, animate) : '');
+        break;
+      }
+      case 'resources': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderResources(state, b) : '';
+        bindResourceInputs();
         break;
       }
       case 'settings': {
@@ -175,6 +211,29 @@ export function createBusinessPage(state: GameState): Page {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !btn.disabled) btn.click();
     });
+    refresh();
+  }
+
+  // --- Byggefirma: skrivefeltene for ressurser (summen regnes ut mens man skriver) ---------
+  function resourceAmounts() {
+    const amounts = emptyResources();
+    element.querySelectorAll<HTMLInputElement>('[data-res]').forEach((input) => {
+      const r = RESOURCES.find((x) => x.id === input.dataset.res)!;
+      amounts[r.id] = Math.min(1e12, Math.max(0, Math.floor(Number(input.value) || 0)));
+    });
+    return amounts;
+  }
+  function bindResourceInputs() {
+    const sum = element.querySelector<HTMLElement>('[data-res-sum]');
+    const btn = element.querySelector<HTMLButtonElement>('[data-res-submit]');
+    if (!sum || !btn) return;
+    const refresh = () => {
+      const cost = RESOURCES.reduce((total, r) => total + resourceAmounts()[r.id] * r.price, 0);
+      sum.textContent = formatMoneyFull(cost);
+      btn.disabled = cost <= 0;
+      btn.classList.toggle('poor', cost > state.balance);
+    };
+    element.querySelectorAll('[data-res]').forEach((i) => i.addEventListener('input', refresh));
     refresh();
   }
 
@@ -234,6 +293,68 @@ export function createBusinessPage(state: GameState): Page {
         const types = typesIn(category as BusinessCategoryId);
         if (types.length === 1) return go({ name: 'name', type: types[0].id });
         return go({ name: 'types', category: category as BusinessCategoryId });
+      }
+
+      // --- Byggefirma ---
+      case 'c-projects':
+        return go({ name: 'projects', id });
+      case 'c-new':
+        return go({ name: 'buildNew', id, short: null });
+      case 'c-refill':
+        return go({ name: 'resources', id });
+      case 'c-build': {
+        const b = find(id);
+        if (!b || view.name !== 'buildNew') return;
+        const result = startProject(state, b, target.dataset.building!);
+        if (result === 'resources') {
+          view.short = target.dataset.building!;
+          shake(target);
+          return render();
+        }
+        if (result !== 'ok') return;
+        view.short = null;
+        showToast(`${buildingById(target.dataset.building!).name} bygges`);
+        stack.pop();
+        return go({ name: 'projects', id });
+      }
+      case 'c-procure':
+        procureFor = target.dataset.building!;
+        procureAnimate = true;
+        return render();
+      case 'c-procure-close':
+        if (target.classList.contains('con-backdrop') && e.target !== target) return;
+        procureFor = null;
+        return render();
+      case 'c-buy-build': {
+        const b = find(id);
+        if (!b || view.name !== 'buildNew') return;
+        const result = startProject(state, b, target.dataset.building!, true);
+        if (result !== 'ok') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        procureFor = null;
+        view.short = null;
+        showToast(`${buildingById(target.dataset.building!).name} bygges`);
+        stack.pop();
+        return go({ name: 'projects', id });
+      }
+      case 'c-sell': {
+        const b = find(id);
+        if (!b) return;
+        const got = sellProject(state, b, target.dataset.project!);
+        if (got > 0) showToast(`Solgt for ${formatMoney(got)}`);
+        return render();
+      }
+      case 'c-refill-buy': {
+        const b = find(id);
+        if (!b) return;
+        if (!buyResources(state, b, resourceAmounts())) {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        showToast('Ressursene er fylt på');
+        return back();
       }
 
       case 'expand-cap': {
@@ -472,6 +593,7 @@ export function createBusinessPage(state: GameState): Page {
   function rowStat(b: Business): string {
     const t = typeById(b.type);
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
+    if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
   }
 
@@ -487,7 +609,9 @@ export function createBusinessPage(state: GameState): Page {
           ${rowStat(b)}
           ${expanding ? `<span class="biz-row-timer">${icons.clock} ${formatDuration((b.expansionEnd! - Date.now()) / 1000, false)}</span>` : ''}
         </span>
-        <span class="biz-row-income"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>
+        ${engineOf(b) === 'build'
+          ? `<span class="biz-row-income"><b>${formatMoneyRounded(readyValue(b))}</b> klart for salg</span>`
+          : `<span class="biz-row-income"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
       </button>`;
   }
 
@@ -673,10 +797,16 @@ export function createBusinessPage(state: GameState): Page {
       stack = [{ name: 'home' }];
       confirmClose = false;
       slotsOpen = false;
+      procureFor = null;
       render();
     },
     navHidden: () => stack.length > 1 || slotsOpen, // menyen vises bare på oversikten
     onBack() {
+      if (procureFor) {
+        procureFor = null;
+        render();
+        return true;
+      }
       if (slotsOpen && stack.length <= 1) {
         slotsOpen = false;
         render();
@@ -690,7 +820,7 @@ export function createBusinessPage(state: GameState): Page {
       // Tall som endres (inntekt, nedtelling, saldo) tegnes på nytt én gang i sekundet.
       // Sider med skrivefelt tegnes ikke på nytt (da ville teksten man skriver forsvinne).
       const view = current().name;
-      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types') return;
+      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources') return;
       if (view === 'settings' && confirmClose) return;
       if (!pressing && performance.now() - lastRender > 1000) render();
     },
