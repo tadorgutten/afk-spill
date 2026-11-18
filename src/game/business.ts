@@ -161,6 +161,21 @@ export const BUSINESS_TYPES: BusinessType[] = [
     firstExpansionSec: 600,
     timeGrowth: 2,
   },
+  // Trinn 1 = $ 3 853/t, investering $ 27 748,50 (+15 % per trinn), +17 % inntekt per trinn,
+  // første utvidelse 2 min, så 3 min 36 s, 6 min 29 s ... (×1,8 som lokal butikk)
+  {
+    id: 'large-factory',
+    category: 'factory',
+    name: 'Stor fabrikk',
+    coins: 3,
+    openingCost: 18499, // vises som $ 184 990
+    baseIncome: 385.3,
+    baseInvestment: 2774.85,
+    growth: 0.17,
+    investGrowth: 1.15,
+    firstExpansionSec: 120,
+    timeGrowth: 1.8,
+  },
 ];
 
 // --- Innstillinger ----------------------------------------------------------------
