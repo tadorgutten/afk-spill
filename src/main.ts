@@ -22,6 +22,7 @@ import type { PageId } from './pages/page';
 import { icons } from './ui/icons';
 import { createNav } from './ui/nav';
 import { initLogos } from './ui/stockLogo';
+import { initUpdater } from './ui/updater';
 
 applyZoom(); // hele appen litt mindre (se src/ui/zoom.ts)
 
@@ -119,3 +120,6 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) saveState(state);
 });
 window.addEventListener('pagehide', () => saveState(state));
+
+// Hent ny versjon av spillet med en gang den er lagt ut (se src/ui/updater.ts)
+initUpdater(() => saveState(state));

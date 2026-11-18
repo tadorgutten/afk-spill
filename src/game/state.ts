@@ -151,7 +151,8 @@ export async function initStorage(): Promise<void> {
   }
 }
 
-export function saveState(state: GameState): void {
+/** Lagrer spillet. Promiset er ferdig når telefonens lagring også er skrevet. */
+export function saveState(state: GameState): Promise<void> {
   const json = JSON.stringify(state);
   try {
     localStorage.setItem(SAVE_KEY, json);
@@ -159,6 +160,7 @@ export function saveState(state: GameState): void {
     // Lagring kan feile – spillet fungerer likevel
   }
   if (Capacitor.isNativePlatform()) {
-    Preferences.set({ key: SAVE_KEY, value: json }).catch(() => {});
+    return Preferences.set({ key: SAVE_KEY, value: json }).catch(() => {});
   }
+  return Promise.resolve();
 }
