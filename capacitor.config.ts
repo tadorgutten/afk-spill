@@ -6,6 +6,8 @@ const config: CapacitorConfig = {
   appName: 'Pengebingen',
   webDir: 'dist', // mappa Vite bygger spillet til
   backgroundColor: '#000000', // svart, som åpningsskjermen (Torfor Studios)
+  // Forteller spillet at appen har et svart startbilde som sier fra når logoen kan starte
+  appendUserAgent: 'PengebingenSplash',
   server: {
     // Appen henter spillet fra GitHub Pages, så den oppdateres hver gang du pusher til GitHub.
     // Fjern denne linja hvis appen skal bruke filene som er bygget inn i APK-en i stedet.

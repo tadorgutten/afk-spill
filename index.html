@@ -27,6 +27,10 @@
         font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
         clip-path: circle(150% at 50% 50%);
       }
+      /* Appen viser et svart startbilde mens spillet lastes: logoen venter til det er borte */
+      html.hold #intro * {
+        animation-play-state: paused !important;
+      }
       /* Lastet på nytt pga. ny versjon: ingen åpningsskjerm */
       html.no-intro #intro {
         display: none;
@@ -108,6 +112,8 @@
     <script>
       // Etter en automatisk oppdatering (?v=...) skal ikke åpningsskjermen vises igjen
       if (/[?&]v=/.test(location.search)) document.documentElement.classList.add('no-intro');
+      // I appen (ny APK) ligger det svarte startbildet over til siden er lastet. Hold logoen igjen til da.
+      else if (navigator.userAgent.indexOf('PengebingenSplash') >= 0) document.documentElement.classList.add('hold');
     </script>
   </head>
   <body>
