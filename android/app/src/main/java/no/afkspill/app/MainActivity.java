@@ -18,6 +18,10 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Tøm WebView-ens mellomlager ved hver oppstart, så appen alltid henter
+        // nyeste versjon av spillet fra GitHub Pages (ellers kan den vise en gammel i 10 min).
+        // Lagringen (spillet ditt) ligger i Preferences og påvirkes ikke.
+        getBridge().getWebView().clearCache(true);
         // Tegn appen helt ut til kantene, også bak kamerahullet
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
