@@ -5,7 +5,7 @@ import './empire.css';
 import './profile.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
-import { tickBusinesses } from './game/business';
+import { removeRetiredBusinesses, tickBusinesses } from './game/business';
 import { tickMarket } from './game/market';
 import { tickCrypto } from './game/crypto';
 import { tickRealEstate } from './game/realEstate';
@@ -24,6 +24,7 @@ import { createNav } from './ui/nav';
 import { initLogos } from './ui/stockLogo';
 import { initUpdater } from './ui/updater';
 import { finishIntro } from './ui/intro';
+import { formatMoney } from './ui/format';
 
 applyZoom(); // hele appen litt mindre (se src/ui/zoom.ts)
 
@@ -33,6 +34,8 @@ const state = loadState();
 tickMarket(state, Date.now());
 tickCrypto(state, Date.now());
 tickRealEstate(state, Date.now());
+// Bedrifter som er fjernet fra spillet: legges ned, og man får tilbake alt man betalte
+const retiredRefund = removeRetiredBusinesses(state);
 tickBusinesses(state, Date.now());
 checkTaxes(state);
 
@@ -74,6 +77,10 @@ showPage(startPage && pages.some((p) => p.id === startPage) ? startPage : 'earni
 
 // Spillet er klart: la åpningsskjermen (Torfor Studios) åpne seg inn til pengesiden
 finishIntro();
+if (retiredRefund > 0) {
+  setTimeout(() => showToast(`Noen bedriftstyper er fjernet. Du fikk tilbake ${formatMoney(retiredRefund)}`, 5000), 2500);
+  saveState(state);
+}
 
 // Finn logobilder i public/logos/ (vises automatisk ved neste oppdatering)
 initLogos();

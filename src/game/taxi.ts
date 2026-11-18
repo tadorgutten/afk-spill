@@ -9,19 +9,15 @@ import type { Business } from './business';
  * - Hver bil kan kjøre et visst antall km (rekkevidde). Bilene kjører 100 km i minuttet
  *   (6 000 km i timen), også mens appen er lukket. Når en bil har kjørt ferdig, forsvinner den.
  *
- * FRAKTSELSKAP, FLYSELSKAP og REDERI fungerer helt likt, bare med andre kjøretøy:
- *   - Fraktselskap: lastebiler som kjører km (klassene By og Langtransport)
- *   - Flyselskap: fly som har et visst antall flytimer før de må pensjoneres
- *   - Rederi: skip som seiler et visst antall nautiske mil
- * Hver flåte har egne priser for å utvide kapasiteten.
+ * FRAKTSELSKAP fungerer helt likt, bare med lastebiler (klassene By og Langtransport).
  */
 
 /** Hvilken "flåte" en bedrift har. Samme id som bedriftstypen i BUSINESS_TYPES. */
-export type FleetKind = 'taxi' | 'shipping' | 'airline' | 'ships';
+export type FleetKind = 'taxi' | 'shipping';
 
 /** Bedrifts-typen (id i BUSINESS_TYPES) for fraktselskap. */
 export const SHIPPING_TYPE = 'shipping';
-const FLEET_KINDS: FleetKind[] = ['taxi', 'shipping', 'airline', 'ships'];
+const FLEET_KINDS: FleetKind[] = ['taxi', 'shipping'];
 export const isFleetType = (typeId: string) => (FLEET_KINDS as string[]).includes(typeId);
 export const fleetOf = (b: Business): FleetKind => (isFleetType(b.type) ? (b.type as FleetKind) : 'taxi');
 
@@ -32,12 +28,10 @@ export const fleetOf = (b: Business): FleetKind => (isFleetType(b.type) ? (b.typ
 export const FLEET_USAGE: Record<FleetKind, { perHour: number; unit: string; rangeLabel: string }> = {
   taxi: { perHour: 6000, unit: 'km', rangeLabel: 'Rekkevidde' },
   shipping: { perHour: 6000, unit: 'km', rangeLabel: 'Rekkevidde' },
-  airline: { perHour: 1, unit: 'flytimer', rangeLabel: 'Levetid' },
-  ships: { perHour: 20, unit: 'nm', rangeLabel: 'Rekkevidde' },
 };
 
 /** Kapasiteten man starter med. */
-export const START_CAPACITY_BY: Record<FleetKind, number> = { taxi: 5, shipping: 5, airline: 3, ships: 3 };
+export const START_CAPACITY_BY: Record<FleetKind, number> = { taxi: 5, shipping: 5 };
 
 /** Tekstene som er forskjellige for hver flåte. */
 export const FLEET_TEXT: Record<
@@ -64,26 +58,6 @@ export const FLEET_TEXT: Record<
     hint: 'Kjøp et kjøretøy for å begynne å tjene penger',
     noun: 'kjøretøy',
   },
-  airline: {
-    fleet: 'Flyflåte',
-    count: 'Fly',
-    buy: 'Kjøp et nytt fly',
-    choose: 'Velg et fly',
-    empty: 'Flyflåten er tom',
-    emptyClass: 'Ingen fly i denne klassen',
-    hint: 'Kjøp et fly for å begynne å tjene penger',
-    noun: 'fly',
-  },
-  ships: {
-    fleet: 'Flåte',
-    count: 'Skip',
-    buy: 'Kjøp et nytt skip',
-    choose: 'Velg et skip',
-    empty: 'Flåten er tom',
-    emptyClass: 'Ingen skip i denne klassen',
-    hint: 'Kjøp et skip for å begynne å tjene penger',
-    noun: 'skip',
-  },
 };
 
 export const START_CAPACITY = 5;
@@ -98,12 +72,7 @@ export type CarClass =
   | 'premier'
   | 'elite'
   | 'city'
-  | 'long'
-  | 'smallplane'
-  | 'shorthaul'
-  | 'longhaul'
-  | 'passenger'
-  | 'cargo';
+  | 'long';
 
 export const CAR_CLASSES: { id: CarClass; label: string; fleet: FleetKind }[] = [
   { id: 'economy', label: 'Økonomi', fleet: 'taxi' },
@@ -114,11 +83,6 @@ export const CAR_CLASSES: { id: CarClass; label: string; fleet: FleetKind }[] = 
   { id: 'elite', label: 'Elite', fleet: 'taxi' },
   { id: 'city', label: 'By', fleet: 'shipping' },
   { id: 'long', label: 'Langtransport', fleet: 'shipping' },
-  { id: 'smallplane', label: 'Småfly', fleet: 'airline' },
-  { id: 'shorthaul', label: 'Kortdistanse', fleet: 'airline' },
-  { id: 'longhaul', label: 'Langdistanse', fleet: 'airline' },
-  { id: 'passenger', label: 'Passasjer', fleet: 'ships' },
-  { id: 'cargo', label: 'Frakt', fleet: 'ships' },
 ];
 
 export const classesFor = (fleet: FleetKind) => CAR_CLASSES.filter((c) => c.fleet === fleet);
@@ -179,19 +143,6 @@ export const CAR_MODELS: CarModel[] = [
   { id: 'daf-cf', name: 'DAF CF', carClass: 'long', price: 10861.7, range: 1_940_000, income: 380, color: '#f2c200', image: 'trucks/daf-cf.png' },
   { id: 'scania', name: 'Scania R-serie', carClass: 'long', price: 11240.2, range: 2_100_000, income: 380, color: '#f2f2f2', image: 'trucks/scania.png' },
 
-  // --- Flyselskap: rekkevidden er flytimer (1 i timen). Vises 10x høyere ($ 2 000 000 osv.). ---
-  { id: 'cessna', name: 'Cessna 208 Caravan', carClass: 'smallplane', price: 200_000, range: 160, income: 9_500, color: '#fff', image: 'planes/cessna.png', flip: true },
-  { id: 'a320', name: 'Airbus A320', carClass: 'shorthaul', price: 900_000, range: 150, income: 40_000, color: '#fff', image: 'planes/a320.png' },
-  { id: 'b737', name: 'Boeing 737', carClass: 'shorthaul', price: 950_000, range: 165, income: 40_000, color: '#fff', image: 'planes/b737.png' },
-  { id: 'b747', name: 'Boeing 747', carClass: 'longhaul', price: 3_600_000, range: 170, income: 145_000, color: '#fff', image: 'planes/b747.png' },
-  { id: 'a380', name: 'Airbus A380', carClass: 'longhaul', price: 4_500_000, range: 180, income: 180_000, color: '#fff', image: 'planes/a380.png', flip: true },
-
-  // --- Rederi: rekkevidden er nautiske mil (20 i timen). ---
-  { id: 'ferry', name: 'Passasjerferje', carClass: 'passenger', price: 400_000, range: 4_000, income: 18_000, color: '#fff', image: 'ships/ferry.png' },
-  { id: 'cruise', name: 'Cruiseskip', carClass: 'passenger', price: 6_000_000, range: 3_600, income: 260_000, color: '#fff', image: 'ships/cruise.png' },
-  { id: 'megacruise', name: 'Megacruiseskip', carClass: 'passenger', price: 25_000_000, range: 3_400, income: 1_050_000, color: '#fff', image: 'ships/megacruise.png' },
-  { id: 'bulk', name: 'Bulkskip', carClass: 'cargo', price: 3_000_000, range: 4_400, income: 135_000, color: '#fff', image: 'ships/bulk.png' },
-  { id: 'container', name: 'Containerskip', carClass: 'cargo', price: 12_000_000, range: 4_600, income: 520_000, color: '#fff', image: 'ships/container.png' },
 ];
 
 export const modelsFor = (fleet: FleetKind) => {
@@ -211,18 +162,6 @@ export const CAPACITY_OPTIONS: Record<FleetKind, { places: number; price: number
     { places: 5, price: 3000, seconds: 10 * 60 },
     { places: 10, price: 8000, seconds: 20 * 60 },
     { places: 20, price: 20000, seconds: 35 * 60 },
-  ],
-  // Flere gater på flyplassen: $ 25 M / $ 70 M / $ 180 M
-  airline: [
-    { places: 5, price: 2_500_000, seconds: 60 * 60 },
-    { places: 10, price: 7_000_000, seconds: 2 * 3600 },
-    { places: 20, price: 18_000_000, seconds: 4 * 3600 },
-  ],
-  // Flere kaiplasser: $ 300 M / $ 800 M / $ 2 B
-  ships: [
-    { places: 5, price: 30_000_000, seconds: 2 * 3600 },
-    { places: 10, price: 80_000_000, seconds: 4 * 3600 },
-    { places: 20, price: 200_000_000, seconds: 8 * 3600 },
   ],
 };
 

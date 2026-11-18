@@ -37,7 +37,7 @@ const FLEET_SORTS: { key: FleetSort; label: string }[] = [
 ];
 
 /** Ikon for hver flåte. */
-const FLEET_ICON: Record<FleetKind, string> = { taxi: icons.taxi, shipping: icons.truck, airline: icons.plane, ships: icons.ship };
+const FLEET_ICON: Record<FleetKind, string> = { taxi: icons.taxi, shipping: icons.truck };
 
 /** Enkel tegning av en bil fra siden, i bilens farge. */
 export function carArt(color: string): string {

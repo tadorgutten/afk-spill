@@ -33,10 +33,6 @@ import {
 } from '../game/business';
 import { capacityOf, carsOf, fleetOf, modelById, type CarClass } from '../game/taxi';
 import { maxCars, renderCarShop, renderFleet, renderTaxiDetail, type FleetSort } from './taxiViews';
-import { levelOf, MAX_UNIT_LEVEL, startUnitBuild, unitById, unitsOf } from '../game/units';
-import { buyOrderCapacity, doneCount, orderCapacity, ordersOf, startOrder } from '../game/orders';
-import { renderUnitsDetail } from './unitViews';
-import { renderOrdersDetail } from './orderViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -71,12 +67,6 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   taxi: icons.taxi,
   shipping: icons.truck,
   factory: icons.factory,
-  construction: icons.crane,
-  dealer: icons.dealer,
-  it: icons.monitor,
-  bank: icons.bank,
-  airline: icons.plane,
-  ships: icons.ship,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -148,8 +138,6 @@ export function createBusinessPage(state: GameState): Page {
         const b = find(view.id);
         if (!b) element.innerHTML = '';
         else if (isTaxi(b)) element.innerHTML = renderTaxiDetail(state, b, heroHtml(b));
-        else if (engineOf(b) === 'units') element.innerHTML = renderUnitsDetail(state, b, heroHtml(b));
-        else if (engineOf(b) === 'orders') element.innerHTML = renderOrdersDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -246,47 +234,6 @@ export function createBusinessPage(state: GameState): Page {
         const types = typesIn(category as BusinessCategoryId);
         if (types.length === 1) return go({ name: 'name', type: types[0].id });
         return go({ name: 'types', category: category as BusinessCategoryId });
-      }
-
-      // --- Taxi ---
-      // --- Avdelinger (fabrikk, IT, bank) ---
-      case 'unit-build': {
-        const b = find(id);
-        if (!b) return;
-        const result = startUnitBuild(state, b, target.dataset.unit!);
-        if (result === 'ok') {
-          const u = unitById(b, target.dataset.unit!)!;
-          showToast(`${u.name} ${levelOf(b, u.id) === 0 ? 'bygges' : 'oppgraderes'}`);
-          return render();
-        }
-        shake(target);
-        return showToast(result === 'busy' ? 'Vent til byggingen som pågår er ferdig' : 'Du har ikke nok penger');
-      }
-
-      // --- Oppdrag (byggefirma, bilforhandler) ---
-      case 'order-start': {
-        const b = find(id);
-        if (!b) return;
-        const result = startOrder(state, b, target.dataset.item!);
-        if (result === 'ok') return render();
-        shake(target);
-        return showToast(result === 'full' ? 'Alle plassene er opptatt – kjøp mer kapasitet' : 'Du har ikke nok penger');
-      }
-      case 'order-cap': {
-        const b = find(id);
-        if (!b) return;
-        if (!buyOrderCapacity(state, b)) {
-          shake(target);
-          return showToast('Du har ikke nok penger');
-        }
-        return render();
-      }
-      case 'order-auto': {
-        const b = find(id);
-        if (!b) return;
-        b.auto = !b.auto;
-        showToast(b.auto ? 'Starter på nytt automatisk' : 'Automatisk start er slått av');
-        return render();
       }
 
       case 'expand-cap': {
@@ -521,21 +468,11 @@ export function createBusinessPage(state: GameState): Page {
       </div>`;
   }
 
-  /** Den lille statistikken på en bedrift i lista (kjøretøy, trinn, avdelinger, oppdrag). */
+  /** Den lille statistikken på en bedrift i lista (kjøretøy eller trinn). */
   function rowStat(b: Business): string {
     const t = typeById(b.type);
-    switch (engineOf(b)) {
-      case 'fleet':
-        return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
-      case 'units': {
-        const levels = unitsOf(b).reduce((sum, u) => sum + levelOf(b, u.id), 0);
-        return `<span>${icons.stage} Nivå ${levels} av ${unitsOf(b).length * MAX_UNIT_LEVEL}</span>`;
-      }
-      case 'orders':
-        return `<span>${icons.clock} ${ordersOf(b).length}/${orderCapacity(b)} · ${doneCount(b)} ferdige</span>`;
-      default:
-        return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
-    }
+    if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
+    return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
   }
 
   function renderRow(b: Business): string {
@@ -606,33 +543,38 @@ export function createBusinessPage(state: GameState): Page {
   function renderDetail(b: Business): string {
     const t = typeById(b.type);
     const expanding = b.expansionEnd !== null;
+    const factory = t.category === 'factory';
+    const headIcon = factory ? icons.factory : icons.store;
+    const text = factory
+      ? { title: 'Åpning av nye verksteder', explain: 'Flere verksteder gir mer inntekt.', button: 'Åpne nye verksteder' }
+      : { title: 'Åpning av nye utsalgssteder', explain: 'Flere butikker gir mer inntekt.', button: 'Åpne nye utsalgssteder' };
 
     let action: string;
     if (expanding) {
       action = `
         <div class="biz-outlets">
-          <div class="biz-outlets-head">${icons.store}<h2>Utvidelse pågår</h2></div>
+          <div class="biz-outlets-head">${headIcon}<h2>Utvidelse pågår</h2></div>
           <strong class="biz-big">${formatDuration((b.expansionEnd! - Date.now()) / 1000)}</strong>
           <span class="biz-muted">Gjenstående tid</span>
         </div>`;
     } else if (isMaxStage(b)) {
       action = `
         <div class="biz-outlets">
-          <div class="biz-outlets-head">${icons.store}<h2>Fullt utbygd</h2></div>
+          <div class="biz-outlets-head">${headIcon}<h2>Fullt utbygd</h2></div>
           <span class="biz-muted">Bedriften har nådd høyeste trinn (${MAX_STAGE}).</span>
         </div>`;
     } else {
       const cost = expansionCost(b);
       action = `
         <div class="biz-outlets">
-          <div class="biz-outlets-head">${icons.store}<h2>Åpning av nye utsalgssteder</h2></div>
-          <p class="biz-explain">Flere butikker gir mer inntekt. Utvidelsen tar ${formatDuration(expansionSeconds(b), false)}, og bedriften tjener som før mens den pågår.</p>
+          <div class="biz-outlets-head">${headIcon}<h2>${text.title}</h2></div>
+          <p class="biz-explain">${text.explain} Utvidelsen tar ${formatDuration(expansionSeconds(b), false)}, og bedriften tjener som før mens den pågår.</p>
           <strong class="biz-big">${formatMoneyRounded(cost)}</strong>
           <span class="biz-muted">Nødvendig investering</span>
           <strong class="biz-big growth">${icons.arrowUp} ${formatMoneyRounded(expectedGrowth(b))}</strong>
           <span class="biz-muted">Forventet økning i inntekt per time</span>
         </div>
-        <button class="biz-green-btn ${state.balance >= cost ? '' : 'poor'}" data-action="expand" data-id="${b.id}">Åpne nye utsalgssteder</button>
+        <button class="biz-green-btn ${state.balance >= cost ? '' : 'poor'}" data-action="expand" data-id="${b.id}">${text.button}</button>
         <p class="biz-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>`;
     }
 

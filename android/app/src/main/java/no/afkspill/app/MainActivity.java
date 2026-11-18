@@ -1,5 +1,6 @@
 package no.afkspill.app;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -22,6 +23,9 @@ public class MainActivity extends BridgeActivity {
         // nyeste versjon av spillet fra GitHub Pages (ellers kan den vise en gammel i 10 min).
         // Lagringen (spillet ditt) ligger i Preferences og påvirkes ikke.
         getBridge().getWebView().clearCache(true);
+        // Svart bak spillet mens det lastes (ellers blinker det hvitt før logoen vises)
+        getBridge().getWebView().setBackgroundColor(Color.BLACK);
+        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
         // Tegn appen helt ut til kantene, også bak kamerahullet
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

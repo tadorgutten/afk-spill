@@ -46,17 +46,12 @@ export const icons = {
   /** Lastebil med fartsstreker (fraktselskap) */
   truck: svg('<path d="M1.5 7h2M1 10h2.5M2 13h1.5"/><path d="M5 5h10v11H5Z"/><path d="M15 9h3.5l3 3.5V16H15"/><circle cx="8.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>', 1.6),
   /** Fabrikk med skorsteiner */
-  factory: svg('<path d="M3 21V11l5 3v-3l5 3V5h3v2h2V5h3v16Z"/><path d="M7 17h2M11 17h2M15 17h2"/>', 1.6),
+  factory: svg('<path d="M3 21h18"/><path d="M4 21V11h16v10"/><path d="M6 11V4h2.5v7M10.75 11V4h2.5v7M15.5 11V4H18v7"/><path d="M7 14.5h2M11 14.5h2M15 14.5h2M7 17.5h2M11 17.5h2M15 17.5h2"/>', 1.5),
   /** Byggekran (byggefirma) */
-  crane: svg('<path d="M6 21V4"/><path d="M3 21h7"/><path d="M6 4h15"/><path d="M6 8 10 4M6 4 2 7h4"/><path d="M17 4v6"/><rect x="15" y="10" width="4" height="3" rx=".5"/><path d="M6 12l4-4M6 16l4-4M6 12l4 4"/>', 1.5),
   /** Bil med prislapp (bilforhandler) */
-  dealer: svg('<path d="M3 16v-3l2-5a2 2 0 0 1 1.9-1.4h7.2A2 2 0 0 1 16 8l2 5v3Z"/><path d="M3 16v2.5M18 16v2.5"/><circle cx="7" cy="13.5" r="1"/><circle cx="14" cy="13.5" r="1"/><path d="M17 3h4v4l-3.5 3.5-4-4Z"/><circle cx="19.3" cy="4.7" r=".4"/>', 1.5),
   /** Skjerm (IT-selskap) */
-  monitor: svg('<rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M9 20.5h6M12 16.5v4"/><path d="m9.5 8.5-2 2 2 2M14.5 8.5l2 2-2 2"/>', 1.6),
   /** Fly (flyselskap) */
-  plane: svg('<path d="M21 15.5v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0v5l-8 5v2l8-2.5v5l-2.5 2V21l4-1 4 1v-1.5L13 18v-5Z"/>', 1.5),
   /** Skip (rederi) */
-  ship: svg('<path d="M3 15h18l-2.5 5H5.5Z"/><path d="M5 15v-4h14v4"/><path d="M8 11V7h8v4"/><path d="M11 7V4h2v3"/><path d="M9.5 13h.01M12 13h.01M14.5 13h.01"/>', 1.5),
   /** Bedriftsplasser: ruter med et pluss */
   slots: svg('<rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><path d="M17.25 14v6.5M14 17.25h6.5"/>', 1.7),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>', 1.7),
