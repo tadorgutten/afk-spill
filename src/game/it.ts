@@ -114,7 +114,7 @@ export interface OfficeDef {
   seconds: number;
 }
 
-/** Kjøpes i rekkefølge, én gang hver. */
+/** Hvert kontor kjøpes én gang (i hvilken som helst rekkefølge). Bare ett kan bygges om gangen. */
 export const OFFICES: OfficeDef[] = [
   { id: 'small', name: 'Lite kontorlokale', places: 15, price: 1_500, seconds: 15 * 60 },
   { id: 'standard', name: 'Standard kontor', places: 70, price: 35_000, seconds: 3600 },
@@ -340,13 +340,14 @@ export function fire(b: Business, employeeId: string): ItResult {
   return 'ok';
 }
 
-/** Neste kontor som kan kjøpes (eller null når alle er kjøpt). */
-export const nextOffice = (b: Business) => OFFICES.find((o) => !itOf(b).offices.includes(o.id)) ?? null;
+/** Kan kontoret kjøpes? (hvert kontor én gang, i hvilken som helst rekkefølge, ett om gangen) */
+export const canBuyOffice = (b: Business, officeId: string) =>
+  !itOf(b).offices.includes(officeId) && !itOf(b).building;
 
 export function buyOffice(b: Business, pay: DealerPay, officeId: string, now = Date.now()): ItResult {
   const it = itOf(b);
   const office = OFFICES.find((o) => o.id === officeId);
-  if (!office || nextOffice(b)?.id !== officeId) return 'locked';
+  if (!office || it.offices.includes(office.id)) return 'locked';
   if (it.building) return 'busy';
   if (!pay.spend(office.price, true)) return 'money';
   it.building = { office: office.id, end: now + office.seconds * 1000 };

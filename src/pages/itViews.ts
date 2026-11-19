@@ -10,7 +10,7 @@ import {
   itOf,
   leadSeconds,
   MAX_QUICK_HIRE,
-  nextOffice,
+  canBuyOffice,
   OFFICES,
   pickedSkill,
   PROJECTS,
@@ -113,11 +113,10 @@ export function renderItDetail(state: GameState, b: Business, hero: string): str
       </button>`;
   }).join('');
 
-  const next = nextOffice(b);
   const offices = OFFICES.map((o) => {
     const bought = it.offices.includes(o.id);
     const building = it.building?.office === o.id;
-    const isNext = next?.id === o.id && !it.building;
+    const isNext = canBuyOffice(b, o.id);
     if (building) {
       return `
         <div class="it-office building">
