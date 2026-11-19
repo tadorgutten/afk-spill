@@ -222,6 +222,8 @@ export function createEarningsPage(state: GameState): Page {
     element,
     onShow() {
       if (cardsOpen) setCardsOpen(false); // start alltid på hovedvisningen
+      // "+$ ..."-tekstene fra trykk før man byttet side skal ikke fortsette når man kommer tilbake
+      element.querySelectorAll('.float-amount').forEach((el) => el.remove());
     },
     onBack() {
       // Mobilens tilbakeknapp: kort → lista → Inntekt
