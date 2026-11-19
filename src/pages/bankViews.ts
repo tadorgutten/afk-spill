@@ -72,7 +72,7 @@ export function renderBankDetail(state: GameState, b: Business, hero: string): s
     </div>
 
     <h2 class="bank-title">Hvelvet</h2>
-    <div class="bank-card bank-funds">
+    <div class="bank-box bank-funds">
       ${icons.bill}
       <p><strong>${formatMoneyFull(s.funds)}</strong> <span>/ ${formatMoneyWhole(s.capacity)}</span></p>
       <span>Penger i hvelvet</span>
@@ -80,9 +80,9 @@ export function renderBankDetail(state: GameState, b: Business, hero: string): s
     ${vault}
 
     <h2 class="bank-title">Per time akkurat nå</h2>
-    <div class="bank-card bank-flow">${icons.percentTicket}<div><span>Nye innskudd fra kunder</span><strong>${formatMoneyFull(f.attracted)}</strong></div></div>
-    <div class="bank-card bank-flow">${icons.arrowUpBox}<div><span>Inntekt fra lån</span><strong>${formatMoneyFull(f.proceeds)}</strong></div></div>
-    <div class="bank-card bank-flow">${icons.arrowDownBox}<div><span>Utbetaling til innskytere</span><strong>${formatMoneyFull(f.payments)}</strong></div></div>
+    <div class="bank-box bank-flow">${icons.percentTicket}<div><span>Nye innskudd fra kunder</span><strong>${formatMoneyFull(f.attracted)}</strong></div></div>
+    <div class="bank-box bank-flow">${icons.arrowUpBox}<div><span>Inntekt fra lån</span><strong>${formatMoneyFull(f.proceeds)}</strong></div></div>
+    <div class="bank-box bank-flow">${icons.arrowDownBox}<div><span>Utbetaling til innskytere</span><strong>${formatMoneyFull(f.payments)}</strong></div></div>
   `;
 }
 
