@@ -12,6 +12,7 @@ export function stockChart(
   lastSample: number,
   price: number,
   label: (v: number) => string = priceNumber,
+  sampleMs = SAMPLE_MS,
 ): string {
   // Siste punkt i historikken er prisen nå (legg den bare til hvis historikken er for kort)
   const points = history.length > 1 ? history : [...history, price];
@@ -39,7 +40,7 @@ export function stockChart(
     .join('');
 
   // Klokkeslett under grafen
-  const startTime = lastSample - (history.length - 1) * SAMPLE_MS;
+  const startTime = lastSample - (history.length - 1) * sampleMs;
   const endTime = Date.now();
   const xLabels = [0.08, 0.31, 0.54, 0.77, 1]
     .map((f) => `<span style="left:${f * 100}%">${formatClock(startTime + (endTime - startTime) * f)}</span>`)

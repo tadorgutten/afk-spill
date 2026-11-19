@@ -1,0 +1,9 @@
+Bilder av gruvene fra Wikimedia Commons (frie lisenser, se lenkene).
+
+svalbard.jpg: https://commons.wikimedia.org/wiki/File:Sveagruva_2019.jpg
+kiruna.jpg: https://commons.wikimedia.org/wiki/File:Kiruna_iron_mine_ISS.jpg
+chuquicamata.jpg: https://commons.wikimedia.org/wiki/File:Mina_de_Chuquicamata%2C_Calama%2C_Chile%2C_2016-02-01%2C_DD_110-112_PAN.JPG
+potosi.jpg: https://commons.wikimedia.org/wiki/File:Cerro_ricco.jpg
+mponeng.jpg: https://commons.wikimedia.org/wiki/File:Mponeng-goudmyn%2C_Merafong_City-pm%2C_Wesrand-dm%2C_a.jpg
+muzo.jpg: https://commons.wikimedia.org/wiki/File:Panor%C3%A1mica_de_Muzo%2C_Boyac%C3%A1.JPG
+jwaneng.jpg: https://commons.wikimedia.org/wiki/File:Jwaneng_Open_Mine.jpg

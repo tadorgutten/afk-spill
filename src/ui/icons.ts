@@ -147,6 +147,14 @@ export const icons = {
   // --- Hotellkjede ---
   /** Hotell (bygning med H) */
   hotel: svg('<path d="M4 21V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v16"/><path d="M2.5 21h19"/><path d="M9 8v6M15 8v6M9 11h6"/><path d="M10.5 21v-3.5h3V21"/>', 1.6),
+  /** Hakke (gruve) */
+  pickaxe: svg('<path d="M3.5 9C8 4.5 16 4.5 20.5 9"/><path d="M12 6.2V21"/>', 1.8),
+  /** Edelstein */
+  gem: svg('<path d="M6.5 4h11L22 9.5 12 21 2 9.5z"/><path d="M2 9.5h20M12 21 8.5 9.5 12 4l3.5 5.5z"/>', 1.6),
+  /** Steinklump (malm) */
+  ore: svg('<path d="M3 16.5 6.5 8 12 5l6 3 3 8.5-6 3.5H8.5z"/><path d="M8.5 10.5l2.5 2M14 9.5l1.5 3M10 16l2.5-1"/>', 1.6),
+  /** Lager */
+  warehouse: svg('<path d="M3 21V9l9-5 9 5v12"/><path d="M7 21v-8h10v8M7 17h10"/>', 1.6),
   /** Seng (rom) */
   bed: svg('<path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="2"/>', 1.6),
   /** Stjerne (fylt) */

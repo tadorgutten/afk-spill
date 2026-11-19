@@ -1,0 +1,1013 @@
+/* =========================================================================
+ * GRUVESELSKAP (src/pages/mineViews.ts) – kobber og jord
+ * ========================================================================= */
+.cat-copper {
+  background: linear-gradient(115deg, #b0692f, #5a3418 55%, #241409);
+}
+
+.biz-hero.cat-copper,
+.biz-hero.cat-copper .biz-hero-icon,
+.business .biz-hero.cat-copper .biz-hero-btn,
+.biz-icon.cat-copper {
+  color: #fff;
+}
+
+.business[data-theme='mine'] {
+  --mn: #8a4f24;
+  --mn-gold: #c9a24a;
+  --mn-soft: #f7f0ea;
+  /* Lånte elementer får gruvas farge */
+  --bank: #8a4f24;
+}
+
+.business[data-theme='mine'] .biz-balance {
+  color: var(--mn);
+}
+
+.mn-neg {
+  color: #d8465a !important;
+}
+
+.mn-title {
+  margin: 30px 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.mn-muted {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.mn-muted.pad {
+  margin: -8px 0 16px;
+}
+
+.business .mn-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--mn);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.business .mn-btn.soft {
+  margin-top: 12px;
+  background: #f3e6da;
+  color: var(--mn);
+}
+
+.business .mn-btn.poor,
+.business .mn-btn:disabled {
+  opacity: 0.5;
+}
+
+.business .mn-mini-btn {
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-radius: 12px;
+  background: var(--mn);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.business .mn-mini-btn.poor {
+  opacity: 0.5;
+}
+
+.business .mn-mini-btn.confirm {
+  background: var(--mn-gold);
+  color: #1c2230;
+}
+
+.business .mn-mini-btn:disabled {
+  background: #c9ced6;
+  opacity: 1;
+}
+
+/* Stjerner */
+.mn-stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.mn-stars i {
+  display: flex;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.mn-stars i.on {
+  color: var(--mn-gold, #c9a24a);
+}
+
+.mn-stars svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Forsiden --- */
+.mn-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.mn-summary div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 6px;
+  border-radius: 18px;
+  background: var(--mn-soft);
+}
+
+.mn-summary svg {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  color: var(--mn);
+}
+
+.mn-summary b {
+  font-size: 20px;
+}
+
+.mn-summary span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.mn-cards,
+.mn-cities {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.business .mn-card,
+.mn-city {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(20, 30, 60, 0.1);
+}
+
+.mn-card-photo {
+  position: relative;
+  height: 150px;
+}
+
+.mn-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mn-card-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(5, 15, 30, 0.75));
+}
+
+.mn-card-photo > div {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.mn-card-photo strong {
+  font-size: 22px;
+}
+
+.mn-card-photo span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.mn-card-photo > .mn-stars {
+  position: absolute;
+  z-index: 1;
+  right: 14px;
+  bottom: 14px;
+}
+
+.mn-card-body,
+.mn-city-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 16px;
+  text-align: left;
+}
+
+.mn-job-chip,
+.mn-event-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mn-job-chip {
+  color: var(--mn);
+}
+
+.mn-event-chip {
+  color: #a87b16;
+}
+
+.mn-job-chip svg,
+.mn-event-chip svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mn-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 8px;
+}
+
+.mn-card-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.mn-card-stats b {
+  font-size: 17px;
+}
+
+.mn-card-stats span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.mn-cond {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e5e8ec;
+}
+
+.mn-cond span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: #2fa35a;
+}
+
+.mn-cond span.low {
+  background: #e5484d;
+}
+
+.mn-cond.big {
+  height: 12px;
+  margin-bottom: 10px;
+}
+
+.mn-cond-label {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.mn-help {
+  margin-top: 26px;
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--mn-soft);
+}
+
+.mn-help h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.mn-help p {
+  margin: 8px 0 0;
+  color: #4b5160;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* --- Én gruve --- */
+.business[data-view='mMine'] {
+  padding-top: 0;
+}
+
+.mn-banner {
+  position: relative;
+  height: 260px;
+  margin: 0 -18px;
+  overflow: hidden;
+}
+
+.mn-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mn-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), transparent 35%, rgba(5, 15, 30, 0.8));
+}
+
+.mn-banner-text {
+  position: absolute;
+  z-index: 1;
+  left: 18px;
+  bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #fff;
+}
+
+.mn-banner-text h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.mn-banner-text .mn-stars svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mn-income {
+  margin-top: -56px;
+}
+
+.mn-job,
+.mn-event {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+}
+
+.mn-job {
+  background: var(--mn-soft);
+  color: var(--mn);
+}
+
+.mn-event {
+  background: #fff6e0;
+  color: #8a6311;
+}
+
+.mn-job svg,
+.mn-event svg {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.mn-job div,
+.mn-event div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mn-job span,
+.mn-event span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.mn-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.mn-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--mn-soft);
+}
+
+.mn-stats span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.mn-stats b {
+  font-size: 20px;
+}
+
+.mn-box {
+  padding: 16px;
+  border-radius: 20px;
+  background: #f4f6f7;
+}
+
+.mn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.mn-row + .mn-row {
+  border-top: 1px solid #e3e6ea;
+}
+
+.mn-row-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--mn);
+}
+
+.mn-row-icon.gold {
+  color: var(--mn-gold);
+}
+
+.mn-row-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.mn-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mn-row-text strong {
+  font-size: 16px;
+}
+
+.mn-row-text span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Fasiliteter */
+.mn-facs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mn-fac {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f4f6f7;
+}
+
+.mn-fac.owned {
+  background: var(--mn-soft);
+  outline: 2px solid #e3c9b3;
+}
+
+.mn-fac-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--mn);
+}
+
+.mn-fac strong {
+  font-size: 16px;
+}
+
+.mn-fac > span {
+  color: #4b5160;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.mn-fac small {
+  color: #1f7a3c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mn-fac em {
+  margin-top: 4px;
+  color: #1c2230;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mn-fac .mn-mini-btn {
+  margin-top: 6px;
+}
+
+.mn-owned {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--mn);
+}
+
+.mn-owned svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Regnskap */
+.mn-ledger {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mn-ledger div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.mn-ledger span {
+  color: #4b5160;
+}
+
+.mn-ledger .sum {
+  padding-top: 8px;
+  border-top: 1px solid #dfe3e8;
+  font-size: 17px;
+}
+
+/* Anmeldelser */
+.mn-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mn-review {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f4f6f7;
+}
+
+.mn-review div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mn-review span {
+  flex: 1;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.mn-review b {
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #9aa0ab;
+  color: #fff;
+  font-size: 14px;
+}
+
+.mn-review b.good {
+  background: #1f7a3c;
+}
+
+.mn-review b.bad {
+  background: #d8465a;
+}
+
+.mn-review p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* --- Byer --- */
+.mn-city.owned {
+  outline: 2px solid var(--mn);
+}
+
+.mn-city-body > span {
+  color: #4b5160;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.mn-city-buy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.mn-city-buy b {
+  font-size: 18px;
+}
+
+.mn-city-buy span {
+  flex: 1;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.mn-city-body > .mn-mini-btn {
+  align-self: flex-start;
+}
+
+/* --- Bygg rom --- */
+.business[data-theme='mine'] .taxi-chip.active {
+  background: var(--mn);
+  color: #fff;
+}
+
+.mn-chips {
+  margin-bottom: 16px;
+}
+
+.mn-qty {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+
+.mn-qty strong {
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.mn-qty span {
+  color: #6b7280;
+}
+
+.mn-qty-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.business .mn-qty-btn {
+  padding: 10px 0;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--mn);
+  font-weight: 700;
+  text-align: center;
+}
+
+.mn-slider {
+  margin-top: 20px;
+}
+
+/* Hvor mye mer man tjener per time på en oppgradering */
+.mn-plus {
+  color: #12805c;
+  font-weight: 700;
+}
+
+/* =========================================================================
+ * Gruveselskap: mineraler, varsler, verktøy og salg
+ * ========================================================================= */
+.mn-up {
+  color: #1f8a4c;
+}
+
+.mn-down {
+  color: #d8465a;
+}
+
+.mn-muted.small {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+/* Rundt ikon i mineralets farge */
+.mn-min-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--min);
+  color: #fff;
+}
+
+.mn-min-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mn-min-icon.big {
+  width: 64px;
+  height: 64px;
+}
+
+.mn-min-icon.big svg {
+  width: 34px;
+  height: 34px;
+}
+
+/* Liste med mineraler (én knapp hver) */
+.mn-res-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.business .mn-res {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(20, 30, 60, 0.08);
+  text-align: left;
+}
+
+.mn-res .mn-cond {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+}
+
+.mn-res-text,
+.mn-res-price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mn-res-text strong {
+  font-size: 17px;
+}
+
+.mn-res-text span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.mn-res-price {
+  align-items: flex-end;
+  font-size: 13px;
+}
+
+.mn-res-price > b:first-child {
+  font-size: 16px;
+}
+
+/* Varsler */
+.mn-warn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fdecee;
+  color: #b3263a;
+}
+
+.mn-warn svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.mn-warn div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mn-warn span {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.mn-warn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #fdecee;
+  color: #b3263a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mn-warn-chip svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Rad som er en knapp (funn i en gruve) */
+.business .mn-row-btn {
+  width: 100%;
+  text-align: left;
+}
+
+.mn-row-btn > svg {
+  width: 20px;
+  height: 20px;
+  color: #9aa0ab;
+}
+
+/* Graveverktøy */
+.mn-tool {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.mn-tool + .mn-tool {
+  border-top: 1px solid #e5e8ec;
+}
+
+.mn-tool.current .mn-row-icon {
+  background: var(--mn);
+  color: #fff;
+}
+
+.mn-tool em {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--mn-soft);
+  color: var(--mn);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.mn-tool .mn-row-text {
+  flex: 1;
+}
+
+.mn-tool-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 14px;
+}
+
+/* Hva en gruve har (i lista over gruver) */
+.mn-finds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mn-find {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
+  background: var(--mn-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mn-find .mn-min-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.mn-find .mn-min-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Ett mineral */
+.mn-res-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.mn-res-head div {
+  display: flex;
+  flex-direction: column;
+}
+
+.mn-res-head h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.mn-res-head span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.mn-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+
+.mn-price strong {
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.mn-price span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.mn-store {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mn-store strong {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.mn-store span {
+  color: #6b7280;
+}
+
+.mn-sell-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.business .mn-sell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 4px;
+  border-radius: 14px;
+  background: var(--mn);
+  color: #fff;
+}
+
+.business .mn-sell:disabled {
+  opacity: 0.4;
+}
+
+.mn-sell strong {
+  font-size: 15px;
+}
+
+.mn-sell span {
+  font-size: 12px;
+  opacity: 0.9;
+}

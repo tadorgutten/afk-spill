@@ -122,19 +122,9 @@ import {
   type ActivityId,
 } from '../game/football';
 import { leagueById } from '../game/footballData';
-import {
-  buildFacility,
-  buildRooms,
-  buyHotel,
-  hotelIn,
-  hotelsOf,
-  roomById,
-  roomCost,
-  upgradeStars,
-  type HotelPay,
-} from '../game/hotel';
-import { cityById, type FacilityId, type RoomType } from '../game/hotelData';
-import { renderCities, renderHotel, renderHotelDetail, renderRooms } from './hotelViews';
+import { buyMine, buyTool, miningOf, ownedMine, sellMineral, upgradeStorage, type MinePay } from '../game/mine';
+import { mineById, mineralById, toolById, type MineralId } from '../game/mineData';
+import { renderMine, renderMineDetail, renderMines, renderResource, renderTools } from './mineViews';
 import {
   renderBuy,
   renderFootballDetail,
@@ -209,9 +199,10 @@ type View =
   | { name: 'fTraining'; id: string }
   | { name: 'fTrophies'; id: string }
   | { name: 'fHistory'; id: string }
-  | { name: 'hHotel'; id: string; city: string }
-  | { name: 'hCities'; id: string }
-  | { name: 'hRooms'; id: string; city: string; room: RoomType; qty: number };
+  | { name: 'mMine'; id: string; mine: string }
+  | { name: 'mTools'; id: string; mine: string }
+  | { name: 'mMines'; id: string }
+  | { name: 'mRes'; id: string; res: MineralId };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -224,7 +215,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   it: icons.monitor,
   bank: icons.bank,
   football: icons.pitch,
-  hotel: icons.hotel,
+  mine: icons.pickaxe,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -237,8 +228,8 @@ export function createBusinessPage(state: GameState): Page {
   let stack: View[] = [{ name: 'home' }];
   const current = () => stack[stack.length - 1];
   const find = (id: string) => state.businesses.find((b) => b.id === id);
-  /** Hotellkjeden betaler på samme måte som bilforhandleren (kjøp blir en del av bedriftens verdi). */
-  const hotelPay = (b: Business): HotelPay => dealerPay(state, b);
+  /** Gruveselskapet betaler på samme måte som bilforhandleren (gruver og lager blir en del av bedriftens verdi). */
+  const minePay = (b: Business): MinePay => dealerPay(state, b);
 
   function go(view: View) {
     stack.push(view);
@@ -263,8 +254,8 @@ export function createBusinessPage(state: GameState): Page {
   /** Fotballklubb: "trykk igjen" for å selge en spiller / trekke laget fra turneringen. */
   let confirmSell = false;
   let confirmLeave = false;
-  /** Hotellkjede: hvilken knapp som venter på "trykk igjen" (f.eks. "stars", "fac:spa", "buy:paris"). */
-  let hotelConfirm: string | null = null;
+  /** Gruveselskap: hvilken knapp som venter på "trykk igjen" (f.eks. "buy:kiruna", "tool:wheel"). */
+  let mineConfirm: string | null = null;
   /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
   let slotsOpen = false;
   /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
@@ -315,7 +306,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (engineOf(b) === 'it') element.innerHTML = renderItDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'bank') element.innerHTML = renderBankDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'football') element.innerHTML = renderFootballDetail(state, b, heroHtml(b));
-        else if (engineOf(b) === 'hotel') element.innerHTML = renderHotelDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'mine') element.innerHTML = renderMineDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -406,22 +397,26 @@ export function createBusinessPage(state: GameState): Page {
         element.innerHTML = b ? backBtn + renderSkills(b) : '';
         break;
       }
-      // --- Hotellkjede ---
-      case 'hHotel':
-      case 'hRooms': {
+      // --- Gruveselskap ---
+      case 'mMine':
+      case 'mTools': {
         const b = find(view.id);
-        const h = b && hotelIn(b, view.city);
-        if (!b || !h) {
+        const m = b && ownedMine(b, view.mine);
+        if (!b || !m) {
           stack.pop();
           return renderView();
         }
-        if (view.name === 'hHotel') element.innerHTML = backBtn + renderHotel(state, b, h, hotelConfirm);
-        else element.innerHTML = backBtn + renderRooms(state, b, h, view.room, view.qty);
+        element.innerHTML = backBtn + (view.name === 'mMine' ? renderMine(state, b, m) : renderTools(state, b, m, mineConfirm));
         break;
       }
-      case 'hCities': {
+      case 'mMines': {
         const b = find(view.id);
-        element.innerHTML = b ? backBtn + renderCities(state, b, hotelConfirm) : '';
+        element.innerHTML = b ? backBtn + renderMines(state, b, mineConfirm) : '';
+        break;
+      }
+      case 'mRes': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderResource(state, b, view.res) : '';
         break;
       }
       // --- Fotballklubb ---
@@ -638,7 +633,7 @@ export function createBusinessPage(state: GameState): Page {
     if (action !== 'i-fire') confirmFire = false;
     if (action !== 'f-sell') confirmSell = false;
     if (action !== 'f-leave') confirmLeave = false;
-    if (action !== 'h-do' && action !== 'h-buy') hotelConfirm = null;
+    if (action !== 'm-buy' && action !== 'm-tool') mineConfirm = null;
 
     switch (action) {
       case 'back':
@@ -857,108 +852,78 @@ export function createBusinessPage(state: GameState): Page {
       case 'd-skills':
         return go({ name: 'dSkills', id });
 
-      // --- Hotellkjede ---
-      case 'h-hotel':
-        return go({ name: 'hHotel', id, city: target.dataset.city! });
-      case 'h-cities':
-        return go({ name: 'hCities', id });
-      case 'h-buy': {
+      // --- Gruveselskap ---
+      case 'm-mine':
+        return go({ name: 'mMine', id, mine: target.dataset.mine! });
+      case 'm-mines':
+        return go({ name: 'mMines', id });
+      case 'm-tools':
+        return go({ name: 'mTools', id, mine: target.dataset.mine! });
+      case 'm-res':
+        return go({ name: 'mRes', id, res: target.dataset.res as MineralId });
+      case 'm-buy': {
         const b = find(id);
-        const cityId = target.dataset.city!;
+        const mineId = target.dataset.mine!;
         if (!b) return;
         // Trykk to ganger for å kjøpe (det er dyrt)
-        if (hotelConfirm !== `buy:${cityId}`) {
-          hotelConfirm = `buy:${cityId}`;
+        if (mineConfirm !== `buy:${mineId}`) {
+          mineConfirm = `buy:${mineId}`;
           return render();
         }
-        hotelConfirm = null;
-        const result = buyHotel(b, hotelPay(b), cityId);
+        mineConfirm = null;
+        const result = buyMine(b, minePay(b), mineId);
         if (result === 'money') {
           shake(target);
           return showToast('Du har ikke nok penger');
         }
         if (result !== 'ok') return render();
-        showToast(`Hotellet i ${cityById(cityId).name} bygges!`);
-        stack = [{ name: 'home' }, { name: 'detail', id }, { name: 'hHotel', id, city: cityId }];
+        showToast(`Du kjøpte ${mineById(mineId).name}! Kjøp et graveverktøy til den.`, 4000);
+        stack = [{ name: 'home' }, { name: 'detail', id }, { name: 'mMine', id, mine: mineId }];
         render();
         window.scrollTo(0, 0);
         return;
       }
-      case 'h-do': {
+      case 'm-tool': {
         const b = find(id);
-        const h = b && hotelIn(b, target.dataset.city!);
-        const key = target.dataset.key!;
-        if (!b || !h) return;
-        if (hotelConfirm !== key) {
-          hotelConfirm = key;
+        const mineId = target.dataset.mine!;
+        const toolId = target.dataset.tool!;
+        if (!b) return;
+        const key = `tool:${toolId}`;
+        if (mineConfirm !== key) {
+          mineConfirm = key;
           return render();
         }
-        hotelConfirm = null;
-        const pay = hotelPay(b);
-        const result =
-          key === 'stars' ? upgradeStars(h, pay) : buildFacility(h, pay, key.slice(4) as FacilityId);
-        const messages: Record<string, string> = {
-          money: 'Du har ikke nok penger',
-          busy: 'Det pågår allerede byggearbeid på hotellet',
-          need: 'Kravene er ikke oppfylt',
-          max: 'Ikke nødvendig nå',
-          locked: 'Ikke tilgjengelig her',
-        };
+        mineConfirm = null;
+        const result = buyTool(b, minePay(b), mineId, toolId);
         if (result !== 'ok') {
           shake(target);
-          return showToast(messages[result] ?? 'Det gikk ikke');
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Det gikk ikke');
         }
-        showToast('Byggearbeidet har startet');
-        return render();
-      }
-      case 'h-rooms': {
-        const b = find(id);
-        const h = b && hotelIn(b, target.dataset.city!);
-        if (!b || !h) return;
-        const room = target.dataset.room as RoomType;
-        return go({ name: 'hRooms', id, city: h.city, room, qty: Math.min(10, roomById(room).max - h.rooms[room]) });
-      }
-      case 'h-room-type': {
-        if (view.name !== 'hRooms') return;
-        const b = find(view.id);
-        const h = b && hotelIn(b, view.city);
-        if (!h) return;
-        view.room = target.dataset.room as RoomType;
-        view.qty = Math.min(10, roomById(view.room).max - h.rooms[view.room]);
-        return render();
-      }
-      case 'h-qty': {
-        if (view.name !== 'hRooms') return;
-        const b = find(view.id);
-        const h = b && hotelIn(b, view.city);
-        if (!h) return;
-        const left = roomById(view.room).max - h.rooms[view.room];
-        const step = Number(target.dataset.step);
-        // "Maks": så mange som er plass til og som man har råd til
-        if (step >= 9999) view.qty = Math.max(0, Math.min(left, Math.floor(state.balance / roomCost(h, view.room))));
-        else view.qty = Math.max(0, Math.min(left, view.qty + step));
-        return render();
-      }
-      case 'h-build-rooms': {
-        if (view.name !== 'hRooms') return;
-        const b = find(view.id);
-        const h = b && hotelIn(b, view.city);
-        if (!b || !h) return;
-        const result = buildRooms(h, hotelPay(b), view.room, view.qty);
-        const messages: Record<string, string> = {
-          money: 'Du har ikke nok penger',
-          busy: 'Det pågår allerede byggearbeid på hotellet',
-          max: 'Ikke plass til så mange rom',
-          locked: 'Hotellet har for få stjerner',
-          need: 'Velg hvor mange rom',
-        };
-        if (result !== 'ok') {
-          shake(target);
-          return showToast(messages[result] ?? 'Det gikk ikke');
-        }
-        showToast(`${view.qty} rom bygges`);
+        showToast(`${toolById(toolId).name} graver i ${mineById(mineId).name}`);
         return back();
       }
+      case 'm-sell': {
+        const b = find(id);
+        if (!b) return;
+        const res = target.dataset.res as MineralId;
+        const gross = sellMineral(b, minePay(b), res, Number(target.dataset.share));
+        if (gross <= 0) return showToast('Ingenting på lager');
+        showToast(`Solgt ${mineralById(res).name.toLowerCase()} for ${formatMoney(gross)}`);
+        return render();
+      }
+      case 'm-storage': {
+        const b = find(id);
+        if (!b) return;
+        const res = target.dataset.res as MineralId;
+        const result = upgradeStorage(b, minePay(b), res);
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Lageret er fullt utbygd');
+        }
+        showToast(`Lageret for ${mineralById(res).name.toLowerCase()} er bygd ut`);
+        return render();
+      }
+
       // --- Fotballklubb ---
       case 'f-leagues':
         return go({ name: 'fLeagues', id });
@@ -1498,9 +1463,9 @@ export function createBusinessPage(state: GameState): Page {
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
-    if (engineOf(b) === 'hotel') {
-      const n = hotelsOf(b).hotels.length;
-      return `<span>${icons.hotel} ${n} ${n === 1 ? 'hotell' : 'hoteller'}</span>`;
+    if (engineOf(b) === 'mine') {
+      const n = miningOf(b).mines.length;
+      return `<span>${icons.pickaxe} ${n} ${n === 1 ? 'gruve' : 'gruver'}</span>`;
     }
     if (engineOf(b) === 'football') {
       const t = fcOf(b).tournament;
@@ -1719,7 +1684,7 @@ export function createBusinessPage(state: GameState): Page {
       confirmFire = false;
       confirmSell = false;
       confirmLeave = false;
-      hotelConfirm = null;
+      mineConfirm = null;
       slotsOpen = false;
       procureFor = null;
       render();

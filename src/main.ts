@@ -7,7 +7,7 @@ import './dealer.css';
 import './it.css';
 import './bank.css';
 import './football.css';
-import './hotel.css';
+import './mine.css';
 import './profile.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
