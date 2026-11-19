@@ -69,18 +69,18 @@ const ART: Record<string, () => string> = {
   },
 
   // Safir, Smaragd, Rubin: edelsteinsfasetter med lys glans
-  sapphire: () => svg(`${facets('#9cc4ff', 0.35)}<circle cx="320" cy="40" r="90" fill="#7fb2ff" opacity="0.12"/>`),
+  sapphire: () => svg(`${facets('#a9bfdf', 0.25)}<circle cx="320" cy="40" r="90" fill="#8fa9d4" opacity="0.1"/>`),
   emerald: () => {
     let hex = '';
     for (let row = 0; row < 5; row++)
       for (let col = 0; col < 9; col++) {
         const x = 170 + col * 28 + (row % 2) * 14;
         const y = row * 42 + 10;
-        hex += `<path d="M${x} ${y} l12 7 v14 l-12 7 l-12 -7 v-14 Z" stroke="#7df0c2" stroke-opacity="0.16" fill="none"/>`;
+        hex += `<path d="M${x} ${y} l12 7 v14 l-12 7 l-12 -7 v-14 Z" stroke="#9fd6c0" stroke-opacity="0.13" fill="none"/>`;
       }
     return svg(hex);
   },
-  ruby: () => svg(`${facets('#ff9aae', 0.3)}<circle cx="80" cy="200" r="110" fill="#ff5a7a" opacity="0.1"/>`),
+  ruby: () => svg(`${facets('#e3aab5', 0.22)}<circle cx="80" cy="200" r="110" fill="#c86a7c" opacity="0.08"/>`),
 
   // Titan: børstet metall (mange tynne streker)
   titan: () => {
@@ -123,19 +123,16 @@ const ART: Record<string, () => string> = {
       <path d="M320 64 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 Z" fill="#fff" opacity="0.8"/>`);
   },
 
-  // Infinity: regnbue-uendelighetstegn og stjerner
+  // Infinity: stjerner som blinker (regnbueskjæret som sveiper over lages i CSS)
   infinity: () => {
-    const g = nextId();
     let stars = '';
     for (let i = 0; i < 26; i++) {
       const x = (i * 97) % 400;
       const y = (i * 53) % 200;
-      stars += `<circle cx="${x}" cy="${y}" r="${(i % 3) * 0.5 + 0.6}" fill="#fff" opacity="${0.25 + (i % 4) * 0.12}"/>`;
+      const delay = ((i * 0.37) % 3).toFixed(2);
+      stars += `<circle class="infinity-star" style="animation-delay:${delay}s" cx="${x}" cy="${y}" r="${(i % 3) * 0.5 + 0.6}" fill="#fff" opacity="${0.25 + (i % 4) * 0.12}"/>`;
     }
-    return svg(`<defs>${gradient(g, ['#ff6ec7', '#ffd36e', '#6effc4', '#6ec8ff', '#b36eff'], 1, 0)}</defs>
-      ${stars}
-      <path d="M260 100 C 260 60, 320 60, 340 100 C 360 140, 420 140, 420 100 C 420 60, 360 60, 340 100 C 320 140, 260 140, 260 100 Z"
-        transform="translate(140 22) scale(0.58)" stroke="url(#${g})" stroke-width="7" fill="none" opacity="0.85"/>`);
+    return svg(stars);
   },
 };
 

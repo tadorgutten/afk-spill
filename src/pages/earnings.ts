@@ -225,6 +225,8 @@ export function createEarningsPage(state: GameState): Page {
       // "+$ ..."-tekstene fra trykk før man byttet side skal ikke fortsette når man kommer tilbake
       element.querySelectorAll('.float-amount').forEach((el) => el.remove());
     },
+    // Menyen nederst skjules på kortsidene
+    navHidden: () => cardsOpen,
     onBack() {
       // Mobilens tilbakeknapp: kort → lista → Inntekt
       if (!cardsOpen) return false;
@@ -276,14 +278,19 @@ function formatRequirement(value: number): string {
  */
 function setBalance(el: HTMLElement, value: number) {
   const text = formatBalance(value);
-  if (el.textContent === text) return;
-  const grew = text.length !== (el.textContent ?? '').length;
-  el.textContent = text;
-  if (!grew) return; // samme lengde: samme størrelse som før
+  if (el.textContent !== text) {
+    // Nytt antall tegn: skriftstørrelsen må regnes ut på nytt
+    if (text.length !== (el.textContent ?? '').length) delete el.dataset.fit;
+    el.textContent = text;
+  }
+  // Allerede tilpasset, eller ikke synlig ennå (da prøver vi igjen neste gang)
+  if (el.dataset.fit === '1' || !el.clientWidth) return;
   el.style.fontSize = '';
   const base = parseFloat(getComputedStyle(el).fontSize);
-  if (!el.clientWidth || el.scrollWidth <= el.clientWidth) return;
-  el.style.fontSize = `${Math.max(12, Math.floor(base * (el.clientWidth / el.scrollWidth) * 10) / 10)}px`;
+  if (el.scrollWidth > el.clientWidth) {
+    el.style.fontSize = `${Math.max(12, Math.floor(base * (el.clientWidth / el.scrollWidth) * 0.98 * 10) / 10)}px`;
+  }
+  el.dataset.fit = '1';
 }
 
 /** Endrer teksten bare når den faktisk er ny (oppdateringen kjører hver skjermoppdatering). */

@@ -1347,14 +1347,15 @@ body.scrolled .investing .back-btn {
 .card-platinum {
   background: linear-gradient(135deg, #34373c, #212327);
 }
+/* Edelsteinskortene: samme farger, men dempet (ikke knallfarget) */
 .card-sapphire {
-  background: linear-gradient(135deg, #0b1e4d, #1d4fa8 70%, #2a63c9);
+  background: linear-gradient(135deg, #172238, #2b4268 70%, #36507a);
 }
 .card-emerald {
-  background: linear-gradient(135deg, #04382a, #0d6e4f 70%, #14936a);
+  background: linear-gradient(135deg, #142b26, #24493f 70%, #2d5a4d);
 }
 .card-ruby {
-  background: linear-gradient(135deg, #3d0610, #8e1029 70%, #b3173a);
+  background: linear-gradient(135deg, #2c1519, #55242f 70%, #683039);
 }
 .card-titan {
   background: linear-gradient(135deg, #4a5059, #2f343a);
@@ -1368,15 +1369,52 @@ body.scrolled .investing .back-btn {
 .card-diamond {
   background: linear-gradient(135deg, #34363b, #222327);
 }
-/* Infinity: fargene glir sakte rundt */
+/* Infinity: mørk bakgrunn der fargene glir sakte rundt, og et regnbueskjær som sveiper over kortet */
 .card-infinity {
   background: linear-gradient(120deg, #1b0b3a, #0b3a5a, #3a0b4a, #0b2a4a, #1b0b3a);
   background-size: 300% 300%;
   animation: infinity-glow 12s ease-in-out infinite;
 }
+.card-infinity::before {
+  content: '';
+  position: absolute;
+  inset: 0 -100%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 110, 199, 0.28) 38%,
+    rgba(255, 211, 110, 0.26) 43%,
+    rgba(110, 255, 196, 0.26) 48%,
+    rgba(110, 200, 255, 0.28) 53%,
+    rgba(179, 110, 255, 0.28) 58%,
+    transparent 66%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: infinity-sweep 7s ease-in-out infinite;
+}
 @keyframes infinity-glow {
   50% {
     background-position: 100% 50%;
+  }
+}
+.infinity-star {
+  animation: infinity-twinkle 3s ease-in-out infinite;
+}
+@keyframes infinity-twinkle {
+  50% {
+    opacity: 0.08;
+  }
+}
+@keyframes infinity-sweep {
+  0% {
+    transform: translateX(-35%);
+  }
+  50% {
+    transform: translateX(35%);
+  }
+  100% {
+    transform: translateX(-35%);
   }
 }
 
