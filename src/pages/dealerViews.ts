@@ -172,6 +172,13 @@ export function renderDealerDetail(b: Business, hero: string): string {
 // =========================================================================
 // Verkstedet og utstillingen
 // =========================================================================
+/** Bilde øverst på verkstedet / utstillingen, med tittelen oppå. */
+const hallBanner = (src: string, title: string) => `
+  <div class="dl-hall">
+    <img src="${src}" alt="" />
+    <h1>${title}</h1>
+  </div>`;
+
 export function renderService(b: Business, filter: ServiceFilter): string {
   const now = Date.now();
   const all = inService(b);
@@ -190,7 +197,7 @@ export function renderService(b: Business, filter: ServiceFilter): string {
       </button>`;
   });
   return `
-    <h1 class="dl-page-title">Bilverksted</h1>
+    ${hallBanner('dealer/hall-service.webp', 'Bilverksted')}
     <div class="dl-chips">${chip('all', 'Alle')}${chip('progress', 'Under reparasjon')}${chip('pending', 'Venter')}</div>
     ${all.length === 0
       ? emptyState('Ingen biler', 'Kjøp en bil på bruktbilmarkedet for å begynne å pusse den opp')
@@ -209,7 +216,7 @@ export function renderShowroom(b: Business): string {
       </button>`,
   );
   return `
-    <h1 class="dl-page-title">Bilutstilling</h1>
+    ${hallBanner('dealer/hall-showroom.png', 'Bilutstilling')}
     ${list.length ? `<div class="dl-grid">${cards.join('')}</div>` : emptyState('Ingen biler', 'Sett biler ut for salg')}`;
 }
 
