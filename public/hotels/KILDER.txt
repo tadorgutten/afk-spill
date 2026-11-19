@@ -1,0 +1,23 @@
+Bilder av landemerker fra Wikimedia Commons (frie lisenser, se lenkene).
+
+oslo.jpg: https://commons.wikimedia.org/wiki/File:Oslo_Opera_House_-_2025.jpg
+copenhagen.jpg: https://commons.wikimedia.org/wiki/File:The_Nyhavn_Canal_3.jpg
+stockholm.jpg: https://commons.wikimedia.org/wiki/File:Gamla_stan_September_2014_01.jpg
+reykjavik.jpg: https://commons.wikimedia.org/wiki/File:Hallgrimskirkja_mai_2026.jpg
+london.jpg: https://commons.wikimedia.org/wiki/File:Tower_Bridge_at_Dawn.jpg
+paris.jpg: https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons_(cropped).jpg
+barcelona.jpg: https://commons.wikimedia.org/wiki/File:SF_maig_2_cropped.jpg
+rome.jpg: https://commons.wikimedia.org/wiki/File:Colosseo_2020.jpg
+santorini.jpg: https://commons.wikimedia.org/wiki/File:Oia_sunset_-_panoramio_(2).jpg
+zermatt.jpg: https://commons.wikimedia.org/wiki/File:Matterhorn_from_Domh%C3%BCtte_-_2.jpg
+dubai.jpg: https://commons.wikimedia.org/wiki/File:Burj_Khalifa_(worlds_tallest_building)_and_the_Dubai_skyline_(25781049892).jpg
+maldives.jpg: https://commons.wikimedia.org/wiki/File:Mal%C3%A9.jpg
+new-york.jpg: https://commons.wikimedia.org/wiki/File:New_york_times_square-terabass.jpg
+las-vegas.jpg: https://commons.wikimedia.org/wiki/File:Las_Vegas_Strip_09_2017_4897.jpg
+miami.jpg: https://commons.wikimedia.org/wiki/File:Ocean_drive_day_2009j.JPG
+tokyo.jpg: https://commons.wikimedia.org/wiki/File:Shibuya_Crossing%2C_Aerial.jpg
+singapore.jpg: https://commons.wikimedia.org/wiki/File:Marina_Bay_Sands_(I).jpg
+bali.jpg: https://commons.wikimedia.org/wiki/File:TanahLot_2014.JPG
+sydney.jpg: https://commons.wikimedia.org/wiki/File:Sydney_Opera_House_2026.jpg
+rio.jpg: https://commons.wikimedia.org/wiki/File:Christ_the_Redeemer_-_Cristo_Redentor.jpg
+monaco.jpg: https://commons.wikimedia.org/wiki/File:Panorama_von_Monaco-La_Turbie.jpg

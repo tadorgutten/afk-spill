@@ -144,6 +144,32 @@ export const icons = {
   /** Pengeseddel */
   bill: svg('<rect x="2.5" y="6" width="19" height="12" rx="1"/><circle cx="12" cy="12" r="2.8"/><path d="M5.5 9v.01M18.5 15v.01"/>', 1.5),
 
+  // --- Hotellkjede ---
+  /** Hotell (bygning med H) */
+  hotel: svg('<path d="M4 21V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v16"/><path d="M2.5 21h19"/><path d="M9 8v6M15 8v6M9 11h6"/><path d="M10.5 21v-3.5h3V21"/>', 1.6),
+  /** Seng (rom) */
+  bed: svg('<path d="M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="2"/>', 1.6),
+  /** Stjerne (fylt) */
+  starFill: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2.8 2.8 5.8 6.3.8-4.6 4.4 1.1 6.3L12 17.1l-5.6 3 1.1-6.3-4.6-4.4 6.3-.8Z"/></svg>',
+  /** Bestikk (restaurant) */
+  fork: svg('<path d="M6 3v7a2 2 0 0 0 4 0V3M8 3v18"/><path d="M17 21V3c-2 1.5-3 4-3 7v3h3"/>', 1.6),
+  /** Cocktailglass (bar) */
+  cocktail: svg('<path d="M4 4h16l-8 9Z"/><path d="M12 13v8M8 21h8M15 4l3-2"/>', 1.6),
+  /** Lotus (spa) */
+  lotus: svg('<path d="M12 20c-4 0-8-2.5-9-7 3 0 6 1.5 9 4.5 3-3 6-4.5 9-4.5-1 4.5-5 7-9 7Z"/><path d="M12 17.5C10 15 9.5 11 12 6c2.5 5 2 9 0 11.5Z"/>', 1.5),
+  /** Bølger (basseng) */
+  waves: svg('<path d="M2 9c2 0 2-1.5 4-1.5S8 9 10 9s2-1.5 4-1.5S16 9 18 9s2-1.5 4-1.5M2 14c2 0 2-1.5 4-1.5S8 14 10 14s2-1.5 4-1.5S16 14 18 14s2-1.5 4-1.5M2 19c2 0 2-1.5 4-1.5S8 19 10 19s2-1.5 4-1.5S16 19 18 19s2-1.5 4-1.5"/>', 1.5),
+  /** Tavle (konferanse) */
+  board: svg('<rect x="3" y="3.5" width="18" height="12" rx="1"/><path d="M12 15.5V20M8 21l4-1.5 4 1.5M7 11l3-3 2.5 2L17 7"/>', 1.6),
+  /** Spillterning (kasino) */
+  dice: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/>', 1.6),
+  /** Kost (renovering) */
+  broom: svg('<path d="M19 3 11 11"/><path d="M11 11c-3 0-6 2-7 6l-1 4h4c1-1 2-3 2-3s0 2-1 3h3c1-1 1.5-3 1.5-3s.5 2 0 3H15c1-4 0-7-4-10Z"/>', 1.5),
+  /** Kalender (sesong) */
+  calendar: svg('<rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>', 1.6),
+  /** Gnister (hendelse) */
+  sparkle: svg('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>', 1.6),
+
   // --- Fotballklubb ---
   /** Fotballbane med ball (fotballklubb) */
   pitch: svg('<rect x="2.5" y="8" width="19" height="13" rx="1.5"/><path d="M12 8v13"/><circle cx="12" cy="14.5" r="2"/><path d="M2.5 11.5h2.5v6H2.5M21.5 11.5H19v6h2.5"/><circle cx="12" cy="4" r="2.5"/>', 1.5),

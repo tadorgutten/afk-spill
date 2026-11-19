@@ -1,0 +1,697 @@
+/* =========================================================================
+ * HOTELLKJEDE (src/pages/hotelViews.ts) – dyp blågrønn med gull
+ * ========================================================================= */
+.cat-lagoon {
+  background: linear-gradient(115deg, #1f6f78, #134359 55%, #0b1d33);
+}
+
+.biz-hero.cat-lagoon,
+.biz-hero.cat-lagoon .biz-hero-icon,
+.business .biz-hero.cat-lagoon .biz-hero-btn,
+.biz-icon.cat-lagoon {
+  color: #fff;
+}
+
+.business[data-theme='hotel'] {
+  --ht: #1b6b74;
+  --ht-gold: #c9a24a;
+  --ht-soft: #eef5f6;
+  /* Skyveknappen (lånt fra banken) får hotellets farge */
+  --bank: #1b6b74;
+}
+
+.business[data-theme='hotel'] .biz-balance {
+  color: var(--ht);
+}
+
+.ht-neg {
+  color: #d8465a !important;
+}
+
+.ht-title {
+  margin: 30px 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.ht-muted {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.ht-muted.pad {
+  margin: -8px 0 16px;
+}
+
+.business .ht-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--ht);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.business .ht-btn.soft {
+  margin-top: 12px;
+  background: #ddeef0;
+  color: var(--ht);
+}
+
+.business .ht-btn.poor,
+.business .ht-btn:disabled {
+  opacity: 0.5;
+}
+
+.business .ht-mini-btn {
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-radius: 12px;
+  background: var(--ht);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.business .ht-mini-btn.poor {
+  opacity: 0.5;
+}
+
+.business .ht-mini-btn.confirm {
+  background: var(--ht-gold);
+  color: #1c2230;
+}
+
+.business .ht-mini-btn:disabled {
+  background: #c9ced6;
+  opacity: 1;
+}
+
+/* Stjerner */
+.ht-stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.ht-stars i {
+  display: flex;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ht-stars i.on {
+  color: var(--ht-gold, #c9a24a);
+}
+
+.ht-stars svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Forsiden --- */
+.ht-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.ht-summary div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 6px;
+  border-radius: 18px;
+  background: var(--ht-soft);
+}
+
+.ht-summary svg {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  color: var(--ht);
+}
+
+.ht-summary b {
+  font-size: 20px;
+}
+
+.ht-summary span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.ht-cards,
+.ht-cities {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.business .ht-card,
+.ht-city {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(20, 30, 60, 0.1);
+}
+
+.ht-card-photo {
+  position: relative;
+  height: 150px;
+}
+
+.ht-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ht-card-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(5, 15, 30, 0.75));
+}
+
+.ht-card-photo > div {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.ht-card-photo strong {
+  font-size: 22px;
+}
+
+.ht-card-photo span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.ht-card-photo > .ht-stars {
+  position: absolute;
+  z-index: 1;
+  right: 14px;
+  bottom: 14px;
+}
+
+.ht-card-body,
+.ht-city-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 16px;
+  text-align: left;
+}
+
+.ht-job-chip,
+.ht-event-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ht-job-chip {
+  color: var(--ht);
+}
+
+.ht-event-chip {
+  color: #a87b16;
+}
+
+.ht-job-chip svg,
+.ht-event-chip svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ht-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 8px;
+}
+
+.ht-card-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.ht-card-stats b {
+  font-size: 17px;
+}
+
+.ht-card-stats span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ht-cond {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e5e8ec;
+}
+
+.ht-cond span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: #2fa35a;
+}
+
+.ht-cond span.low {
+  background: #e5484d;
+}
+
+.ht-cond.big {
+  height: 12px;
+  margin-bottom: 10px;
+}
+
+.ht-cond-label {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ht-help {
+  margin-top: 26px;
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--ht-soft);
+}
+
+.ht-help h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.ht-help p {
+  margin: 8px 0 0;
+  color: #4b5160;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* --- Ett hotell --- */
+.business[data-view='hHotel'] {
+  padding-top: 0;
+}
+
+.ht-banner {
+  position: relative;
+  height: 260px;
+  margin: 0 -18px;
+  overflow: hidden;
+}
+
+.ht-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ht-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), transparent 35%, rgba(5, 15, 30, 0.8));
+}
+
+.ht-banner-text {
+  position: absolute;
+  z-index: 1;
+  left: 18px;
+  bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #fff;
+}
+
+.ht-banner-text h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.ht-banner-text .ht-stars svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ht-income {
+  margin-top: -56px;
+}
+
+.ht-job,
+.ht-event {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+}
+
+.ht-job {
+  background: var(--ht-soft);
+  color: var(--ht);
+}
+
+.ht-event {
+  background: #fff6e0;
+  color: #8a6311;
+}
+
+.ht-job svg,
+.ht-event svg {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.ht-job div,
+.ht-event div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ht-job span,
+.ht-event span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.ht-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ht-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--ht-soft);
+}
+
+.ht-stats span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.ht-stats b {
+  font-size: 20px;
+}
+
+.ht-box {
+  padding: 16px;
+  border-radius: 20px;
+  background: #f4f6f7;
+}
+
+.ht-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.ht-row + .ht-row {
+  border-top: 1px solid #e3e6ea;
+}
+
+.ht-row-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ht);
+}
+
+.ht-row-icon.gold {
+  color: var(--ht-gold);
+}
+
+.ht-row-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.ht-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ht-row-text strong {
+  font-size: 16px;
+}
+
+.ht-row-text span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Fasiliteter */
+.ht-facs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ht-fac {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f4f6f7;
+}
+
+.ht-fac.owned {
+  background: var(--ht-soft);
+  outline: 2px solid #bfdcdf;
+}
+
+.ht-fac-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--ht);
+}
+
+.ht-fac strong {
+  font-size: 16px;
+}
+
+.ht-fac > span {
+  color: #4b5160;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.ht-fac small {
+  color: #1f7a3c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ht-fac em {
+  margin-top: 4px;
+  color: #1c2230;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.ht-fac .ht-mini-btn {
+  margin-top: 6px;
+}
+
+.ht-owned {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--ht);
+}
+
+.ht-owned svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Regnskap */
+.ht-ledger {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ht-ledger div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.ht-ledger span {
+  color: #4b5160;
+}
+
+.ht-ledger .sum {
+  padding-top: 8px;
+  border-top: 1px solid #dfe3e8;
+  font-size: 17px;
+}
+
+/* Anmeldelser */
+.ht-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ht-review {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f4f6f7;
+}
+
+.ht-review div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ht-review span {
+  flex: 1;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.ht-review b {
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #9aa0ab;
+  color: #fff;
+  font-size: 14px;
+}
+
+.ht-review b.good {
+  background: #1f7a3c;
+}
+
+.ht-review b.bad {
+  background: #d8465a;
+}
+
+.ht-review p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* --- Byer --- */
+.ht-city.owned {
+  outline: 2px solid var(--ht);
+}
+
+.ht-city-body > span {
+  color: #4b5160;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ht-city-buy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ht-city-buy b {
+  font-size: 18px;
+}
+
+.ht-city-buy span {
+  flex: 1;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.ht-city-body > .ht-mini-btn {
+  align-self: flex-start;
+}
+
+/* --- Bygg rom --- */
+.business[data-theme='hotel'] .taxi-chip.active {
+  background: var(--ht);
+  color: #fff;
+}
+
+.ht-chips {
+  margin-bottom: 16px;
+}
+
+.ht-qty {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+
+.ht-qty strong {
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.ht-qty span {
+  color: #6b7280;
+}
+
+.ht-qty-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.business .ht-qty-btn {
+  padding: 10px 0;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ht);
+  font-weight: 700;
+  text-align: center;
+}
+
+.ht-slider {
+  margin-top: 20px;
+}

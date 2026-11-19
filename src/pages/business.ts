@@ -123,6 +123,21 @@ import {
 } from '../game/football';
 import { leagueById } from '../game/footballData';
 import {
+  buildFacility,
+  buildRooms,
+  buyHotel,
+  hotelIn,
+  hotelsOf,
+  renovate,
+  roomById,
+  roomCost,
+  setPrice,
+  upgradeStars,
+  type HotelPay,
+} from '../game/hotel';
+import { cityById, type FacilityId, type RoomType } from '../game/hotelData';
+import { bindHotelPrice, renderCities, renderHotel, renderHotelDetail, renderPrice, renderRooms } from './hotelViews';
+import {
   renderBuy,
   renderFootballDetail,
   renderHistory,
@@ -195,7 +210,11 @@ type View =
   | { name: 'fBuy'; id: string; ref: string; replace: string | null }
   | { name: 'fTraining'; id: string }
   | { name: 'fTrophies'; id: string }
-  | { name: 'fHistory'; id: string };
+  | { name: 'fHistory'; id: string }
+  | { name: 'hHotel'; id: string; city: string }
+  | { name: 'hCities'; id: string }
+  | { name: 'hRooms'; id: string; city: string; room: RoomType; qty: number }
+  | { name: 'hPrice'; id: string; city: string; price: number };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -208,6 +227,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   it: icons.monitor,
   bank: icons.bank,
   football: icons.pitch,
+  hotel: icons.hotel,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -220,6 +240,8 @@ export function createBusinessPage(state: GameState): Page {
   let stack: View[] = [{ name: 'home' }];
   const current = () => stack[stack.length - 1];
   const find = (id: string) => state.businesses.find((b) => b.id === id);
+  /** Hotellkjeden betaler på samme måte som bilforhandleren (kjøp blir en del av bedriftens verdi). */
+  const hotelPay = (b: Business): HotelPay => dealerPay(state, b);
 
   function go(view: View) {
     stack.push(view);
@@ -244,6 +266,8 @@ export function createBusinessPage(state: GameState): Page {
   /** Fotballklubb: "trykk igjen" for å selge en spiller / trekke laget fra turneringen. */
   let confirmSell = false;
   let confirmLeave = false;
+  /** Hotellkjede: hvilken knapp som venter på "trykk igjen" (f.eks. "stars", "fac:spa", "buy:paris"). */
+  let hotelConfirm: string | null = null;
   /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
   let slotsOpen = false;
   /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
@@ -294,6 +318,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (engineOf(b) === 'it') element.innerHTML = renderItDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'bank') element.innerHTML = renderBankDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'football') element.innerHTML = renderFootballDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'hotel') element.innerHTML = renderHotelDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -382,6 +407,29 @@ export function createBusinessPage(state: GameState): Page {
       case 'dSkills': {
         const b = find(view.id);
         element.innerHTML = b ? backBtn + renderSkills(b) : '';
+        break;
+      }
+      // --- Hotellkjede ---
+      case 'hHotel':
+      case 'hRooms':
+      case 'hPrice': {
+        const b = find(view.id);
+        const h = b && hotelIn(b, view.city);
+        if (!b || !h) {
+          stack.pop();
+          return renderView();
+        }
+        if (view.name === 'hHotel') element.innerHTML = backBtn + renderHotel(state, b, h, hotelConfirm);
+        else if (view.name === 'hRooms') element.innerHTML = backBtn + renderRooms(state, b, h, view.room, view.qty);
+        else {
+          element.innerHTML = backBtn + renderPrice(b, h, view.price);
+          bindHotelPrice(element, h, (price) => (view.price = price));
+        }
+        break;
+      }
+      case 'hCities': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderCities(state, b, hotelConfirm) : '';
         break;
       }
       // --- Fotballklubb ---
@@ -598,6 +646,7 @@ export function createBusinessPage(state: GameState): Page {
     if (action !== 'i-fire') confirmFire = false;
     if (action !== 'f-sell') confirmSell = false;
     if (action !== 'f-leave') confirmLeave = false;
+    if (action !== 'h-do' && action !== 'h-buy') hotelConfirm = null;
 
     switch (action) {
       case 'back':
@@ -815,6 +864,125 @@ export function createBusinessPage(state: GameState): Page {
       }
       case 'd-skills':
         return go({ name: 'dSkills', id });
+
+      // --- Hotellkjede ---
+      case 'h-hotel':
+        return go({ name: 'hHotel', id, city: target.dataset.city! });
+      case 'h-cities':
+        return go({ name: 'hCities', id });
+      case 'h-buy': {
+        const b = find(id);
+        const cityId = target.dataset.city!;
+        if (!b) return;
+        // Trykk to ganger for å kjøpe (det er dyrt)
+        if (hotelConfirm !== `buy:${cityId}`) {
+          hotelConfirm = `buy:${cityId}`;
+          return render();
+        }
+        hotelConfirm = null;
+        const result = buyHotel(b, hotelPay(b), cityId);
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result !== 'ok') return render();
+        showToast(`Hotellet i ${cityById(cityId).name} bygges!`);
+        stack = [{ name: 'home' }, { name: 'detail', id }, { name: 'hHotel', id, city: cityId }];
+        render();
+        window.scrollTo(0, 0);
+        return;
+      }
+      case 'h-do': {
+        const b = find(id);
+        const h = b && hotelIn(b, target.dataset.city!);
+        const key = target.dataset.key!;
+        if (!b || !h) return;
+        if (hotelConfirm !== key) {
+          hotelConfirm = key;
+          return render();
+        }
+        hotelConfirm = null;
+        const pay = hotelPay(b);
+        const result =
+          key === 'stars' ? upgradeStars(h, pay) : key === 'renovate' ? renovate(h, pay) : buildFacility(h, pay, key.slice(4) as FacilityId);
+        const messages: Record<string, string> = {
+          money: 'Du har ikke nok penger',
+          busy: 'Det pågår allerede byggearbeid på hotellet',
+          need: 'Kravene er ikke oppfylt',
+          max: 'Ikke nødvendig nå',
+          locked: 'Ikke tilgjengelig her',
+        };
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(messages[result] ?? 'Det gikk ikke');
+        }
+        showToast(key === 'renovate' ? 'Renoveringen har startet' : 'Byggearbeidet har startet');
+        return render();
+      }
+      case 'h-rooms': {
+        const b = find(id);
+        const h = b && hotelIn(b, target.dataset.city!);
+        if (!b || !h) return;
+        const room = target.dataset.room as RoomType;
+        return go({ name: 'hRooms', id, city: h.city, room, qty: Math.min(10, roomById(room).max - h.rooms[room]) });
+      }
+      case 'h-room-type': {
+        if (view.name !== 'hRooms') return;
+        const b = find(view.id);
+        const h = b && hotelIn(b, view.city);
+        if (!h) return;
+        view.room = target.dataset.room as RoomType;
+        view.qty = Math.min(10, roomById(view.room).max - h.rooms[view.room]);
+        return render();
+      }
+      case 'h-qty': {
+        if (view.name !== 'hRooms') return;
+        const b = find(view.id);
+        const h = b && hotelIn(b, view.city);
+        if (!h) return;
+        const left = roomById(view.room).max - h.rooms[view.room];
+        const step = Number(target.dataset.step);
+        // "Maks": så mange som er plass til og som man har råd til
+        if (step >= 9999) view.qty = Math.max(0, Math.min(left, Math.floor(state.balance / roomCost(h, view.room))));
+        else view.qty = Math.max(0, Math.min(left, view.qty + step));
+        return render();
+      }
+      case 'h-build-rooms': {
+        if (view.name !== 'hRooms') return;
+        const b = find(view.id);
+        const h = b && hotelIn(b, view.city);
+        if (!b || !h) return;
+        const result = buildRooms(h, hotelPay(b), view.room, view.qty);
+        const messages: Record<string, string> = {
+          money: 'Du har ikke nok penger',
+          busy: 'Det pågår allerede byggearbeid på hotellet',
+          max: 'Ikke plass til så mange rom',
+          locked: 'Hotellet har for få stjerner',
+          need: 'Velg hvor mange rom',
+        };
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(messages[result] ?? 'Det gikk ikke');
+        }
+        showToast(`${view.qty} rom bygges`);
+        return back();
+      }
+      case 'h-price': {
+        const b = find(id);
+        const h = b && hotelIn(b, target.dataset.city!);
+        if (!h) return;
+        return go({ name: 'hPrice', id, city: h.city, price: h.price });
+      }
+      case 'h-price-save':
+      case 'h-price-default': {
+        if (view.name !== 'hPrice') return;
+        const b = find(view.id);
+        const h = b && hotelIn(b, view.city);
+        if (!h) return;
+        setPrice(h, action === 'h-price-save' ? view.price : 0);
+        showToast('Prisen er lagret');
+        return back();
+      }
 
       // --- Fotballklubb ---
       case 'f-leagues':
@@ -1355,6 +1523,10 @@ export function createBusinessPage(state: GameState): Page {
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
+    if (engineOf(b) === 'hotel') {
+      const n = hotelsOf(b).hotels.length;
+      return `<span>${icons.hotel} ${n} ${n === 1 ? 'hotell' : 'hoteller'}</span>`;
+    }
     if (engineOf(b) === 'football') {
       const t = fcOf(b).tournament;
       const league = t && !t.finished ? ` · ${leagueById(t.league).name}` : '';
@@ -1572,6 +1744,7 @@ export function createBusinessPage(state: GameState): Page {
       confirmFire = false;
       confirmSell = false;
       confirmLeave = false;
+      hotelConfirm = null;
       slotsOpen = false;
       procureFor = null;
       render();
@@ -1596,7 +1769,7 @@ export function createBusinessPage(state: GameState): Page {
       // Tall som endres (inntekt, nedtelling, saldo) tegnes på nytt én gang i sekundet.
       // Sider med skrivefelt tegnes ikke på nytt (da ville teksten man skriver forsvinne).
       const view = current().name;
-      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire' || view === 'bControl') return;
+      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire' || view === 'bControl' || view === 'hPrice') return;
       // Ikke tegn på nytt mens man bekrefter (teksten "Trykk igjen" skal bli stående)
       if (confirmDrop || confirmFire || confirmSell || confirmLeave) return;
       // Kamphistorikk, trofeer og lister med bilder endrer seg ikke av seg selv
