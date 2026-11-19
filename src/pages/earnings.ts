@@ -278,19 +278,13 @@ function formatRequirement(value: number): string {
  */
 function setBalance(el: HTMLElement, value: number) {
   const text = formatBalance(value);
-  if (el.textContent !== text) {
-    // Nytt antall tegn: skriftstørrelsen må regnes ut på nytt
-    if (text.length !== (el.textContent ?? '').length) delete el.dataset.fit;
-    el.textContent = text;
-  }
-  // Allerede tilpasset, eller ikke synlig ennå (da prøver vi igjen neste gang)
-  if (el.dataset.fit === '1' || !el.clientWidth) return;
-  el.style.fontSize = '';
-  const base = parseFloat(getComputedStyle(el).fontSize);
-  if (el.scrollWidth > el.clientWidth) {
-    el.style.fontSize = `${Math.max(12, Math.floor(base * (el.clientWidth / el.scrollWidth) * 0.98 * 10) / 10)}px`;
-  }
-  el.dataset.fit = '1';
+  if (el.textContent === text) return;
+  el.textContent = text;
+  // Hvor bred teksten er, målt i "em" (bredden på skriften). Regnes ut fra tegnene,
+  // så det virker uten å måle på skjermen. CSS gjør skriften så stor som kortet tillater.
+  let em = 0;
+  for (const ch of text) em += /\d|\$/.test(ch) ? 0.62 : 0.32;
+  el.style.setProperty('--balance-em', em.toFixed(2));
 }
 
 /** Endrer teksten bare når den faktisk er ny (oppdateringen kjører hver skjermoppdatering). */

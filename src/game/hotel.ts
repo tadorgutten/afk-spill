@@ -56,7 +56,11 @@ export const PRICE_RANGE: [number, number] = [-0.3, 0.6];
 const CLEANING = 0.18;
 const STAFF = 0.08;
 /** Tilstanden synker så mye per time. */
-const WEAR_PER_HOUR = 0.5;
+const WEAR_PER_HOUR = 0.25;
+/** Over denne tilstanden merkes ikke slitasjen på inntekten. */
+export const WEAR_LIMIT = 80;
+/** Hvor mye slitasjen under grensen trekker ned (0 = ingen, 1 = helt nedslitt). */
+const wearPenalty = (h: Hotel) => Math.max(0, WEAR_LIMIT - h.condition) / WEAR_LIMIT;
 /** Pris per romenhet å bygge (ganges med byens prisnivå og stjernene). */
 const ROOM_COST = 380_000;
 /** Pris for et nytt hotell (ganges med byens prisnivå). Oslo = $ 1,5 mrd. */
@@ -148,7 +152,7 @@ export const roomCount = (h: Hotel) => ROOMS.reduce((sum, r) => sum + h.rooms[r.
 /** Gjestevurdering 1–10. */
 export function reviewScore(h: Hotel): number {
   const facilities = h.facilities.reduce((sum, id) => sum + facilityById(id).review, 0);
-  const score = 4.2 + h.stars * 0.55 + facilities + (h.condition - 70) / 30 - Math.max(0, h.price) * 4 + Math.max(0, -h.price) * 1.5;
+  const score = 4.2 + h.stars * 0.55 + facilities + 1 - wearPenalty(h) * 3.3 - Math.max(0, h.price) * 4 + Math.max(0, -h.price) * 1.5;
   return Math.max(1, Math.min(10, score));
 }
 
@@ -170,7 +174,7 @@ export function hotelNumbers(h: Hotel, now = Date.now(), price = h.price): Hotel
   const season = seasonFactor(c, now);
   const trial = { ...h, price };
   const rating = 0.7 + reviewScore(trial) * 0.05;
-  const condition = 0.6 + 0.4 * (h.condition / 100);
+  const condition = 1 - 0.4 * wearPenalty(h);
   const pool = h.facilities.includes('pool') && season > 1.1 ? 1.05 : 1;
   const demand = BASE_OCCUPANCY * season * weekFactor(c, now) * (event ? EVENT_BOOST : 1) * rating * condition * pool;
   let occupancy = Math.max(0.03, Math.min(0.97, demand * Math.exp(-PRICE_SENSITIVITY * price)));

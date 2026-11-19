@@ -73,6 +73,7 @@ button {
   background: var(--card);
   color: #fff;
   box-shadow: 0 14px 30px rgba(10, 15, 40, 0.3);
+  container-type: inline-size; /* saldoen måler seg mot kortets bredde (cqw) */
 }
 
 .bank-card-pattern {
@@ -105,11 +106,12 @@ button {
 
 .bank-card-balance {
   margin-top: 4px;
-  font-size: clamp(30px, 9.5vw, 42px);
+  /* Skriften krympes så hele saldoen får plass på kortet (--balance-em settes i earnings.ts) */
+  font-size: min(clamp(30px, 9.5vw, 42px), calc(96cqw / var(--balance-em, 1)));
   font-weight: 800;
   letter-spacing: -0.5px;
   white-space: nowrap;
-  overflow: hidden; /* hele saldoen vises – skriften krympes i earnings.ts så den får plass */
+  overflow: hidden;
   font-variant-numeric: tabular-nums;
 }
 

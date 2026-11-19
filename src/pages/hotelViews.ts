@@ -223,7 +223,7 @@ export function renderHotel(state: GameState, b: Business, h: Hotel, confirm: st
     <h2 class="ht-title">Tilstand</h2>
     <div class="ht-box">
       <div class="ht-cond big"><span style="width:${h.condition}%" class="${h.condition < 40 ? 'low' : ''}"></span></div>
-      <p class="ht-muted">Tilstand ${Math.round(h.condition)} %. Hotellet slites litt hver time. Lav tilstand gir dårligere vurdering og færre gjester.</p>
+      <p class="ht-muted">Tilstand ${Math.round(h.condition)} %. Hotellet slites litt hver time. Over 80 % merkes det ikke, men under 80 % gir det dårligere vurdering og færre gjester.</p>
       <div class="ht-row">
         <span class="ht-row-icon">${icons.broom}</span>
         <div class="ht-row-text"><strong>Renover</strong><span>${formatMoneyWhole(renovateCost(h))} · 30 min · halvt belegg mens det pågår</span></div>
