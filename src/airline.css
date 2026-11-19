@@ -1,0 +1,1416 @@
+/* =========================================================================
+ * FLYSELSKAP (src/pages/airlineViews.ts) – himmelblått og rent
+ * ========================================================================= */
+.cat-sky {
+  background: linear-gradient(110deg, #5fcbf6, #4a7fd4);
+}
+
+.biz-hero.cat-sky,
+.biz-hero.cat-sky .biz-hero-icon,
+.business .biz-hero.cat-sky .biz-hero-btn,
+.biz-icon.cat-sky {
+  color: #fff;
+}
+
+.business[data-theme='airline'] {
+  --air: #4fb3ea;
+  --air-dark: #2e6da8;
+  --air-soft: #eef7fd;
+  --air-card: #f4f6f9;
+  --air-intl: #9a5bc4;
+  --air-red: #e0565b;
+}
+
+.business[data-theme='airline'] .biz-balance,
+.air-sub {
+  margin: 4px 0 18px;
+  color: #3a4252;
+  font-size: 16px;
+}
+
+.air-sub b {
+  font-weight: 600;
+}
+
+.biz-income-card.air-grounded strong {
+  color: var(--air-red);
+}
+
+.air-muted {
+  margin: 0;
+  color: #6b7383;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.air-muted.center {
+  text-align: center;
+}
+
+.air-muted.small {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.air-muted.pad {
+  padding: 24px 0;
+}
+
+.air-page-title {
+  margin: 62px 0 0 56px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.air-page-title + .air-sub {
+  margin-left: 56px;
+}
+
+.air-title {
+  margin: 34px 0 14px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.business .air-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 17px;
+  border-radius: 20px;
+  background: var(--air);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.business .air-btn.off {
+  background: #bfe2f6;
+}
+
+.business .air-soft-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 17px;
+  border-radius: 20px;
+  background: var(--air-soft);
+  color: var(--air);
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.business .air-soft-btn svg {
+  width: 26px;
+  height: 26px;
+}
+
+.business .air-soft-btn.off {
+  opacity: 0.5;
+}
+
+.business .air-soft-btn.confirm {
+  background: var(--air-red);
+  color: #fff;
+}
+
+.business .air-pill-btn {
+  flex-shrink: 0;
+  padding: 14px 34px;
+  border-radius: 999px;
+  background: var(--air);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.business .air-pill-btn.off {
+  opacity: 0.45;
+}
+
+.business .air-pill-btn.intl {
+  background: var(--air-intl);
+}
+
+.air-card {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 6px 22px rgba(30, 60, 110, 0.08);
+  text-align: left;
+}
+
+.air-progress {
+  height: 10px;
+  margin: 16px 0 10px;
+  border-radius: 99px;
+  background: #dfe6ee;
+  overflow: hidden;
+}
+
+.air-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--air);
+}
+
+.air-progress.intl span {
+  background: var(--air-intl);
+}
+
+.air-owned {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #3fa35d;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.air-owned svg {
+  width: 20px;
+  height: 20px;
+}
+
+.air-flag {
+  width: 30px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Forsiden --- */
+.business .air-alert {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 20px;
+  background: #fdeced;
+  color: var(--air-red);
+  text-align: left;
+}
+
+.air-alert svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.air-alert div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.air-alert strong {
+  font-size: 17px;
+}
+
+.air-alert span {
+  color: #8a4b4e;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.air-world {
+  margin-top: 26px;
+  border-radius: 30px;
+  background: var(--air-card);
+  overflow: hidden;
+}
+
+.air-world-sky {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 16px 34px;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.18) 0 2px, transparent 3px) 0 0 / 14px 14px,
+    linear-gradient(170deg, #4a7fd4, #56c3f3);
+  border-radius: 0 0 50% 50% / 0 0 34px 34px;
+  color: #fff;
+}
+
+.air-world-sky h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.air-world-sky > span {
+  margin-top: 4px;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.air-ring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 190px;
+  height: 190px;
+  margin-top: 14px;
+}
+
+.air-ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.air-ring circle {
+  fill: none;
+  stroke-width: 5;
+}
+
+.air-ring .track {
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-dasharray: 3 5;
+}
+
+.air-ring .fill {
+  stroke: #fff;
+  stroke-linecap: round;
+}
+
+.air-ring-plane {
+  display: flex;
+  color: #fff;
+  filter: drop-shadow(0 6px 10px rgba(10, 40, 90, 0.3));
+}
+
+.air-ring-plane svg {
+  width: 92px;
+  height: 92px;
+  stroke-width: 1.1;
+}
+
+.air-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 18px 14px 4px;
+}
+
+.business .air-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 68px;
+  padding: 12px 14px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background: #e9ecf1;
+  color: #9aa2af;
+  text-align: left;
+}
+
+.business .air-tile.wide {
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+
+.business .air-tile.owned {
+  border-color: #8fd0f3;
+  background: #e3f2fc;
+  color: var(--air);
+}
+
+.air-tile-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.air-tile-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.air-tile-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.air-tile-text strong {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.air-tile-text small {
+  margin-top: 2px;
+  color: #6b8299;
+  font-size: 12.5px;
+}
+
+.air-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f0a12c;
+}
+
+.air-hint {
+  margin: 10px 0 18px;
+  color: #8fc9ea;
+  font-size: 15px;
+  text-align: center;
+}
+
+.business .air-fleet-card {
+  display: block;
+  width: 100%;
+  margin-top: 26px;
+  padding: 18px 14px 14px;
+  border-radius: 30px;
+  background: linear-gradient(180deg, #56c3f3, #d9eef9);
+  color: #fff;
+  text-align: left;
+  overflow: hidden;
+}
+
+.air-fleet-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: -4px;
+}
+
+.air-fleet-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px -14px 12px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.air-fleet-title svg {
+  position: absolute;
+  right: 30px;
+  width: 26px;
+  height: 26px;
+}
+
+.air-fleet-title {
+  position: relative;
+}
+
+.air-fleet-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.air-fleet-stats div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 8px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.55);
+  color: #1c2230;
+}
+
+.air-fleet-stats svg {
+  width: 22px;
+  height: 22px;
+  color: var(--air);
+}
+
+.air-fleet-stats b {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.air-fleet-stats span {
+  grid-column: 1 / -1;
+  color: #6b7383;
+  font-size: 13px;
+}
+
+.air-fleet-stats .warn b,
+.air-fleet-stats .warn svg {
+  color: var(--air-red);
+}
+
+.business .air-license-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 26px;
+  padding: 26px 22px;
+  border-radius: 30px;
+  background: linear-gradient(110deg, var(--air-card) 55%, #e2e8ef);
+  text-align: left;
+}
+
+.air-license-card div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.air-license-card strong {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.air-license-card div span {
+  color: #6b7383;
+  font-size: 16px;
+}
+
+.air-license-icon {
+  display: flex;
+  color: var(--air);
+}
+
+.air-license-icon svg {
+  width: 64px;
+  height: 64px;
+  stroke-width: 1.1;
+}
+
+.air-help {
+  margin-top: 26px;
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--air-card);
+}
+
+.air-help h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.air-help p {
+  margin: 0 0 8px;
+  color: #5d6575;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* --- Ett kontinent --- */
+.business[data-view='aRegion'] {
+  padding-top: 0;
+  background: #eaf5fc;
+}
+
+.business[data-view='aRegion'] .biz-back {
+  background: transparent;
+  color: #fff;
+}
+
+body.scrolled .business[data-view='aRegion'] .biz-back {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+}
+
+.air-region-head {
+  margin: 0 -18px;
+  padding: calc(env(safe-area-inset-top) + 64px) 18px 70px;
+  background: linear-gradient(180deg, #2c5684, #56b4e6);
+  color: #fff;
+  text-align: center;
+}
+
+.air-region-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.air-region-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.air-region-stat svg {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 6px;
+  stroke-width: 1.4;
+}
+
+.air-region-stat b {
+  font-size: 22px;
+}
+
+.air-region-stat span {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.air-globe {
+  width: 170px;
+  height: 170px;
+}
+
+.air-globe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Wikipedia-kartene er grønne – gjør dem blå som resten av siden */
+  filter: hue-rotate(95deg) saturate(1.3) brightness(1.45);
+}
+
+.air-region-head h1 {
+  margin: 12px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.air-region-body {
+  margin-top: -50px;
+}
+
+.air-flight-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 2px dashed #dfe4ea;
+}
+
+.air-badge {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--air-soft);
+  color: var(--air);
+}
+
+.air-badge.intl {
+  background: #f4ecf9;
+  color: var(--air-intl);
+}
+
+.air-badge svg {
+  width: 26px;
+  height: 26px;
+}
+
+.air-flight-kind {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.air-flight-kind strong {
+  color: var(--air);
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.air-flight-kind strong.intl {
+  color: var(--air-intl);
+}
+
+.air-flight-kind span,
+.air-flight-inc span {
+  color: #7a8291;
+  font-size: 14px;
+}
+
+.air-flight-inc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.air-flight-inc b {
+  color: var(--air-intl);
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.air-route {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  align-items: end;
+  padding: 16px 0;
+  border-bottom: 2px dashed #dfe4ea;
+}
+
+.air-end {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.air-end.right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.air-end span {
+  margin-top: 4px;
+  color: #3a4252;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.air-end b {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.air-path {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+.air-path svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.air-path path {
+  fill: none;
+  stroke: #9dd3f2;
+  stroke-width: 2;
+}
+
+.air-path circle {
+  fill: #fff;
+  stroke: var(--air);
+  stroke-width: 1.5;
+}
+
+.air-path-plane {
+  position: absolute;
+  top: -8px;
+  display: flex;
+  color: var(--air);
+  transform: rotate(45deg);
+}
+
+.air-path-plane svg {
+  width: 28px;
+  height: 28px;
+  fill: var(--air);
+}
+
+.air-path small {
+  margin-top: 2px;
+  color: #6b7383;
+  font-size: 14px;
+}
+
+.air-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+.air-lines div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.air-lines svg {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--air);
+}
+
+.air-lines span {
+  flex: 1;
+  color: #6b7383;
+}
+
+.air-lines b {
+  color: var(--air);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.air-lines b.short {
+  color: var(--air-red);
+}
+
+.air-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 26px;
+  text-align: center;
+}
+
+.air-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #2c5684, #4a7fd4);
+  color: #fff;
+}
+
+.air-empty-icon.intl {
+  background: #eceff3;
+  color: #b8c0cb;
+}
+
+.air-empty-icon.done {
+  background: #e3f5e8;
+  color: #3fa35d;
+}
+
+.air-empty-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.air-empty h3 {
+  margin: 16px 0 14px;
+  color: #2c4a6e;
+  font-size: 23px;
+}
+
+.business .air-empty-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding-top: 16px;
+  border-top: 2px solid #eef2f6;
+  color: #2a303c;
+  font-size: 16px;
+  text-align: left;
+}
+
+.air-empty-row svg {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  color: var(--air);
+  stroke-width: 1.3;
+}
+
+.air-empty-row b {
+  color: var(--air);
+  font-weight: 600;
+}
+
+.business .air-hubs-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 26px;
+  padding: 22px 18px;
+}
+
+.air-hubs-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, #3b4a63, #1d2533);
+  color: #fff;
+}
+
+.air-hubs-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke-width: 1.4;
+}
+
+.air-hubs-card div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.air-hubs-card strong {
+  font-size: 24px;
+}
+
+.air-hubs-card div span {
+  color: #4b5262;
+  font-size: 15px;
+}
+
+.air-hubs-card > svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  color: var(--air);
+}
+
+/* --- Hubs --- */
+.air-hub {
+  padding-bottom: 22px;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.air-hub + .air-hub {
+  padding-top: 22px;
+}
+
+.air-hub.leased {
+  padding: 18px;
+  border: 0;
+  border-radius: 26px;
+  background: var(--air-card);
+}
+
+.air-hub.leased + .air-hub.leased {
+  margin-top: 14px;
+}
+
+.air-hub-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.air-hub-head div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.air-hub-head strong {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.air-hub-head div span {
+  color: #2a303c;
+  font-size: 17px;
+}
+
+.air-flag-box {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 76px;
+  height: 52px;
+  border-radius: 14px;
+  background: #eef1f5;
+}
+
+.air-flag-box .air-flag {
+  width: 42px;
+  height: 28px;
+}
+
+.air-hub-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  margin: 14px 0;
+  border-radius: 22px;
+  object-fit: cover;
+  background: #dfe6ee;
+}
+
+.air-hub .air-muted {
+  margin-bottom: 16px;
+}
+
+.air-buy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.air-price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.air-price > svg {
+  width: 30px;
+  height: 30px;
+  color: var(--air);
+}
+
+.air-price > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.air-price b {
+  font-size: 17px;
+}
+
+.air-price small {
+  color: #8a92a1;
+  font-size: 14px;
+}
+
+/* --- Flyflåten --- */
+.air-plane-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.air-service {
+  margin-top: 6px;
+  background: var(--air-card);
+  box-shadow: none;
+}
+
+.air-service-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.air-service-icon {
+  display: flex;
+  color: var(--air);
+}
+
+.air-service.late .air-service-icon,
+.air-service.late .air-service-top strong {
+  color: var(--air-red);
+}
+
+.air-service-icon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.air-service-top div {
+  display: flex;
+  flex-direction: column;
+}
+
+.air-service-top strong {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.air-service-top span,
+.air-service-cost span {
+  color: #8a92a1;
+  font-size: 15px;
+}
+
+.air-service-cost {
+  display: inline-flex;
+  flex-direction: column;
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.air-service-cost b {
+  font-size: 18px;
+}
+
+.air-service p {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 2px solid #d9e9f5;
+  color: var(--air);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.air-service.late p {
+  border-color: #f3d3d4;
+  color: var(--air-red);
+}
+
+.air-fleet-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 40px 0 18px;
+  color: var(--air);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.air-fleet-head svg {
+  width: 30px;
+  height: 30px;
+}
+
+.air-fleet-head.off {
+  color: #9aa2af;
+}
+
+.air-used {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.air-used > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.air-used strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.air-used .air-plane-img {
+  max-width: 220px;
+}
+
+.air-count {
+  flex-shrink: 0;
+  padding: 14px 22px;
+  border-radius: 20px;
+  background: var(--air-soft);
+  color: var(--air);
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.air-free-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.air-free {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  border-radius: 22px;
+  background: var(--air-card);
+  text-align: center;
+}
+
+.air-free strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.air-free b {
+  color: var(--air);
+  font-size: 19px;
+}
+
+.air-free .air-plane-img {
+  margin-top: 8px;
+}
+
+.air-total {
+  display: flex;
+  flex-direction: column;
+  margin-top: 26px;
+}
+
+.air-total b {
+  font-size: 22px;
+}
+
+.air-total span {
+  color: #8a92a1;
+  font-size: 15px;
+}
+
+/* --- Kjøp fly --- */
+.air-shop.with-sheet {
+  padding-bottom: 230px;
+}
+
+.business .air-shop-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0 -2px;
+  padding: 22px 6px;
+  border-bottom: 2px solid #eef2f6;
+  border-radius: 22px;
+  text-align: left;
+}
+
+.business .air-shop-row.sel {
+  background: var(--air-soft);
+}
+
+.air-name-pill {
+  padding: 10px 34px;
+  border-radius: 999px;
+  background: var(--air-soft);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.air-shop-row.sel .air-name-pill {
+  background: #fff;
+}
+
+.air-shop-row .air-plane-img {
+  max-width: 340px;
+  margin: 18px 0;
+}
+
+.air-shop-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.air-shop-info div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.air-shop-info svg {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  color: var(--air);
+}
+
+.air-shop-info span {
+  display: flex;
+  flex-direction: column;
+}
+
+.air-shop-info b {
+  font-size: 17px;
+}
+
+.air-shop-info small {
+  color: #8a92a1;
+  font-size: 14px;
+}
+
+.air-sheet {
+  position: fixed;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px);
+  border-radius: 24px 24px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 30px rgba(20, 40, 80, 0.15);
+  animation: air-sheet-in 0.22s ease-out;
+}
+
+@keyframes air-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.air-sheet-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+
+.business .air-sheet-title button {
+  display: flex;
+  color: #8a92a1;
+}
+
+.air-sheet-title svg {
+  width: 26px;
+  height: 26px;
+}
+
+.air-sheet-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: end;
+}
+
+.air-qty {
+  display: grid;
+  grid-template-columns: 52px 52px 52px;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.air-qty b {
+  font-size: 24px;
+}
+
+.business .air-qty button {
+  height: 52px;
+  text-align: center;
+  border-radius: 10px;
+  background: #eef0f3;
+  font-size: 26px;
+}
+
+.business .air-qty button.max {
+  grid-column: 1 / -1;
+  height: 40px;
+  background: #e2e5ea;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.air-sheet-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.air-sheet-buy span {
+  font-size: 17px;
+}
+
+.air-sheet-buy .air-btn {
+  margin-top: 10px;
+}
+
+.air-sheet > small {
+  display: block;
+  margin-top: 8px;
+}
+
+/* --- Lisenser --- */
+.air-lic {
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border-radius: 26px;
+  background: var(--air-card);
+}
+
+.air-lic-top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 16px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid #dde9f3;
+}
+
+.air-lic-top .air-globe-img {
+  width: 92px;
+  height: 92px;
+}
+
+.air-lic-top div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.air-lic-top strong {
+  font-size: 22px;
+}
+
+.air-lic-top div span {
+  color: var(--air);
+  font-size: 16px;
+}
+
+.air-lic-price {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.air-lic.intl .air-lic-top {
+  border-color: #e3d6ee;
+}
+
+.air-lic.intl .air-lic-top div span,
+.air-lic-need,
+.air-lic-count {
+  color: var(--air-intl);
+}
+
+.air-lic-world {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #8f6fc4, #3a2560);
+  color: #fff;
+}
+
+.air-lic-world svg {
+  width: 60px;
+  height: 60px;
+  stroke-width: 1.2;
+}
+
+.air-lic-need {
+  margin: 0;
+  font-size: 16px;
+}
+
+.air-lic-count {
+  display: block;
+  margin: -4px 0 12px;
+  text-align: right;
+  font-size: 15px;
+}
+
+.air-world ~ .air-sub {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.air-sub {
+  text-align: center;
+}
+
+.air-page-title + .air-sub {
+  text-align: left;
+}

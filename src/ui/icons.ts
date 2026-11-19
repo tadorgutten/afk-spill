@@ -243,4 +243,16 @@ export const icons = {
   laurel: svg('<path d="M7 20c-3-2-4.5-5.5-4-9.5M17 20c3-2 4.5-5.5 4-9.5"/><path d="M4 14.5c1.5.2 2.5 1 3 2.3M3.3 10.8c1.4.4 2.2 1.3 2.5 2.6M20 14.5c-1.5.2-2.5 1-3 2.3M20.7 10.8c-1.4.4-2.2 1.3-2.5 2.6"/><rect x="8" y="7" width="8" height="6" rx="1"/><path d="M7 15h10"/>', 1.4),
   /** Kontorbygg (forbedringer) */
   office: svg('<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h.01M12 7h.01M15 7h.01M9 11h.01M12 11h.01M15 11h.01M9 15h.01M15 15h.01"/><path d="M10.5 21v-3.5h3V21"/>', 2),
+
+  // --- Flyselskap ---
+  /** Fly sett ovenfra, på skrå */
+  plane: svg('<path d="M16.5 3.5c.9-.9 2.6-1.1 3.4-.3.8.8.6 2.5-.3 3.4l-3.4 3.4 2.1 8.3-1.8 1.8-3.8-6.6-3.3 3.3.4 2.7-1.4 1.4-1.6-3.2-3.2-1.6 1.4-1.4 2.7.4 3.3-3.3-6.6-3.8 1.8-1.8 8.3 2.1z"/>', 1.6),
+  /** Kontrolltårn (hubs) */
+  tower: svg('<path d="M8 3h8l1.5 4h-11z"/><path d="M6.5 7 8 11h8l1.5-4"/><path d="M9.5 11v10M14.5 11v10M7 21h10"/><path d="M12 3V1.5"/>', 1.6),
+  /** Dokument med segl (lisens) */
+  license: svg('<path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21H11"/><path d="M14 3l5 5v3"/><path d="M14 3v5h5"/><path d="M8 9h3M8 12.5h6M8 16h3"/><circle cx="16.5" cy="16" r="2.8"/><path d="m15 18.4-.6 3.1 2.1-1 2.1 1-.6-3.1"/>', 1.5),
+  /** Jordklode */
+  globe: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9M12 3C9.4 5.6 8.2 8.6 8.2 12s1.2 6.4 3.8 9"/>', 1.6),
+  /** Pluss i en firkant (kjøp flere) */
+  plusBox: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M12 8v8M8 12h8"/>', 1.7),
 };

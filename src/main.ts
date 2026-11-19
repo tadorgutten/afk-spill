@@ -8,6 +8,7 @@ import './it.css';
 import './bank.css';
 import './football.css';
 import './mine.css';
+import './airline.css';
 import './profile.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';

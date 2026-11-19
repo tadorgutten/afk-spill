@@ -35,8 +35,8 @@ import { formatDuration, formatInt, formatMoney, formatMoneyFull, formatMoneyWho
 import { icons } from '../ui/icons';
 
 /*
- * Sidene til gruveselskapet:
- *   detail – oversikt: verdi per time, mineralene (én knapp hver), mine gruver
+ * Sidene til gruveselskapet (ryddig design i samme stil som flyselskapet):
+ *   detail – forsiden: verdi per time, gruvene (rutenett), mineralene, lager og salg
  *   mMine  – én gruve: funn, fangst og graveverktøyet
  *   mTools – kjøp nytt graveverktøy til en gruve
  *   mMines – alle gruvene (ingen er låst – dyrere gruver har mer verdifulle funn)
@@ -55,6 +55,7 @@ const tonn = (t: number) => `${formatInt(t)} t`;
 const perHour = (v: number) => `${formatMoney(v)} / t`;
 const pct = (v: number) => `${Math.round(v * 100)} %`;
 const change = (v: number) => `<b class="${v >= 0 ? 'mn-up' : 'mn-down'}">${formatSignedPercent(v * 100)}</b>`;
+const balanceLine = (state: GameState) => `<p class="mn-sub">Saldo: <b>${formatMoneyFull(state.balance)}</b></p>`;
 
 /** Rundt ikon for et mineral i mineralets farge. */
 export const mineralIcon = (id: MineralId, big = false) => {
@@ -64,7 +65,7 @@ export const mineralIcon = (id: MineralId, big = false) => {
 
 const photo = (id: string) => `<img src="mines/${id}.jpg" alt="" loading="lazy" />`;
 const bar = (fill: number, warn = false) =>
-  `<div class="mn-cond"><span style="width:${Math.max(0, Math.min(100, fill * 100))}%" class="${warn ? 'low' : ''}"></span></div>`;
+  `<div class="mn-bar"><span style="width:${Math.max(0, Math.min(100, fill * 100))}%" class="${warn ? 'low' : ''}"></span></div>`;
 
 /** Hva som er galt med en gruve akkurat nå (eller null). */
 function mineProblem(m: OwnedMine): string | null {
@@ -74,6 +75,14 @@ function mineProblem(m: OwnedMine): string | null {
   return null;
 }
 
+/** Kort status for en gruve (på rutene på forsiden). */
+function mineStatus(m: OwnedMine): { text: string; bad: boolean } {
+  if (!isOpen(m)) return { text: `Klar om ${formatDuration((m.openAt! - Date.now()) / 1000, false)}`, bad: false };
+  const problem = mineProblem(m);
+  if (problem) return { text: 'Står stille', bad: true };
+  return { text: `${tonn(digRate(m))} / t`, bad: false };
+}
+
 // =========================================================================
 // Forsiden
 // =========================================================================
@@ -81,6 +90,18 @@ export function renderMineDetail(state: GameState, b: Business, hero: string): s
   const s = miningOf(b);
   const stopped = s.mines.filter((m) => mineProblem(m)).length;
   const full = MINERALS.filter((m) => isFull(s, m.id));
+  // Bildet øverst: den mest verdifulle gruva man eier
+  const best = [...s.mines].sort((a, z) => mineById(z.id).mult - mineById(a.id).mult)[0];
+
+  const tiles = MINES.map((def, i) => {
+    const m = ownedMine(b, def.id);
+    const status = m ? mineStatus(m) : null;
+    return `
+      <button class="mn-tile ${m ? 'owned' : ''} ${status?.bad ? 'bad' : ''} ${i === 0 ? 'wide' : ''}" data-action="${m ? 'm-mine' : 'm-mines'}" data-id="${b.id}" data-mine="${def.id}">
+        <span class="mn-tile-icon">${m ? icons.pickaxe : icons.plusBox}</span>
+        <span class="mn-tile-text"><strong>${def.name}</strong><small>${status ? status.text : formatMoney(def.price)}</small></span>
+      </button>`;
+  }).join('');
 
   const minerals = MINERALS.map((m) => {
     const cap = capacityOf(s, m.id);
@@ -91,37 +112,14 @@ export function renderMineDetail(state: GameState, b: Business, hero: string): s
         <div class="mn-res-text">
           <strong>${m.name}</strong>
           <span>${weight(s.stock[m.id])} på lager</span>
+          ${bar(fill, fill >= 0.9999)}
         </div>
         <div class="mn-res-price">
           <b>${formatPrice(priceNow(s, m.id))}</b>
           ${change(priceChange(s, m.id))}
         </div>
-        ${bar(fill, fill >= 0.9999)}
       </button>`;
   }).join('');
-
-  const cards = s.mines
-    .map((m) => {
-      const def = mineById(m.id);
-      const problem = mineProblem(m);
-      const tool = m.tool ? toolById(m.tool) : null;
-      return `
-      <button class="mn-card" data-action="m-mine" data-id="${b.id}" data-mine="${m.id}">
-        <div class="mn-card-photo">${photo(m.id)}<div><strong>${def.name}</strong><span>${def.place}, ${def.country}</span></div></div>
-        <div class="mn-card-body">
-          ${!isOpen(m) ? `<span class="mn-job-chip">${icons.clock}Gjøres klar · ${formatDuration((m.openAt! - Date.now()) / 1000)}</span>` : ''}
-          ${problem ? `<span class="mn-warn-chip">${icons.info}${problem}</span>` : ''}
-          <div class="mn-card-stats">
-            <div><b>${tool ? tool.name : '–'}</b><span>Verktøy</span></div>
-            <div><b>${tonn(digRate(m))}</b><span>Per time</span></div>
-            <div><b>${formatMoney(mineValuePerHour(s, m))}</b><span>Verdi / t</span></div>
-          </div>
-          ${tool ? bar(m.wear / (tool.rate * tool.lifeHours), hoursLeft(m) < 6) : ''}
-          ${tool ? `<small class="mn-cond-label">Verktøyet varer ca. ${formatDuration(hoursLeft(m) * 3600, false)} til</small>` : ''}
-        </div>
-      </button>`;
-    })
-    .join('');
 
   return `
     ${hero}
@@ -129,25 +127,32 @@ export function renderMineDetail(state: GameState, b: Business, hero: string): s
       <strong>${formatMoneyFull(miningIncome(b))}</strong>
       <span>Verdi av funn per time</span>
     </div>
-    <div class="mn-summary">
-      <div>${icons.pickaxe}<b>${s.mines.length} / ${MINES.length}</b><span>Gruver</span></div>
-      <div>${icons.warehouse}<b>${formatMoney(stockValue(s))}</b><span>På lager</span></div>
-      <div>${icons.coin}<b>${formatMoney(s.sold)}</b><span>Solgt for</span></div>
+    ${stopped ? `<button class="mn-alert" data-action="m-mines" data-id="${b.id}">${icons.info}<div><strong>${stopped === 1 ? 'En gruve står stille' : `${stopped} gruver står stille`}</strong><span>Kjøp nytt graveverktøy så de graver igjen.</span></div></button>` : ''}
+    ${full.length ? `<div class="mn-alert">${icons.warehouse}<div><strong>Fullt lager: ${full.map((m) => m.name.toLowerCase()).join(', ')}</strong><span>Nye funn går tapt. Selg eller bygg ut lageret.</span></div></div>` : ''}
+
+    <section class="mn-world">
+      <div class="mn-world-top">
+        ${best ? photo(best.id) : ''}
+        <div class="mn-world-text"><h2>Gruvedrift</h2><span>${s.mines.length} av ${MINES.length} gruver</span></div>
+      </div>
+      <div class="mn-tiles">${tiles}</div>
+      <p class="mn-hint">Trykk på en gruve for å se den</p>
+    </section>
+
+    <div class="mn-stock-card">
+      <div>${icons.warehouse}<b>${formatMoney(stockValue(s))}</b><span>På lager nå</span></div>
+      <div>${icons.coin}<b>${formatMoney(s.sold)}</b><span>Solgt for totalt</span></div>
     </div>
-    ${stopped ? `<div class="mn-warn">${icons.info}<div><strong>${stopped === 1 ? 'En gruve står stille' : `${stopped} gruver står stille`}</strong><span>Kjøp nytt graveverktøy så de graver igjen.</span></div></div>` : ''}
-    ${full.length ? `<div class="mn-warn">${icons.warehouse}<div><strong>Fullt lager: ${full.map((m) => m.name.toLowerCase()).join(', ')}</strong><span>Nye funn går tapt. Selg eller bygg ut lageret.</span></div></div>` : ''}
 
-    <h2 class="mn-title">Mineraler</h2>
-    <div class="mn-res-list">${minerals}</div>
+    <h2 class="mn-head">${icons.gem}Mineraler</h2>
+    <div class="mn-list">${minerals}</div>
+    <button class="mn-soft-btn" data-action="m-mines" data-id="${b.id}">${icons.plusBox}Se alle gruver</button>
+    ${balanceLine(state)}
 
-    <h2 class="mn-title">Mine gruver</h2>
-    <div class="mn-cards">${cards}</div>
-    <button class="mn-btn" data-action="m-mines" data-id="${b.id}">Se alle gruver</button>
-    <p class="biz-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>
     <div class="mn-help">
       <h3>Slik fungerer gruvene</h3>
       <p>Gruvene graver hele tiden, også når appen er lukket. Det de finner, havner på lageret – og du selger selv når prisen er god. Prisene går opp og ned som aksjer.</p>
-      <p>Graveverktøyet slites ut etter en stund, og da stopper gruva til du kjøper et nytt. Bedre verktøy graver mer per time. Er et lager fullt, går nye funn av det mineralet tapt.</p>
+      <p>Graveverktøyet slites ut etter en stund, og da stopper gruva til du kjøper et nytt. Er et lager fullt, går nye funn av det mineralet tapt.</p>
     </div>`;
 }
 
@@ -164,7 +169,7 @@ export function renderMine(state: GameState, b: Business, m: OwnedMine): string 
   const finds = findsPerHour(m)
     .map(
       ([id, kg]) => `
-      <button class="mn-row mn-row-btn" data-action="m-res" data-id="${b.id}" data-res="${id}">
+      <button class="mn-row" data-action="m-res" data-id="${b.id}" data-res="${id}">
         ${mineralIcon(id)}
         <div class="mn-row-text"><strong>${mineralById(id).name}</strong><span>${pct(def.finds[id]!)} av funnene · ${weight(kg)} per time</span></div>
         ${icons.chevronRight}
@@ -181,8 +186,8 @@ export function renderMine(state: GameState, b: Business, m: OwnedMine): string 
       <strong>${formatMoneyFull(mineValuePerHour(s, m))}</strong>
       <span>Verdi av funn per time</span>
     </div>
-    ${!isOpen(m) ? `<div class="mn-job">${icons.clock}<div><strong>Gruva gjøres klar</strong><span>Ferdig om ${formatDuration((m.openAt! - Date.now()) / 1000)}</span></div></div>` : ''}
-    ${problem ? `<div class="mn-warn">${icons.info}<div><strong>${problem}</strong><span>Gruva graver ikke før den får et nytt graveverktøy.</span></div></div>` : ''}
+    ${!isOpen(m) ? `<div class="mn-alert info">${icons.clock}<div><strong>Gruva gjøres klar</strong><span>Ferdig om ${formatDuration((m.openAt! - Date.now()) / 1000)}</span></div></div>` : ''}
+    ${problem ? `<div class="mn-alert">${icons.info}<div><strong>${problem}</strong><span>Gruva graver ikke før den får et nytt graveverktøy.</span></div></div>` : ''}
 
     <div class="mn-stats">
       <div><span>Fangst</span><b>${weight(yieldPerTonn(def))} per tonn</b></div>
@@ -191,24 +196,24 @@ export function renderMine(state: GameState, b: Business, m: OwnedMine): string 
       <div><span>Gravd totalt</span><b>${tonn(m.dug)}</b></div>
     </div>
 
-    <h2 class="mn-title">Funn</h2>
-    <div class="mn-box">${finds}</div>
+    <h2 class="mn-head">${icons.gem}Funn</h2>
+    <div class="mn-list">${finds}</div>
 
-    <h2 class="mn-title">Graveverktøy</h2>
-    <div class="mn-box">
+    <h2 class="mn-head">${icons.pickaxe}Graveverktøy</h2>
+    <div class="mn-card">
       ${
         tool
-          ? `<div class="mn-row">
-              <span class="mn-row-icon">${icons.pickaxe}</span>
-              <div class="mn-row-text"><strong>${tool.name}</strong><span>${tonn(tool.rate)} per time</span></div>
+          ? `<div class="mn-tool-now">
+              <div><strong>${tool.name}</strong><span>${tonn(tool.rate)} per time</span></div>
+              <span class="mn-count">${m.wear > 0 ? formatDuration(hoursLeft(m) * 3600, false) : 'Slitt ut'}</span>
             </div>
             ${bar(perTool, hoursLeft(m) < 6)}
-            <p class="mn-muted small">${m.wear > 0 ? `${tonn(m.wear)} igjen – varer ca. ${formatDuration(hoursLeft(m) * 3600, false)} til` : 'Slitt ut'}</p>`
+            <p class="mn-muted">${m.wear > 0 ? `${tonn(m.wear)} igjen før verktøyet er slitt ut` : 'Verktøyet er slitt ut – gruva står stille.'}</p>`
           : '<p class="mn-muted">Gruva har ikke noe graveverktøy ennå.</p>'
       }
-      <button class="mn-btn" data-action="m-tools" data-id="${b.id}" data-mine="${m.id}">Kjøp nytt graveverktøy</button>
     </div>
-    <p class="biz-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>`;
+    <button class="mn-btn" data-action="m-tools" data-id="${b.id}" data-mine="${m.id}">Kjøp nytt graveverktøy</button>
+    ${balanceLine(state)}`;
 }
 
 // =========================================================================
@@ -218,29 +223,30 @@ export function renderTools(state: GameState, b: Business, m: OwnedMine, confirm
   const def = mineById(m.id);
   const rows = TOOLS.map((t) => {
     const price = toolPrice(m.id, t.id);
-    const key = `tool:${t.id}`;
-    const sure = confirm === key;
+    const sure = confirm === `tool:${t.id}`;
     const current = m.tool === t.id && m.wear > 0;
     return `
-      <div class="mn-tool ${current ? 'current' : ''}">
-        <span class="mn-row-icon">${icons.pickaxe}</span>
-        <div class="mn-row-text">
-          <strong>${t.name}${current ? ' <em>I bruk</em>' : ''}</strong>
-          <span>${tonn(t.rate)} per time · varer ${t.lifeHours} timer</span>
-          <span>Gir ca. <b class="mn-plus">${perHour(t.rate * valuePerTonn(def))}</b> her</span>
+      <div class="mn-shop-row ${current ? 'current' : ''}">
+        <div class="mn-shop-top">
+          <span class="mn-name-pill">${t.name}</span>
+          ${current ? '<span class="mn-in-use">I bruk</span>' : ''}
         </div>
-        <div class="mn-tool-buy">
+        <div class="mn-shop-info">
+          <div>${icons.pickaxe}<span><b>${tonn(t.rate)} / t</b><small>Graver</small></span></div>
+          <div>${icons.clock}<span><b>${t.lifeHours} timer</b><small>Varer</small></span></div>
+          <div>${icons.coin}<span><b class="mn-plus">${perHour(t.rate * valuePerTonn(def))}</b><small>Gir her</small></span></div>
+        </div>
+        <div class="mn-buy-row">
           <b>${formatMoneyWhole(price)}</b>
-          <button class="mn-mini-btn ${state.balance >= price ? '' : 'poor'} ${sure ? 'confirm' : ''}" data-action="m-tool" data-id="${b.id}" data-mine="${m.id}" data-tool="${t.id}">${sure ? 'Trykk igjen' : 'Kjøp'}</button>
+          <button class="mn-pill-btn ${state.balance >= price ? '' : 'off'} ${sure ? 'confirm' : ''}" data-action="m-tool" data-id="${b.id}" data-mine="${m.id}" data-tool="${t.id}">${sure ? 'Trykk igjen' : 'Kjøp'}</button>
         </div>
       </div>`;
   }).join('');
   return `
-    <h1 class="con-page-title">Graveverktøy</h1>
-    <p class="mn-muted pad">${def.name}. Verktøyet graver til det er slitt ut. Kjøper du et nytt, byttes det gamle ut${m.tool && m.wear > 0 ? ` (det har ${formatDuration(hoursLeft(m) * 3600, false)} igjen)` : ''}.</p>
-    <div class="mn-box">${rows}</div>
-    <p class="mn-muted">Prisen avhenger av gruva: i dyrere gruver koster verktøyet mer, men det graver også fram mer verdifulle ting.</p>
-    <p class="biz-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>`;
+    <h1 class="mn-page-title">Graveverktøy</h1>
+    ${balanceLine(state)}
+    <p class="mn-muted pad">${def.name}: verktøyet graver til det er slitt ut. Kjøper du et nytt, byttes det gamle ut${m.tool && m.wear > 0 ? ` (det har ${formatDuration(hoursLeft(m) * 3600, false)} igjen)` : ''}. I dyrere gruver koster verktøyet mer, men gir mer.</p>
+    ${rows}`;
 }
 
 // =========================================================================
@@ -256,25 +262,30 @@ export function renderMines(state: GameState, b: Business, confirm: string | nul
       .map(([id, share]) => `<span class="mn-find">${mineralIcon(id as MineralId)}${mineralById(id as MineralId).name} ${pct(share!)}</span>`)
       .join('');
     return `
-      <div class="mn-city ${owned ? 'owned' : ''}">
-        <div class="mn-card-photo">${photo(def.id)}<div><strong>${def.name}</strong><span>${def.place}, ${def.country}</span></div></div>
-        <div class="mn-city-body">
-          <div class="mn-finds">${chips}</div>
-          <span>Fangst: <b>${weight(yieldPerTonn(def))} per tonn</b> · verdi ${formatMoneyWhole(valuePerTonn(def))} per tonn</span>
-          <span>${first.name}: ${perHour(first.rate * valuePerTonn(def))} · ${best.name}: ${perHour(best.rate * valuePerTonn(def))}</span>
-          ${
-            owned
-              ? `<button class="mn-mini-btn" data-action="m-mine" data-id="${b.id}" data-mine="${def.id}">Se gruva</button>`
-              : `<div class="mn-city-buy"><b>${formatMoneyWhole(def.price)}</b><span>Klar om ${def.openHours} t · uten verktøy</span>
-                 <button class="mn-mini-btn ${state.balance >= def.price ? '' : 'poor'} ${sure ? 'confirm' : ''}" data-action="m-buy" data-id="${b.id}" data-mine="${def.id}">${sure ? 'Trykk igjen' : 'Kjøp'}</button></div>`
-          }
+      <div class="mn-mine-card ${owned ? 'owned' : ''}">
+        <div class="mn-mine-head"><div><strong>${def.name}</strong><span>${def.place}, ${def.country}</span></div>${owned ? `<span class="mn-owned">${icons.check} Din</span>` : ''}</div>
+        <div class="mn-mine-photo">${photo(def.id)}</div>
+        <div class="mn-finds">${chips}</div>
+        <div class="mn-mine-lines">
+          <div><span>Fangst</span><b>${weight(yieldPerTonn(def))} per tonn</b></div>
+          <div><span>Med ${first.name.toLowerCase()}</span><b>${perHour(first.rate * valuePerTonn(def))}</b></div>
+          <div><span>Med ${best.name.toLowerCase()}</span><b>${perHour(best.rate * valuePerTonn(def))}</b></div>
         </div>
+        ${
+          owned
+            ? `<button class="mn-soft-btn" data-action="m-mine" data-id="${b.id}" data-mine="${def.id}">Se gruva</button>`
+            : `<div class="mn-buy-row">
+                 <span class="mn-cost">${icons.bill}<span><b>${formatMoneyWhole(def.price)}</b><small>Klar om ${def.openHours} t · uten verktøy</small></span></span>
+                 <button class="mn-pill-btn ${state.balance >= def.price ? '' : 'off'} ${sure ? 'confirm' : ''}" data-action="m-buy" data-id="${b.id}" data-mine="${def.id}">${sure ? 'Trykk igjen' : 'Kjøp'}</button>
+               </div>`
+        }
       </div>`;
   }).join('');
   return `
-    <h1 class="con-page-title">Gruver</h1>
+    <h1 class="mn-page-title">Gruver</h1>
+    ${balanceLine(state)}
     <p class="mn-muted pad">Alle gruvene kan kjøpes. Jo dyrere gruva er, jo mer verdifulle ting finner du – men fangsten (kg per tonn) blir mindre.</p>
-    <div class="mn-cities">${cards}</div>`;
+    ${cards}`;
 }
 
 // =========================================================================
@@ -296,7 +307,7 @@ export function renderResource(state: GameState, b: Business, id: MineralId): st
   const sources = MINES.filter((d) => d.finds[id])
     .map((d) => {
       const owned = ownedMine(b, d.id);
-      return `<div class="mn-row"><span class="mn-row-icon">${icons.pickaxe}</span><div class="mn-row-text"><strong>${d.name}</strong><span>${d.place}, ${d.country} · ${pct(d.finds[id]!)} av funnene</span></div>${owned ? `<b class="mn-owned">${icons.check} Din</b>` : ''}</div>`;
+      return `<div class="mn-row"><span class="mn-row-icon">${icons.pickaxe}</span><div class="mn-row-text"><strong>${d.name}</strong><span>${d.place}, ${d.country} · ${pct(d.finds[id]!)} av funnene</span></div>${owned ? `<span class="mn-owned">${icons.check} Din</span>` : ''}</div>`;
     })
     .join('');
   const perHourKg = s.mines.reduce((sum, o) => sum + (findsPerHour(o).find(([x]) => x === id)?.[1] ?? 0), 0);
@@ -318,31 +329,31 @@ export function renderResource(state: GameState, b: Business, id: MineralId): st
       <div><span>Graves per time</span><b>${weight(perHourKg)}</b></div>
     </div>
 
-    <h2 class="mn-title">Lager</h2>
-    <div class="mn-box">
-      <div class="mn-store">
-        <strong>${weight(stock)}</strong><span>av ${weight(cap)}</span>
-      </div>
+    <h2 class="mn-head">${icons.warehouse}Lager</h2>
+    <div class="mn-card">
+      <div class="mn-store"><strong>${weight(stock)}</strong><span>av ${weight(cap)}</span></div>
       ${bar(stock / cap, full)}
-      <p class="mn-muted small">${full ? '<b class="mn-down">Lageret er fullt – nye funn går tapt.</b>' : perHourKg > 0 ? `Fullt om ca. ${formatDuration(((cap - stock) / perHourKg) * 3600, false)}` : 'Ingen av gruvene dine graver dette nå.'}</p>
-      <p class="mn-muted">Verdi nå: <b>${formatMoney(stock * price)}</b></p>
-      <div class="mn-sell-row">${sell(0.25, 'Selg 25 %')}${sell(0.5, 'Selg 50 %')}${sell(1, 'Selg alt')}</div>
+      <p class="mn-muted">${full ? '<b class="mn-down">Lageret er fullt – nye funn går tapt.</b>' : perHourKg > 0 ? `Fullt om ca. ${formatDuration(((cap - stock) / perHourKg) * 3600, false)}` : 'Ingen av gruvene dine graver dette nå.'}</p>
+      <div class="mn-store-value"><b>${formatMoneyFull(stock * price)}</b><span>Verdi nå</span></div>
     </div>
+    <div class="mn-sell-row">${sell(0.25, 'Selg 25 %')}${sell(0.5, 'Selg 50 %')}${sell(1, 'Selg alt')}</div>
 
-    <h2 class="mn-title">Bygg ut lageret</h2>
-    <div class="mn-box">
+    <h2 class="mn-head">${icons.arrowUpBox}Bygg ut lageret</h2>
+    <div class="mn-card">
       ${
         level >= MAX_STORAGE_LEVEL
           ? '<p class="mn-muted">Lageret er bygd ut så mye det går.</p>'
-          : `<div class="mn-row">
-              <span class="mn-row-icon">${icons.warehouse}</span>
-              <div class="mn-row-text"><strong>Nivå ${level + 1} av ${MAX_STORAGE_LEVEL}</strong><span>Plass til ${weight(cap)} → <b class="mn-plus">${weight(capacity(id, level + 1))}</b></span><span>${formatMoneyWhole(storageCost(s, id))}</span></div>
-              <button class="mn-mini-btn ${state.balance >= storageCost(s, id) ? '' : 'poor'}" data-action="m-storage" data-id="${b.id}" data-res="${id}">Bygg ut</button>
+          : `<div class="mn-upgrade">
+              <div><strong>Nivå ${level + 1} av ${MAX_STORAGE_LEVEL}</strong><span>Plass til ${weight(cap)} → <b class="mn-plus">${weight(capacity(id, level + 1))}</b></span></div>
+            </div>
+            <div class="mn-buy-row">
+              <b>${formatMoneyWhole(storageCost(s, id))}</b>
+              <button class="mn-pill-btn ${state.balance >= storageCost(s, id) ? '' : 'off'}" data-action="m-storage" data-id="${b.id}" data-res="${id}">Bygg ut</button>
             </div>`
       }
     </div>
 
-    <h2 class="mn-title">Finnes i</h2>
-    <div class="mn-box">${sources}</div>
-    <p class="biz-balance">Saldo: <b>${formatMoney(state.balance)}</b></p>`;
+    <h2 class="mn-head">${icons.pickaxe}Finnes i</h2>
+    <div class="mn-list">${sources}</div>
+    ${balanceLine(state)}`;
 }

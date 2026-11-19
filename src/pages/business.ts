@@ -126,6 +126,26 @@ import { buyMine, buyTool, miningOf, ownedMine, sellMineral, upgradeStorage, typ
 import { mineById, mineralById, toolById, type MineralId } from '../game/mineData';
 import { renderMine, renderMineDetail, renderMines, renderResource, renderTools } from './mineViews';
 import {
+  airlineOf,
+  buyLicense,
+  buyPlanes,
+  continentById,
+  hasLicense,
+  isGrounded,
+  launchFlight,
+  launchedFlights,
+  leaseHub,
+  maxAffordable,
+  nextFlight,
+  performService,
+  planeById,
+  planeCount,
+  sellUnused,
+  type AirlinePay,
+} from '../game/airline';
+import { ALL_FLIGHTS, type ContinentId, type PlaneId } from '../game/airlineData';
+import { renderAirFleet, renderAirlineDetail, renderHubs, renderLicenses, renderPlaneShop, renderRegion } from './airlineViews';
+import {
   renderBuy,
   renderFootballDetail,
   renderHistory,
@@ -202,7 +222,12 @@ type View =
   | { name: 'mMine'; id: string; mine: string }
   | { name: 'mTools'; id: string; mine: string }
   | { name: 'mMines'; id: string }
-  | { name: 'mRes'; id: string; res: MineralId };
+  | { name: 'mRes'; id: string; res: MineralId }
+  | { name: 'aRegion'; id: string; cont: ContinentId }
+  | { name: 'aHubs'; id: string; cont: ContinentId }
+  | { name: 'aFleet'; id: string }
+  | { name: 'aShop'; id: string; sel: PlaneId | null; qty: number }
+  | { name: 'aLicenses'; id: string };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -216,6 +241,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   bank: icons.bank,
   football: icons.pitch,
   mine: icons.pickaxe,
+  airline: icons.plane,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -230,6 +256,8 @@ export function createBusinessPage(state: GameState): Page {
   const find = (id: string) => state.businesses.find((b) => b.id === id);
   /** Gruveselskapet betaler på samme måte som bilforhandleren (gruver og lager blir en del av bedriftens verdi). */
   const minePay = (b: Business): MinePay => dealerPay(state, b);
+  /** Flyselskapet: som fotballklubben (ledige fly selges uten skatt). */
+  const airPay = (b: Business): AirlinePay => footballPay(state, b);
 
   function go(view: View) {
     stack.push(view);
@@ -256,6 +284,8 @@ export function createBusinessPage(state: GameState): Page {
   let confirmLeave = false;
   /** Gruveselskap: hvilken knapp som venter på "trykk igjen" (f.eks. "buy:kiruna", "tool:wheel"). */
   let mineConfirm: string | null = null;
+  /** Flyselskap: "trykk igjen" for å selge ledige fly. */
+  let airSellConfirm = false;
   /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
   let slotsOpen = false;
   /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
@@ -307,6 +337,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (engineOf(b) === 'bank') element.innerHTML = renderBankDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'football') element.innerHTML = renderFootballDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'mine') element.innerHTML = renderMineDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'airline') element.innerHTML = renderAirlineDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -419,6 +450,30 @@ export function createBusinessPage(state: GameState): Page {
         element.innerHTML = b ? backBtn + renderResource(state, b, view.res) : '';
         break;
       }
+      // --- Flyselskap ---
+      case 'aRegion':
+      case 'aHubs': {
+        const b = find(view.id);
+        if (!b) break;
+        element.innerHTML = backBtn + (view.name === 'aRegion' ? renderRegion(state, b, view.cont) : renderHubs(state, b, view.cont));
+        break;
+      }
+      case 'aFleet': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderAirFleet(state, b, airSellConfirm) : '';
+        break;
+      }
+      case 'aShop': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderPlaneShop(state, b, view.sel, view.qty) : '';
+        break;
+      }
+      case 'aLicenses': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderLicenses(state, b) : '';
+        break;
+      }
+
       // --- Fotballklubb ---
       case 'fLeagues':
       case 'fTournament':
@@ -634,6 +689,7 @@ export function createBusinessPage(state: GameState): Page {
     if (action !== 'f-sell') confirmSell = false;
     if (action !== 'f-leave') confirmLeave = false;
     if (action !== 'm-buy' && action !== 'm-tool') mineConfirm = null;
+    if (action !== 'a-sell') airSellConfirm = false;
 
     switch (action) {
       case 'back':
@@ -921,6 +977,121 @@ export function createBusinessPage(state: GameState): Page {
           return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Lageret er fullt utbygd');
         }
         showToast(`Lageret for ${mineralById(res).name.toLowerCase()} er bygd ut`);
+        return render();
+      }
+
+      // --- Flyselskap ---
+      case 'a-region': {
+        const b = find(id);
+        const cont = target.dataset.cont as ContinentId;
+        if (!b) return;
+        // Låst: rett til lisensene
+        if (!hasLicense(airlineOf(b), cont)) {
+          showToast(`Kjøp lisens for ${continentById(cont).name} først`);
+          return go({ name: 'aLicenses', id });
+        }
+        return go({ name: 'aRegion', id, cont });
+      }
+      case 'a-hubs':
+        return go({ name: 'aHubs', id, cont: target.dataset.cont as ContinentId });
+      case 'a-fleet':
+        return go({ name: 'aFleet', id });
+      case 'a-licenses':
+        return go({ name: 'aLicenses', id });
+      case 'a-shop': {
+        const plane = (target.dataset.plane as PlaneId | undefined) ?? null;
+        return go({ name: 'aShop', id, sel: plane, qty: 1 });
+      }
+      case 'a-license': {
+        const b = find(id);
+        if (!b) return;
+        const lic = target.dataset.lic!;
+        const result = buyLicense(b, airPay(b), lic);
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : result === 'locked' ? 'Lanser alle innenriksflyvningene først' : 'Du har allerede lisensen');
+        }
+        showToast(lic === 'intl' ? 'Du kan nå lansere internasjonale flyvninger!' : `Du kan nå fly i ${continentById(lic as ContinentId).name}!`);
+        return render();
+      }
+      case 'a-hub': {
+        const b = find(id);
+        if (!b) return;
+        const cont = target.dataset.cont as ContinentId;
+        const result = leaseHub(b, airPay(b), cont);
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Det gikk ikke');
+        }
+        showToast('Hubben er leid – nye flyvninger er klare');
+        return render();
+      }
+      case 'a-launch': {
+        const b = find(id);
+        if (!b) return;
+        const cont = target.dataset.cont as ContinentId;
+        const next = nextFlight(airlineOf(b), cont);
+        const result = launchFlight(b, airPay(b), cont);
+        if (result !== 'ok') {
+          shake(target);
+          if (result === 'planes' && next.kind === 'flight') return showToast(`Du trenger flere fly av typen ${planeById(next.flight.plane).name}`);
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Det gikk ikke');
+        }
+        showToast('Flyvningen lanseres – den er i lufta om 1 time');
+        return render();
+      }
+      case 'a-pick': {
+        if (view.name !== 'aShop') return;
+        const plane = target.dataset.plane as PlaneId;
+        view.qty = view.sel === plane ? view.qty : 1;
+        view.sel = plane;
+        return render();
+      }
+      case 'a-unpick':
+        if (view.name !== 'aShop') return;
+        view.sel = null;
+        return render();
+      case 'a-qty': {
+        if (view.name !== 'aShop' || !view.sel) return;
+        const d = target.dataset.delta!;
+        view.qty = d === 'max' ? Math.max(1, maxAffordable(state.balance, view.sel)) : Math.max(1, view.qty + Number(d));
+        return render();
+      }
+      case 'a-buy': {
+        const b = find(id);
+        if (!b || view.name !== 'aShop' || !view.sel) return;
+        const result = buyPlanes(b, airPay(b), view.sel, view.qty);
+        if (result !== 'ok') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        showToast(`Kjøpte ${view.qty} × ${planeById(view.sel).name}`);
+        view.sel = null;
+        view.qty = 1;
+        return render();
+      }
+      case 'a-service': {
+        const b = find(id);
+        if (!b) return;
+        const result = performService(b, airPay(b));
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Ingen fly trenger service ennå');
+        }
+        showToast('Service utført – neste frist er om 48 timer');
+        return render();
+      }
+      case 'a-sell': {
+        const b = find(id);
+        if (!b) return;
+        if (!airSellConfirm) {
+          airSellConfirm = true;
+          return render();
+        }
+        airSellConfirm = false;
+        const value = sellUnused(b, airPay(b));
+        if (value <= 0) return showToast('Ingen ledige fly å selge');
+        showToast(`Solgte ledige fly for ${formatMoney(value)}`);
         return render();
       }
 
@@ -1467,6 +1638,10 @@ export function createBusinessPage(state: GameState): Page {
       const n = miningOf(b).mines.length;
       return `<span>${icons.pickaxe} ${n} ${n === 1 ? 'gruve' : 'gruver'}</span>`;
     }
+    if (engineOf(b) === 'airline') {
+      const a = airlineOf(b);
+      return `<span>${icons.plane} ${planeCount(a)} fly · ${launchedFlights(a).length}/${ALL_FLIGHTS.length} flyvninger</span>`;
+    }
     if (engineOf(b) === 'football') {
       const t = fcOf(b).tournament;
       const league = t && !t.finished ? ` · ${leagueById(t.league).name}` : '';
@@ -1495,7 +1670,7 @@ export function createBusinessPage(state: GameState): Page {
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(squadValue(fcOf(b)))}</b> lagverdi</span>`
           : engineOf(b) === 'dealer'
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(showroomValue(b))}</b> til salgs</span>`
-          : `<span class="biz-row-income ${incomePerHour(b) < 0 ? 'negative' : ''}"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
+          : `<span class="biz-row-income ${incomePerHour(b) < 0 || (engineOf(b) === 'airline' && isGrounded(airlineOf(b))) ? 'negative' : ''}"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
       </button>`;
   }
 

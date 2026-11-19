@@ -1,0 +1,56 @@
+Bilder til flyselskapet.
+Fly: pngimg.com (gjennomsiktig bakgrunn, lisens CC BY-NC 4.0), beskåret og forminsket:
+  small.png   https://pngimg.com/uploads/plane/plane_PNG5220.png
+  medium.png  https://pngimg.com/uploads/plane/plane_PNG101236.png
+  large.png   https://pngimg.com/uploads/plane/plane_PNG5232.png
+  xlarge.png  https://pngimg.com/uploads/plane/plane_PNG101216.png
+  front.png   https://pngimg.com/uploads/plane/plane_PNG101211.png
+Kontinentkart (globes/): Wikimedia Commons, fri lisens (se filsiden for detaljer):
+  globes/na.png  https://commons.wikimedia.org/wiki/File:Location_North_America.svg
+  globes/sa.png  https://commons.wikimedia.org/wiki/File:South_America_(orthographic_projection).svg
+  globes/eu.png  https://commons.wikimedia.org/wiki/File:Europe_orthographic_Caucasus_Urals_boundary.svg
+  globes/as.png  https://commons.wikimedia.org/wiki/File:Asia_(orthographic_projection).svg
+  globes/af.png  https://commons.wikimedia.org/wiki/File:Africa_(orthographic_projection).svg
+  globes/oc.png  https://commons.wikimedia.org/wiki/File:Oceania_(orthographic_projection).svg
+  globes/me.png  https://commons.wikimedia.org/wiki/File:Middle_East_(orthographic_projection).svg
+Flagg (flags/): https://flagcdn.com (offentlig eiendom)
+Flyplasser (hubs/): Wikimedia Commons, fri lisens (se filsiden for fotograf og lisens):
+  hubs/ADD.jpg  https://commons.wikimedia.org/wiki/File:Addis_Ababa_Bole_International_Airport_in_2024.01.jpg
+  hubs/AKL.jpg  https://commons.wikimedia.org/wiki/File:Auckland_Airport_Carparks_Main.jpg
+  hubs/AMS.jpg  https://commons.wikimedia.org/wiki/File:Amsterdam_Airport_Schiphol_PD_2011_15.JPG
+  hubs/ATL.jpg  https://commons.wikimedia.org/wiki/File:Atlanta_Airport_–_Hartsfield-Jackson_Atlanta_International_Airport_in_Georgia_11.jpg
+  hubs/BNE.jpg  https://commons.wikimedia.org/wiki/File:Skyway_at_Brisbane_Airport_Domestic_Terminal_at_night.jpg
+  hubs/BOG.jpg  https://commons.wikimedia.org/wiki/File:Apron_or_Ramp_internacional_airport_"El_Dorado",_Bogotá,_Colombia.jpg
+  hubs/CAI.jpg  https://commons.wikimedia.org/wiki/File:Cairo_Airport_Terminal_3.jpg
+  hubs/CDG.jpg  https://commons.wikimedia.org/wiki/File:Jet_bridge,_Paris-Charles_de_Gaulle_Airport,_Roissy_(SIAE2156).jpg
+  hubs/DEL.jpg  https://commons.wikimedia.org/wiki/File:Inside_Terminal_3_at_Indira_Gandhi_International_Airport.JPG
+  hubs/DEN.jpg  https://commons.wikimedia.org/wiki/File:Denver_International_Airport_Main_Terminal_at_dusk_1.jpg
+  hubs/DOH.jpg  https://commons.wikimedia.org/wiki/File:Hamad_Intl_Airport_T1_IMG_20250813_072925_02.jpg
+  hubs/DXB.jpg  https://commons.wikimedia.org/wiki/File:Dubai_International_Airport_Terminal_three.JPG
+  hubs/EZE.jpg  https://commons.wikimedia.org/wiki/File:Buenos_Aires_Airport,_International_Check_In_Area_(4013261729).jpg
+  hubs/FRA.jpg  https://commons.wikimedia.org/wiki/File:Frankfurt_Flughafen,_Terminal_1,_Abflughalle_B.jpg
+  hubs/GRU.jpg  https://commons.wikimedia.org/wiki/File:Guarulhos_International_Airport_Sao_Paulo_Brazil_Terminal_1_Wing_A.jpg
+  hubs/HKG.jpg  https://commons.wikimedia.org/wiki/File:Aeropuerto_de_Hong_Kong,_2013-08-13,_DD_05.JPG
+  hubs/IST.jpg  https://commons.wikimedia.org/wiki/File:Istanbul_Airport,_Arnavutköy_(P1090184).jpg
+  hubs/JFK.jpg  https://commons.wikimedia.org/wiki/File:John_F._Kennedy_Airport_T8_20240602.jpg
+  hubs/JNB.jpg  https://commons.wikimedia.org/wiki/File:Central_Terminal_area,_O.R._Tambo_International_Airport,_Johannesburg,_South_Africa_(52732792678).jpg
+  hubs/LHR.jpg  https://commons.wikimedia.org/wiki/File:Terminal_5_at_London_Heathrow_Airport,_2008.jpg
+  hubs/LIM.jpg  https://commons.wikimedia.org/wiki/File:Aeropuerto_Internacional_Jorge_Chávez_en_2024.jpg
+  hubs/LOS.jpg  https://commons.wikimedia.org/wiki/File:2009_airport_Lagos_Nigeria_6350754168.jpg
+  hubs/MAD.jpg  https://commons.wikimedia.org/wiki/File:Barajas_Airport_(Madrid)_(4684560779).jpg
+  hubs/MEL.jpg  https://commons.wikimedia.org/wiki/File:Melbourne_Airport_Terminal_1_Qantas.jpg
+  hubs/NBO.jpg  https://commons.wikimedia.org/wiki/File:Jomo_Kenyatta_International_Airport_terminal_building,_2025_(02).jpg
+  hubs/ORD.jpg  https://commons.wikimedia.org/wiki/File:Concourse_B,_Chicago_O'Hare_airport.jpg
+  hubs/OSL.jpg  https://commons.wikimedia.org/wiki/File:14-09-02-oslo-RalfR-469.jpg
+  hubs/PEK.jpg  https://commons.wikimedia.org/wiki/File:CAE_Terminal_3_Station_(20191128145910).jpg
+  hubs/PER.jpg  https://commons.wikimedia.org/wiki/File:Perth_Airport_Terminal_2_gn11.jpg
+  hubs/SCL.jpg  https://commons.wikimedia.org/wiki/File:Terminal_Aeropuerto_Pudahuel.jpg
+  hubs/SEA.jpg  https://commons.wikimedia.org/wiki/File:Sea-Tac_Airport_Terminals_A_and_B_Aerial_(53275357898).jpg
+  hubs/SIN.jpg  https://commons.wikimedia.org/wiki/File:Singapore_Changi_Airport_Terminal_3_(113212).jpg
+  hubs/SJC.jpg  https://commons.wikimedia.org/wiki/File:San_Jose_International_Airport_-_Terminal_B.jpg
+  hubs/SYD.jpg  https://commons.wikimedia.org/wiki/File:Sydney_Airport_Terminal_3b.jpg
+  hubs/TLV.jpg  https://commons.wikimedia.org/wiki/File:16-03-30-Ben_Gurion_International_Airport-RalfR-DSCF7550.jpg
+  hubs/AUH.jpg  https://commons.wikimedia.org/wiki/File:13-08-06-abu-dhabi-airport-01.jpg
+  hubs/RUH.jpg  https://commons.wikimedia.org/wiki/File:King_Khalid_International_Airport.JPG
+  hubs/FCO.jpg  https://commons.wikimedia.org/wiki/File:Rome_Fiumicino_Leonardo_da_Vinci_International_Airport,_Aeroporto_internazionale_di_Roma-Fiumicino_"Leonardo_da_Vinci".jpg
+  hubs/HND.jpg  https://commons.wikimedia.org/wiki/File:All_haneda.jpg

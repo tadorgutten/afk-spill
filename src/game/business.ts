@@ -36,6 +36,7 @@ import { IT_TYPE, isItType, newIt, tickIt, wagesPerHour, type ItState } from './
 import { BANK_TYPE, bankIncome, isBankType, newBank, tickBank, type BankState } from './bank';
 import { FOOTBALL_TYPE, isFootballType, newFootball, tickFootball, type FcPay, type FootballState } from './football';
 import { MINE_TYPE, isMineType, miningIncome, newMining, tickMines, type MineState } from './mine';
+import { AIRLINE_TYPE, airlineIncome, isAirlineType, newAirline, tickAirline, type AirlineState } from './airline';
 
 /*
  * BEDRIFTER
@@ -58,6 +59,7 @@ import { MINE_TYPE, isMineType, miningIncome, newMining, tickMines, type MineSta
  *   - bank: bank – velg innskudds- og utlånsrente, utvid hvelvet (bank.ts)
  *   - football: fotballklubb – kjøp spillere, tren laget og vinn turneringer (football.ts)
  *   - mine: gruveselskap – grav etter kull, gull og diamanter, lagre og selg når prisen er god (mine.ts)
+ *   - airline: flyselskap – lisenser, hubs, fly og flyvninger over hele verden (airline.ts)
  *
  * Kapitalisering = alt du har puttet inn i bedriften (åpningskostnad + investeringer).
  * Legger du ned bedriften, får du tilbake 30 % av kapitaliseringen.
@@ -73,9 +75,10 @@ export type BusinessCategoryId =
   | 'it'
   | 'bank'
   | 'football'
-  | 'mine';
+  | 'mine'
+  | 'airline';
 
-export type Engine = 'stage' | 'fleet' | 'build' | 'dealer' | 'it' | 'bank' | 'football' | 'mine';
+export type Engine = 'stage' | 'fleet' | 'build' | 'dealer' | 'it' | 'bank' | 'football' | 'mine' | 'airline';
 
 export interface BusinessCategory {
   id: BusinessCategoryId;
@@ -120,6 +123,7 @@ export const CATEGORIES: BusinessCategory[] = [
   { id: 'bank', name: 'Bank', chooseTitle: '', nameTitle: 'Skriv inn navnet på banken', color: 'slate' },
   { id: 'football', name: 'Fotballklubb', chooseTitle: '', nameTitle: 'Skriv inn navnet på fotballklubben', color: 'crimson' },
   { id: 'mine', name: 'Gruveselskap', chooseTitle: '', nameTitle: 'Skriv inn navnet på gruveselskapet', color: 'copper' },
+  { id: 'airline', name: 'Flyselskap', chooseTitle: '', nameTitle: 'Skriv inn navnet på flyselskapet', color: 'sky' },
 ];
 
 // Tallene er 1/10 av Business Empire sine (spillet har 10 ganger lavere verdier).
@@ -267,6 +271,19 @@ export const BUSINESS_TYPES: BusinessType[] = [
     firstExpansionSec: 0,
     timeGrowth: 1,
   },
+  // Flyselskap: fast inntekt + flyvningene (se airline.ts). Den siste og dyreste bedriften.
+  {
+    id: AIRLINE_TYPE,
+    category: 'airline',
+    name: 'Flyselskap',
+    coins: 1,
+    openingCost: 1_300_000_000, // vises som $ 13 000 000 000
+    baseIncome: 0,
+    baseInvestment: 0,
+    growth: 0,
+    firstExpansionSec: 0,
+    timeGrowth: 1,
+  },
   // Fotballklubb: inntekten kommer fra premiepenger og salg av spillere (se football.ts)
   {
     id: FOOTBALL_TYPE,
@@ -394,6 +411,9 @@ export interface Business {
   // --- Bare for gruveselskap ---
   mining?: MineState;
 
+  // --- Bare for flyselskap ---
+  airline?: AirlineState;
+
   /** Hvor mange plasser utvidelsen som pågår gir. */
   pendingPlaces?: number;
 
@@ -419,6 +439,7 @@ export function engineOf(b: Business): Engine {
   if (isBankType(b.type)) return 'bank';
   if (isFootballType(b.type)) return 'football';
   if (isMineType(b.type)) return 'mine';
+  if (isAirlineType(b.type)) return 'airline';
   return isConstructionType(b.type) ? 'build' : 'stage';
 }
 
@@ -441,6 +462,8 @@ export function incomePerHour(b: Business): number {
       return 0; // tjener på premiepenger og salg av spillere
     case 'mine':
       return miningIncome(b); // verdien av det som graves fram (tjenes først når man selger)
+    case 'airline':
+      return airlineIncome(b); // 0 hvis fristen for service er gått ut
     default:
       return incomeAt(typeById(b.type), b.stage);
   }
@@ -530,6 +553,8 @@ export function startBusiness(state: GameState, typeId: string, name: string): B
     b.football = newFootball();
   } else if (engineOf(b) === 'mine') {
     b.mining = newMining();
+  } else if (engineOf(b) === 'airline') {
+    b.airline = newAirline();
   }
   state.businesses.unshift(b); // nyeste øverst
   return b;
@@ -593,6 +618,11 @@ export function tickBusinesses(state: GameState, now: number) {
     // Gruveselskap: gruvene graver og fyller lagrene (pengene kommer når man selger)
     if (engineOf(b) === 'mine') {
       tickMines(b, from, now);
+      continue;
+    }
+    // Flyselskap: fast inntekt og flyvningene (stopper når fristen for service er gått ut)
+    if (engineOf(b) === 'airline') {
+      payGross(state, b, tickAirline(b, from, now));
       continue;
     }
     // Fotballklubb: trening, kontrakter, kamper og premiepenger
