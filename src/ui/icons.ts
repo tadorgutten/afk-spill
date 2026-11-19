@@ -253,6 +253,8 @@ export const icons = {
   license: svg('<path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21H11"/><path d="M14 3l5 5v3"/><path d="M14 3v5h5"/><path d="M8 9h3M8 12.5h6M8 16h3"/><circle cx="16.5" cy="16" r="2.8"/><path d="m15 18.4-.6 3.1 2.1-1 2.1 1-.6-3.1"/>', 1.5),
   /** Jordklode */
   globe: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9M12 3C9.4 5.6 8.2 8.6 8.2 12s1.2 6.4 3.8 9"/>', 1.6),
+  /** Dokument med pluss (kontinent med lisens) */
+  filePlus: svg('<path d="M13 3H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h4"/><path d="M13 3l5 5v3"/><path d="M13 3v5h5"/><path d="M8.5 10h5M8.5 13.5h3"/><circle cx="17" cy="17" r="4"/><path d="M17 15v4M15 17h4"/>', 1.5),
   /** Pluss i en firkant (kjøp flere) */
   plusBox: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M12 8v8M8 12h8"/>', 1.7),
 };

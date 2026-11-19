@@ -1,10 +1,12 @@
 Bilder til flyselskapet.
-Fly: pngimg.com (gjennomsiktig bakgrunn, lisens CC BY-NC 4.0), beskåret og forminsket:
-  small.png   https://pngimg.com/uploads/plane/plane_PNG5220.png
-  medium.png  https://pngimg.com/uploads/plane/plane_PNG101236.png
-  large.png   https://pngimg.com/uploads/plane/plane_PNG5232.png
-  xlarge.png  https://pngimg.com/uploads/plane/plane_PNG101216.png
+Fly: pngimg.com (gjennomsiktig bakgrunn, lisens CC BY-NC 4.0), beskåret, forminsket og noen snudd/omfarget:
+  small.png   https://pngimg.com/uploads/plane/plane_PNG5237.png
+  medium.png  https://pngimg.com/uploads/plane/plane_PNG101268.png (rød hale gjort blå)
+  large.png   https://pngimg.com/uploads/plane/plane_PNG5232.png (lysere, snudd)
+  xlarge.png  https://pngimg.com/uploads/plane/plane_PNG101216.png (snudd, gulltekst fjernet)
   front.png   https://pngimg.com/uploads/plane/plane_PNG101211.png
+Fly ovenfra (top.png): utsnitt av https://commons.wikimedia.org/wiki/File:Airbus_A380-800_v1.0.png av Julien.scavini, CC BY-SA 3.0 (fylt med hvitt og rotert)
+Verdenskart (worldmap.png): https://commons.wikimedia.org/wiki/File:World_map_(blue_dots).svg av sNowFleikuN, CC BY 3.0 (gjort hvit)
 Kontinentkart (globes/): Wikimedia Commons, fri lisens (se filsiden for detaljer):
   globes/na.png  https://commons.wikimedia.org/wiki/File:Location_North_America.svg
   globes/sa.png  https://commons.wikimedia.org/wiki/File:South_America_(orthographic_projection).svg

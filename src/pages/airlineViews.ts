@@ -51,37 +51,25 @@ const PLANE_PLURAL: Record<PlaneId, string> = { small: 'Små fly', medium: 'Mell
 /** Rekkefølgen på knappene på forsiden (Nord-Amerika over hele bredden). */
 const GRID: ContinentId[] = ['na', 'as', 'eu', 'sa', 'me', 'af', 'oc'];
 
-/** Ring som viser verdensdekningen. */
-function ring(share: number): string {
-  const r = 46;
-  const len = 2 * Math.PI * r;
-  return `
-    <svg class="air-ring" viewBox="0 0 110 110" aria-hidden="true">
-      <circle cx="55" cy="55" r="${r}" class="track" />
-      ${share > 0 ? `<circle cx="55" cy="55" r="${r}" class="fill" stroke-dasharray="${len}" stroke-dashoffset="${len * (1 - share)}" />` : ''}
-    </svg>`;
-}
-
 // =========================================================================
-// Forsiden
+// Forsiden (bygd så likt originalen som mulig)
 // =========================================================================
 export function renderAirlineDetail(state: GameState, b: Business, hero: string): string {
+  void state;
   const s = airlineOf(b);
   const grounded = isGrounded(s);
   const income = airlineIncome(b);
   const cover = coverage(s);
 
+  // Låste kontinenter er ikke knapper (ingenting skjer når man trykker)
   const tiles = GRID.map((id) => {
     const c = continentById(id);
     const owned = hasLicense(s, id);
-    const next = owned ? nextFlight(s, id) : null;
-    const ready = next?.kind === 'flight';
-    return `
-      <button class="air-tile ${owned ? 'owned' : 'locked'} ${ready ? 'ready' : ''} ${id === 'na' ? 'wide' : ''}" data-action="a-region" data-id="${b.id}" data-cont="${id}">
-        <span class="air-tile-icon">${owned ? icons.plane : icons.lock}</span>
-        <span class="air-tile-text"><strong>${c.name}</strong>${owned ? `<small>${launchedIn(s, id)}/${c.flights.length} flyvninger</small>` : ''}</span>
-        ${ready ? '<i class="air-dot"></i>' : ''}
-      </button>`;
+    const cls = `air-tile ${owned ? 'owned' : 'locked'} ${id === 'na' ? 'wide' : ''}`;
+    const inner = `<span class="air-tile-icon">${owned ? icons.filePlus : icons.lock}</span><strong>${c.name}</strong>`;
+    return owned
+      ? `<button class="${cls}" data-action="a-region" data-id="${b.id}" data-cont="${id}">${inner}</button>`
+      : `<div class="${cls}">${inner}</div>`;
   }).join('');
 
   const due = s.serviceDue - Date.now();
@@ -93,46 +81,38 @@ export function renderAirlineDetail(state: GameState, b: Business, hero: string)
       <strong>${formatMoneyFull(income)}</strong>
       <span>Inntekt per time</span>
     </div>
-    ${
-      grounded
-        ? `<button class="air-alert" data-action="a-fleet" data-id="${b.id}">${icons.wrench}<div><strong>Flyene står på bakken</strong><span>Fristen for service er gått ut, så selskapet tjener ingenting. Trykk her for å utføre service.</span></div></button>`
-        : ''
-    }
 
     <section class="air-world">
       <div class="air-world-sky">
         <h2>Flyvninger</h2>
         <span>Verdensdekning: ${Math.floor(cover * 100)} %</span>
-        <div class="air-ring-wrap">
-          ${ring(cover)}
-          <span class="air-ring-plane">${icons.plane}</span>
+        <div class="air-world-map">
+          <span class="air-world-ring"></span>
+          <img class="air-world-plane" src="airline/top.png" alt="" />
         </div>
       </div>
       <div class="air-tiles">${tiles}</div>
       <p class="air-hint">Trykk på et område for å styre det</p>
     </section>
 
+    <hr class="air-sep" />
+
     <button class="air-fleet-card" data-action="a-fleet" data-id="${b.id}">
       <img class="air-fleet-img" src="airline/front.png" alt="" />
-      <div class="air-fleet-title"><strong>Flyflåten</strong>${icons.chevronRight}</div>
+      <div class="air-fleet-title"><strong>Flyparken</strong>${icons.chevronRight}</div>
       <div class="air-fleet-stats">
         <div>${icons.plane}<b>${planeCount(s)}</b><span>Antall fly</span></div>
-        <div class="${needsService && due < 6 * 3_600_000 ? 'warn' : ''}">${icons.wrench}<b>${needsService ? formatDuration(Math.max(0, due) / 1000, false) : '–'}</b><span>Neste service</span></div>
+        <div class="${grounded ? 'warn' : ''}">${icons.wrench}<b>${needsService ? formatDuration(Math.max(0, due) / 1000, false) : '–'}</b><span>Neste service</span></div>
       </div>
     </button>
-    <button class="air-soft-btn" data-action="a-shop" data-id="${b.id}">${icons.plusBox}Kjøp flere fly</button>
+    <button class="air-soft-btn" data-action="a-shop" data-id="${b.id}">${icons.plusBox}Utvid flyparken</button>
+
+    <hr class="air-sep" />
 
     <button class="air-license-card" data-action="a-licenses" data-id="${b.id}">
       <div><strong>Lisenser</strong><span>Innenriks og internasjonale flyvninger</span></div>
-      <span class="air-license-icon">${icons.license}</span>
-    </button>
-    ${balanceLine(state)}
-
-    <div class="air-help">
-      <h3>Slik fungerer flyselskapet</h3>
-      <p>Kjøp lisens for et kontinent, lei hubs (flyplasser) og kjøp fly. Da kan du lansere flyvninger – hver av dem gir mer inntekt per time. En lansering tar 1 time, og så kommer neste.</p>
-      <p>Flyene som er i bruk, må ha service hver 48. time. Går fristen ut, tjener selskapet ingenting før du betaler.</p>
-    </div>`;
+      <span class="air-license-papers"><i></i><i></i><i>${icons.license}</i></span>
+    </button>`;
 }
 
 // =========================================================================
@@ -178,12 +158,11 @@ export function renderRegion(state: GameState, b: Business, id: ContinentId): st
         ${flightHead(f)}
         ${routeHtml(f)}
         <div class="air-lines">
-          <div>${icons.bill}<span>Pris</span><b class="${enoughMoney ? '' : 'short'}">${formatMoney(f.cost)}</b></div>
-          <div>${icons.plane}<span>${PLANE_PLURAL[f.plane]} (${planeById(f.plane).name})</span><b class="${enoughPlanes ? '' : 'short'}">${Math.min(free, f.count)}/${f.count}</b></div>
+          <div>${icons.bill}<span>Pris</span><b class="${enoughMoney ? '' : 'short'}">${formatMoney(state.balance)}/${formatMoney(f.cost)}</b></div>
+          <div>${icons.plane}<span>${PLANE_PLURAL[f.plane]}</span><b class="dark ${enoughPlanes ? '' : 'short'}">${Math.min(free, f.count)}/${f.count}</b></div>
         </div>
       </div>
-      <button class="air-btn ${enoughPlanes && enoughMoney ? '' : 'off'}" data-action="a-launch" data-id="${b.id}" data-cont="${id}">Lanser flyvning</button>
-      ${enoughPlanes ? '' : `<button class="air-soft-btn" data-action="a-shop" data-id="${b.id}" data-plane="${f.plane}">${icons.plusBox}Kjøp ${f.count - free} fly til</button>`}`;
+      <button class="air-btn ${enoughPlanes && enoughMoney ? '' : 'off'}" data-action="a-launch" data-id="${b.id}" data-cont="${id}">Lanser flyvning</button>`;
   } else if (next.kind === 'launching') {
     const f = next.flight;
     const left = Math.max(0, next.readyAt - Date.now());
@@ -308,7 +287,7 @@ export function renderAirFleet(state: GameState, b: Business, confirmSell: boole
     .join('');
 
   return `
-    <h1 class="air-page-title">Flyflåten</h1>
+    <h1 class="air-page-title">Flyparken</h1>
     ${balanceLine(state)}
     <div class="air-card air-service ${grounded ? 'late' : ''}">
       <div class="air-service-top">
@@ -382,45 +361,36 @@ export function renderPlaneShop(state: GameState, b: Business, sel: PlaneId | nu
 // =========================================================================
 export function renderLicenses(state: GameState, b: Business): string {
   const s = airlineOf(b);
+  // Kjøpte lisenser forsvinner fra lista
   const card = (id: ContinentId) => {
     const c = continentById(id);
-    const owned = hasLicense(s, id);
     return `
       <div class="air-lic">
         <div class="air-lic-top">${globe(id)}<div><strong>${c.name}</strong><span>Innenriksflyvninger</span></div></div>
         <div class="air-buy-row">
           <b class="air-lic-price">${formatMoneyWhole(c.license)}</b>
-          ${
-            owned
-              ? `<span class="air-owned">${icons.check} Kjøpt</span>`
-              : `<button class="air-pill-btn ${state.balance >= c.license ? '' : 'off'}" data-action="a-license" data-id="${b.id}" data-lic="${id}">Kjøp</button>`
-          }
+          <button class="air-pill-btn ${state.balance >= c.license ? '' : 'off'}" data-action="a-license" data-id="${b.id}" data-lic="${id}">Kjøp</button>
         </div>
       </div>`;
   };
   const done = domesticLaunched(s);
-  const intlOwned = hasLicense(s, INTL);
   const ok = canBuyIntl(s);
+  const intl = hasLicense(s, INTL)
+    ? ''
+    : `
+    <div class="air-lic intl">
+      <div class="air-lic-top"><span class="air-lic-world">${icons.globe}</span><div><strong>Internasjonal</strong><span>Internasjonale flyvninger</span></div></div>
+      <p class="air-lic-need">Lanser alle innenriksflyvningene</p>
+      <div class="air-progress intl"><span style="width:${(done / DOMESTIC_COUNT) * 100}%"></span></div>
+      <small class="air-lic-count">${done}/${DOMESTIC_COUNT}</small>
+      <div class="air-buy-row">
+        <b class="air-lic-price">${formatMoneyWhole(licensePrice(INTL))}</b>
+        <button class="air-pill-btn intl ${ok && state.balance >= licensePrice(INTL) ? '' : 'off'}" data-action="a-license" data-id="${b.id}" data-lic="${INTL}">Kjøp</button>
+      </div>
+    </div>`;
+  const list = CONTINENTS.filter((c) => !hasLicense(s, c.id)).map((c) => card(c.id)).join('') + intl;
   return `
     <h1 class="air-page-title">Lisenser</h1>
     ${balanceLine(state)}
-    ${CONTINENTS.map((c) => card(c.id)).join('')}
-    <div class="air-lic intl">
-      <div class="air-lic-top"><span class="air-lic-world">${icons.globe}</span><div><strong>Internasjonal</strong><span>Internasjonale flyvninger</span></div></div>
-      ${
-        intlOwned
-          ? ''
-          : `<p class="air-lic-need">Lanser alle innenriksflyvningene</p>
-             <div class="air-progress intl"><span style="width:${(done / DOMESTIC_COUNT) * 100}%"></span></div>
-             <small class="air-lic-count">${done}/${DOMESTIC_COUNT}</small>`
-      }
-      <div class="air-buy-row">
-        <b class="air-lic-price">${formatMoneyWhole(licensePrice(INTL))}</b>
-        ${
-          intlOwned
-            ? `<span class="air-owned">${icons.check} Kjøpt</span>`
-            : `<button class="air-pill-btn intl ${ok && state.balance >= licensePrice(INTL) ? '' : 'off'}" data-action="a-license" data-id="${b.id}" data-lic="${INTL}">Kjøp</button>`
-        }
-      </div>
-    </div>`;
+    ${list || '<p class="air-muted center pad">Du har kjøpt alle lisensene.</p>'}`;
 }

@@ -139,7 +139,7 @@ import {
   nextFlight,
   performService,
   planeById,
-  planeCount,
+  serviceCost,
   sellUnused,
   type AirlinePay,
 } from '../game/airline';
@@ -985,11 +985,8 @@ export function createBusinessPage(state: GameState): Page {
         const b = find(id);
         const cont = target.dataset.cont as ContinentId;
         if (!b) return;
-        // Låst: rett til lisensene
-        if (!hasLicense(airlineOf(b), cont)) {
-          showToast(`Kjøp lisens for ${continentById(cont).name} først`);
-          return go({ name: 'aLicenses', id });
-        }
+        // Låst: ingenting skjer (som i originalen)
+        if (!hasLicense(airlineOf(b), cont)) return;
         return go({ name: 'aRegion', id, cont });
       }
       case 'a-hubs':
@@ -1640,7 +1637,8 @@ export function createBusinessPage(state: GameState): Page {
     }
     if (engineOf(b) === 'airline') {
       const a = airlineOf(b);
-      return `<span>${icons.plane} ${planeCount(a)} fly · ${launchedFlights(a).length}/${ALL_FLIGHTS.length} flyvninger</span>`;
+      const due = serviceCost(a) > 0 ? formatDuration(Math.max(0, a.serviceDue - Date.now()) / 1000, false) : '–';
+      return `<span>${icons.plane} ${Math.floor((launchedFlights(a).length / ALL_FLIGHTS.length) * 100)} %</span><span class="${isGrounded(a) ? 'air-row-late' : ''}">${icons.wrench} ${due}</span>`;
     }
     if (engineOf(b) === 'football') {
       const t = fcOf(b).tournament;

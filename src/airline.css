@@ -187,132 +187,90 @@
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
-/* --- Forsiden --- */
-.business .air-alert {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  margin-top: 18px;
-  padding: 16px;
-  border-radius: 20px;
-  background: #fdeced;
-  color: var(--air-red);
-  text-align: left;
-}
-
-.air-alert svg {
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
-}
-
-.air-alert div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.air-alert strong {
-  font-size: 17px;
-}
-
-.air-alert span {
-  color: #8a4b4e;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
 .air-world {
   margin-top: 26px;
   border-radius: 30px;
-  background: var(--air-card);
+  background: #f4f6f9;
   overflow: hidden;
 }
 
+/* Den blå himmelen med verdenskart, stiplet sirkel og flyet sett ovenfra */
 .air-world-sky {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 22px 16px 34px;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.18) 0 2px, transparent 3px) 0 0 / 14px 14px,
-    linear-gradient(170deg, #4a7fd4, #56c3f3);
-  border-radius: 0 0 50% 50% / 0 0 34px 34px;
+  padding: 22px 0 0;
+  border-radius: 0 0 50% 50% / 0 0 60px 60px;
+  background: linear-gradient(180deg, #4a7bd3 0%, #4f9fe4 55%, #5cc8f5 100%);
   color: #fff;
+  overflow: hidden;
 }
 
 .air-world-sky h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
 }
 
 .air-world-sky > span {
-  margin-top: 4px;
-  font-size: 16px;
-  opacity: 0.95;
+  margin-top: 6px;
+  font-size: 18px;
 }
 
-.air-ring-wrap {
+.air-world-map {
   position: relative;
   display: grid;
   place-items: center;
-  width: 190px;
-  height: 190px;
-  margin-top: 14px;
+  width: 100%;
+  height: 420px;
+  margin-top: 6px;
 }
 
-.air-ring {
+.air-world-map::before {
+  /* Kartet skal bare skimtes */
+  content: '';
   position: absolute;
   inset: 0;
-  transform: rotate(-90deg);
+  background: url('/airline/worldmap.png') center 58% / 118% auto no-repeat;
+  opacity: 0.3;
 }
 
-.air-ring circle {
-  fill: none;
-  stroke-width: 5;
+.air-world-ring {
+  position: absolute;
+  z-index: 1;
+  width: 290px;
+  height: 290px;
+  border: 3px dashed rgba(40, 80, 150, 0.55);
+  border-radius: 50%;
 }
 
-.air-ring .track {
-  stroke: rgba(255, 255, 255, 0.25);
-  stroke-dasharray: 3 5;
-}
-
-.air-ring .fill {
-  stroke: #fff;
-  stroke-linecap: round;
-}
-
-.air-ring-plane {
-  display: flex;
-  color: #fff;
-  filter: drop-shadow(0 6px 10px rgba(10, 40, 90, 0.3));
-}
-
-.air-ring-plane svg {
-  width: 92px;
-  height: 92px;
-  stroke-width: 1.1;
+.air-world-plane {
+  position: relative;
+  z-index: 2;
+  width: 250px;
+  height: auto;
+  margin-top: -30px;
+  filter: drop-shadow(0 18px 14px rgba(20, 50, 110, 0.35));
 }
 
 .air-tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding: 18px 14px 4px;
+  padding: 26px 16px 4px;
 }
 
 .business .air-tile {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 68px;
-  padding: 12px 14px;
+  gap: 14px;
+  min-height: 84px;
+  padding: 12px 18px;
   border: 2px solid transparent;
-  border-radius: 18px;
-  background: #e9ecf1;
-  color: #9aa2af;
+  border-radius: 20px;
+  background: #eceef2;
+  color: #a3aab5;
   text-align: left;
 }
 
@@ -322,9 +280,9 @@
 }
 
 .business .air-tile.owned {
-  border-color: #8fd0f3;
-  background: #e3f2fc;
-  color: var(--air);
+  border-color: #6cc1ef;
+  background: #e2eefa;
+  color: #4fb3ea;
 }
 
 .air-tile-icon {
@@ -333,43 +291,33 @@
 }
 
 .air-tile-icon svg {
-  width: 26px;
-  height: 26px;
+  width: 36px;
+  height: 36px;
+  stroke-width: 1.3;
 }
 
-.air-tile-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.air-tile-text strong {
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.air-tile-text small {
-  margin-top: 2px;
-  color: #6b8299;
-  font-size: 12.5px;
-}
-
-.air-dot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #f0a12c;
+.air-tile strong {
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.15;
 }
 
 .air-hint {
-  margin: 10px 0 18px;
+  margin: 14px 0 26px;
   color: #8fc9ea;
-  font-size: 15px;
+  font-size: 17px;
   text-align: center;
+}
+
+.air-sep {
+  height: 2px;
+  margin: 36px 0 0;
+  border: 0;
+  background: #eceff3;
+}
+
+.air-row-late {
+  color: #e0565b;
 }
 
 .business .air-fleet-card {
@@ -479,36 +427,6 @@
 .air-license-card div span {
   color: #6b7383;
   font-size: 16px;
-}
-
-.air-license-icon {
-  display: flex;
-  color: var(--air);
-}
-
-.air-license-icon svg {
-  width: 64px;
-  height: 64px;
-  stroke-width: 1.1;
-}
-
-.air-help {
-  margin-top: 26px;
-  padding: 18px;
-  border-radius: 22px;
-  background: var(--air-card);
-}
-
-.air-help h3 {
-  margin: 0 0 8px;
-  font-size: 17px;
-}
-
-.air-help p {
-  margin: 0 0 8px;
-  color: #5d6575;
-  font-size: 14px;
-  line-height: 1.5;
 }
 
 /* --- Ett kontinent --- */
@@ -1193,7 +1111,7 @@ body.scrolled .business[data-view='aRegion'] .biz-back {
 }
 
 .air-shop-row .air-plane-img {
-  max-width: 340px;
+  max-width: 100%;
   margin: 18px 0;
 }
 
@@ -1413,4 +1331,68 @@ body.scrolled .business[data-view='aRegion'] .biz-back {
 
 .air-page-title + .air-sub {
   text-align: left;
+}
+
+/* Lisenskortet: papirbunke til høyre, som i originalen */
+.air-license-papers {
+  position: relative;
+  flex-shrink: 0;
+  width: 110px;
+  height: 96px;
+}
+
+.air-license-papers i {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 92px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(20, 30, 60, 0.15);
+  color: #9aa6b5;
+}
+
+.air-license-papers i:nth-child(1) {
+  right: 26px;
+  top: 4px;
+  transform: rotate(-12deg);
+}
+
+.air-license-papers i:nth-child(2) {
+  right: 12px;
+  top: 2px;
+  transform: rotate(-4deg);
+}
+
+.air-license-papers i:nth-child(3) {
+  right: 0;
+  top: 0;
+  transform: rotate(8deg);
+}
+
+.air-license-papers svg {
+  width: 44px;
+  height: 44px;
+  stroke-width: 1.1;
+}
+
+/* Innenriks er lilla som i originalen */
+.air-flight-kind strong,
+.air-flight-kind strong.intl {
+  color: var(--air-intl);
+}
+
+.air-badge,
+.air-badge.intl {
+  background: #f4ecf9;
+  color: var(--air-intl);
+}
+
+.air-lines b.dark {
+  color: #1c2230;
+}
+
+.air-lines b.short {
+  color: var(--air-red);
 }
