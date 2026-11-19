@@ -144,6 +144,22 @@ export const icons = {
   /** Pengeseddel */
   bill: svg('<rect x="2.5" y="6" width="19" height="12" rx="1"/><circle cx="12" cy="12" r="2.8"/><path d="M5.5 9v.01M18.5 15v.01"/>', 1.5),
 
+  // --- Bank ---
+  /** Billett med % (innskudd) */
+  percentTicket: svg('<path d="M2.5 6h19v3.2a2.8 2.8 0 0 0 0 5.6V18h-19v-3.2a2.8 2.8 0 0 0 0-5.6Z"/><path d="m9.5 14.5 5-5"/><circle cx="9.7" cy="9.7" r=".9"/><circle cx="14.3" cy="14.3" r=".9"/>', 1.8),
+  /** % i en sirkel (lån) */
+  percentCircle: svg('<circle cx="12" cy="12" r="9.5"/><path d="m8.5 15.5 7-7"/><circle cx="9" cy="9" r="1.2"/><circle cx="15" cy="15" r="1.2"/>', 1.8),
+  /** To skyveknapper (innstillinger for renter) */
+  sliders: svg('<path d="M3 7h3M10 7h11M3 17h11M18 17h3"/><circle cx="8" cy="7" r="2"/><circle cx="16" cy="17" r="2"/>', 1.4),
+  /** Hvelvdør (utvid hvelvet) */
+  vault: svg('<rect x="2.5" y="4" width="19" height="16" rx="2.5"/><path d="M6.5 8.5v7"/><circle cx="14" cy="12" r="3"/><path d="m11.5 9.5 1 1M16.5 9.5l-1 1M11.5 14.5l1-1M16.5 14.5l-1-1"/>', 1.6),
+  /** Pil opp i en boks */
+  arrowUpBox: svg('<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M12 17V7M7.5 11.5 12 7l4.5 4.5"/>', 2),
+  /** Pil ned i en boks */
+  arrowDownBox: svg('<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M12 7v10M7.5 12.5 12 17l4.5-4.5"/>', 2),
+  /** Lyspære (tips) */
+  bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M8.5 14.5A6.5 6.5 0 1 1 15.5 14.5c-.6.6-1 1.4-1 2.3V18h-5v-1.2c0-.9-.4-1.7-1-2.3Z"/>', 1.5),
+
   // --- IT-selskap ---
   /** Dataskjerm (IT-selskap) */
   monitor: svg('<rect x="2.5" y="3.5" width="19" height="13" rx="2"/><path d="M8 21h8M10 16.5 9.5 21M14 16.5l.5 4.5"/>', 1.8),

@@ -104,6 +104,8 @@ import {
   renderItTeam,
   type StaffSort,
 } from './itViews';
+import { bankOf, DEFAULT_DEPOSIT, DEFAULT_LOAN, expandVault, setRates } from '../game/bank';
+import { bindBankSliders, renderBankControl, renderBankDetail } from './bankViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyFull, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -151,7 +153,8 @@ type View =
   | { name: 'iEmployee'; id: string; emp: string }
   | { name: 'iHire'; id: string; role: RoleId }
   | { name: 'iOffers'; id: string }
-  | { name: 'iOffer'; id: string; offer: string };
+  | { name: 'iOffer'; id: string; offer: string }
+  | { name: 'bControl'; id: string; deposit: number; loan: number };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -162,6 +165,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   construction: icons.hook,
   dealer: icons.dealer,
   it: icons.monitor,
+  bank: icons.bank,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -243,6 +247,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (engineOf(b) === 'build') element.innerHTML = renderConstructionDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'dealer') element.innerHTML = renderDealerDetail(b, heroHtml(b));
         else if (engineOf(b) === 'it') element.innerHTML = renderItDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'bank') element.innerHTML = renderBankDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -331,6 +336,17 @@ export function createBusinessPage(state: GameState): Page {
       case 'dSkills': {
         const b = find(view.id);
         element.innerHTML = b ? backBtn + renderSkills(b) : '';
+        break;
+      }
+      // --- Bank ---
+      case 'bControl': {
+        const b = find(view.id);
+        if (!b) break;
+        element.innerHTML = backBtn + renderBankControl(b, view.deposit, view.loan);
+        bindBankSliders(element, b, (deposit, loan) => {
+          view.deposit = deposit;
+          view.loan = loan;
+        });
         break;
       }
       // --- IT-selskap ---
@@ -716,6 +732,34 @@ export function createBusinessPage(state: GameState): Page {
       case 'd-skills':
         return go({ name: 'dSkills', id });
 
+      // --- Bank ---
+      case 'b-control': {
+        const b = find(id);
+        if (!b) return;
+        // Skyveknappene starter på rentene som er lagret nå (endringer lagres bare med "Lagre")
+        return go({ name: 'bControl', id, deposit: bankOf(b).deposit, loan: bankOf(b).loan });
+      }
+      case 'b-save':
+      case 'b-default': {
+        const b = find(id);
+        if (!b || view.name !== 'bControl') return;
+        if (action === 'b-save') setRates(b, view.deposit, view.loan);
+        else setRates(b, DEFAULT_DEPOSIT, DEFAULT_LOAN);
+        showToast(action === 'b-save' ? 'Rentene er lagret' : 'Rentene er satt til standard');
+        return back();
+      }
+      case 'b-expand': {
+        const b = find(id);
+        if (!b) return;
+        const result = expandVault(b, dealerPay(state, b));
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'ok') showToast('Utvidelsen av hvelvet har startet');
+        return render();
+      }
+
       // --- IT-selskap ---
       case 'i-projects':
         return go({ name: 'iProjects', id, tab: target.dataset.tab as 'progress' | 'done' });
@@ -1092,6 +1136,7 @@ export function createBusinessPage(state: GameState): Page {
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
+    if (engineOf(b) === 'bank') return `<span>${icons.bill} ${formatMoneyWhole(bankOf(b).funds)} i hvelvet</span>`;
     if (engineOf(b) === 'it') return `<span>${icons.hourglass} ${inProgress(b).length} pågår · ${completed(b).length} ferdige · ${formatMoneyWhole(wagesPerHour(b))} lønn per time</span>`;
     return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
   }
@@ -1323,7 +1368,7 @@ export function createBusinessPage(state: GameState): Page {
       // Tall som endres (inntekt, nedtelling, saldo) tegnes på nytt én gang i sekundet.
       // Sider med skrivefelt tegnes ikke på nytt (da ville teksten man skriver forsvinne).
       const view = current().name;
-      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire') return;
+      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire' || view === 'bControl') return;
       // Ikke tegn på nytt mens man bekrefter (teksten "Trykk igjen" skal bli stående)
       if (confirmDrop || confirmFire) return;
       // Bruktbilmarkedet (100 bilder) og ferdighetene endrer seg ikke av seg selv

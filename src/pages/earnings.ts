@@ -26,7 +26,7 @@ export function createEarningsPage(state: GameState): Page {
             <span>per klikk</span>
           </div>
           <div class="click-upgrade-row">
-            <span><b data-level>1</b> nivå</span>
+            <span>Nivå <b data-level>1</b></span>
             <span class="click-upgrade-gain" data-next>
               <span class="triangle"></span>
               <b data-next-value></b> per klikk

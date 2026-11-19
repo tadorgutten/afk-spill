@@ -1,0 +1,308 @@
+/* =========================================================================
+ * BANK (src/pages/bankViews.ts) – grå-blått tema med blå knapper
+ * ========================================================================= */
+.cat-slate {
+  background: linear-gradient(110deg, #d3d8e1, #a7b0c0);
+}
+
+.business[data-theme='bank'] {
+  --bank: #3f7cf4;
+  --bank-soft: #f1f5fd;
+}
+
+.business[data-theme='bank'] .biz-balance {
+  color: var(--bank);
+}
+
+.bank-negative {
+  color: #d8465a;
+}
+
+.bank-title {
+  margin: 30px 0 14px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.bank-card {
+  padding: 18px 22px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20, 30, 60, 0.08);
+}
+
+/* --- Renter --- */
+.bank-rates {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.bank-rate {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20, 30, 60, 0.08);
+}
+
+.bank-rate svg {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 18px;
+  color: var(--bank);
+}
+
+.bank-rate strong {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.bank-rate span {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.business .bank-control-btn {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e8e8e8;
+  color: #444;
+}
+
+.bank-control-btn svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* --- Hvelvet --- */
+.bank-funds svg {
+  width: 40px;
+  height: 40px;
+  color: var(--bank);
+}
+
+.bank-funds p {
+  margin: 14px 0 4px;
+}
+
+.bank-funds strong {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.bank-funds p span {
+  color: #7a8090;
+  font-size: 16px;
+}
+
+.bank-funds > span {
+  color: #7a8090;
+  font-size: 16px;
+}
+
+.bank-expand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 14px;
+  padding: 18px 22px 22px;
+  border-radius: 20px;
+  background: var(--bank-soft);
+}
+
+.bank-expand-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.bank-expand-head svg {
+  width: 32px;
+  height: 32px;
+  color: var(--bank);
+}
+
+.bank-expand-head h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.bank-expand strong {
+  margin-top: 12px;
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bank-expand span {
+  color: #7a8090;
+  font-size: 16px;
+}
+
+.business .bank-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 17px;
+  border-radius: 16px;
+  background: var(--bank);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 600;
+  text-align: center;
+  transition: opacity 0.2s;
+}
+
+.business .bank-btn.poor {
+  opacity: 0.55;
+}
+
+.business .bank-btn.soft {
+  margin-top: 12px;
+  background: #e3ebfa;
+  color: var(--bank);
+  font-size: 17px;
+}
+
+/* --- Pengestrømmer --- */
+.bank-flow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.bank-flow svg {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  color: var(--bank);
+}
+
+.bank-flow div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bank-flow span {
+  color: #7a8090;
+  font-size: 15px;
+}
+
+.bank-flow strong {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* --- Kontrollpanelet --- */
+.bank-page-title {
+  margin: 58px 0 26px;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.bank-slider-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  font-size: 20px;
+}
+
+.bank-slider-head svg {
+  width: 34px;
+  height: 34px;
+  color: var(--bank);
+}
+
+.bank-slider {
+  --fill: 50%;
+  width: calc(100% - 40px);
+  height: 30px;
+  margin: 10px 20px 4px;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.bank-slider::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--bank) var(--fill), #dcdcdc var(--fill));
+}
+
+.bank-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -9.5px;
+  border-radius: 50%;
+  background: var(--bank);
+}
+
+.bank-slider::-moz-range-track {
+  height: 3px;
+  background: #dcdcdc;
+}
+
+.bank-slider::-moz-range-progress {
+  height: 3px;
+  background: var(--bank);
+}
+
+.bank-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bank);
+}
+
+.bank-value {
+  margin: 0 0 10px;
+  font-size: 19px;
+}
+
+.bank-preview {
+  margin: 18px 0 0;
+  color: #5b6170;
+  font-size: 16px;
+}
+
+.bank-preview b {
+  color: #1c2230;
+}
+
+.bank-preview b.bank-negative {
+  color: #d8465a;
+}
+
+.bank-tip {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #e3e5ea;
+  border-radius: 20px;
+  box-shadow: 0 4px 18px rgba(20, 30, 60, 0.06);
+}
+
+.bank-tip svg {
+  width: 40px;
+  height: 40px;
+  color: var(--bank);
+}
+
+.bank-tip p {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
