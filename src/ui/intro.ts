@@ -27,12 +27,15 @@ export function finishIntro() {
   if (!intro) return;
   const html = document.documentElement;
   if (html.classList.contains('no-intro')) {
+    html.classList.remove('dark-start');
     intro.remove();
     return;
   }
 
   const leave = (wait: number) =>
     setTimeout(() => {
+      // Logoskjermen åpner seg: nå skal spillets vanlige (lyse) bakgrunn vises
+      html.classList.remove('dark-start');
       intro.classList.add('leaving');
       document.body.classList.add('intro-reveal');
       setTimeout(() => {
