@@ -590,7 +590,7 @@ export function tickBusinesses(state: GameState, now: number) {
       payWages(state, b, tickIt(b, from, now));
       continue;
     }
-    // Hotellkjede: inntekt fra hotellene (kan bli minus hvis prisen er for høy)
+    // Hotellkjede: fast inntekt fra hotellene
     if (engineOf(b) === 'hotel') {
       const income = tickHotels(b, from, now);
       if (income >= 0) payGross(state, b, income);

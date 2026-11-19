@@ -695,3 +695,9 @@
 .ht-slider {
   margin-top: 20px;
 }
+
+/* Hvor mye mer man tjener per time på en oppgradering */
+.ht-plus {
+  color: #12805c;
+  font-weight: 700;
+}

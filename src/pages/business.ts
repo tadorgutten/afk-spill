@@ -128,15 +128,13 @@ import {
   buyHotel,
   hotelIn,
   hotelsOf,
-  renovate,
   roomById,
   roomCost,
-  setPrice,
   upgradeStars,
   type HotelPay,
 } from '../game/hotel';
 import { cityById, type FacilityId, type RoomType } from '../game/hotelData';
-import { bindHotelPrice, renderCities, renderHotel, renderHotelDetail, renderPrice, renderRooms } from './hotelViews';
+import { renderCities, renderHotel, renderHotelDetail, renderRooms } from './hotelViews';
 import {
   renderBuy,
   renderFootballDetail,
@@ -213,8 +211,7 @@ type View =
   | { name: 'fHistory'; id: string }
   | { name: 'hHotel'; id: string; city: string }
   | { name: 'hCities'; id: string }
-  | { name: 'hRooms'; id: string; city: string; room: RoomType; qty: number }
-  | { name: 'hPrice'; id: string; city: string; price: number };
+  | { name: 'hRooms'; id: string; city: string; room: RoomType; qty: number };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -411,8 +408,7 @@ export function createBusinessPage(state: GameState): Page {
       }
       // --- Hotellkjede ---
       case 'hHotel':
-      case 'hRooms':
-      case 'hPrice': {
+      case 'hRooms': {
         const b = find(view.id);
         const h = b && hotelIn(b, view.city);
         if (!b || !h) {
@@ -420,11 +416,7 @@ export function createBusinessPage(state: GameState): Page {
           return renderView();
         }
         if (view.name === 'hHotel') element.innerHTML = backBtn + renderHotel(state, b, h, hotelConfirm);
-        else if (view.name === 'hRooms') element.innerHTML = backBtn + renderRooms(state, b, h, view.room, view.qty);
-        else {
-          element.innerHTML = backBtn + renderPrice(b, h, view.price);
-          bindHotelPrice(element, h, (price) => (view.price = price));
-        }
+        else element.innerHTML = backBtn + renderRooms(state, b, h, view.room, view.qty);
         break;
       }
       case 'hCities': {
@@ -904,7 +896,7 @@ export function createBusinessPage(state: GameState): Page {
         hotelConfirm = null;
         const pay = hotelPay(b);
         const result =
-          key === 'stars' ? upgradeStars(h, pay) : key === 'renovate' ? renovate(h, pay) : buildFacility(h, pay, key.slice(4) as FacilityId);
+          key === 'stars' ? upgradeStars(h, pay) : buildFacility(h, pay, key.slice(4) as FacilityId);
         const messages: Record<string, string> = {
           money: 'Du har ikke nok penger',
           busy: 'Det pågår allerede byggearbeid på hotellet',
@@ -916,7 +908,7 @@ export function createBusinessPage(state: GameState): Page {
           shake(target);
           return showToast(messages[result] ?? 'Det gikk ikke');
         }
-        showToast(key === 'renovate' ? 'Renoveringen har startet' : 'Byggearbeidet har startet');
+        showToast('Byggearbeidet har startet');
         return render();
       }
       case 'h-rooms': {
@@ -967,23 +959,6 @@ export function createBusinessPage(state: GameState): Page {
         showToast(`${view.qty} rom bygges`);
         return back();
       }
-      case 'h-price': {
-        const b = find(id);
-        const h = b && hotelIn(b, target.dataset.city!);
-        if (!h) return;
-        return go({ name: 'hPrice', id, city: h.city, price: h.price });
-      }
-      case 'h-price-save':
-      case 'h-price-default': {
-        if (view.name !== 'hPrice') return;
-        const b = find(view.id);
-        const h = b && hotelIn(b, view.city);
-        if (!h) return;
-        setPrice(h, action === 'h-price-save' ? view.price : 0);
-        showToast('Prisen er lagret');
-        return back();
-      }
-
       // --- Fotballklubb ---
       case 'f-leagues':
         return go({ name: 'fLeagues', id });
@@ -1769,7 +1744,7 @@ export function createBusinessPage(state: GameState): Page {
       // Tall som endres (inntekt, nedtelling, saldo) tegnes på nytt én gang i sekundet.
       // Sider med skrivefelt tegnes ikke på nytt (da ville teksten man skriver forsvinne).
       const view = current().name;
-      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire' || view === 'bControl' || view === 'hPrice') return;
+      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire' || view === 'bControl') return;
       // Ikke tegn på nytt mens man bekrefter (teksten "Trykk igjen" skal bli stående)
       if (confirmDrop || confirmFire || confirmSell || confirmLeave) return;
       // Kamphistorikk, trofeer og lister med bilder endrer seg ikke av seg selv
