@@ -1,0 +1,1038 @@
+/* =========================================================================
+ * FOTBALLKLUBB (src/pages/footballViews.ts) – rødt/mørk lilla tema
+ * ========================================================================= */
+.cat-crimson {
+  background: linear-gradient(115deg, #b8323e, #7a1c36 50%, #2c0f2e);
+}
+
+.biz-hero.cat-crimson,
+.biz-hero.cat-crimson .biz-hero-icon,
+.business .biz-hero.cat-crimson .biz-hero-btn,
+.biz-icon.cat-crimson {
+  color: #fff;
+}
+
+.business[data-theme='football'] {
+  --fc: #b0303d;
+  --fc-navy: #2f2f63;
+  --fc-gray: #eeeeef;
+}
+
+.business[data-theme='football'] .biz-balance {
+  color: var(--fc);
+}
+
+.fc-title {
+  margin: 0 0 16px;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.fc-sub {
+  margin: 22px 0 10px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.fc-mini-title {
+  margin: 12px 0 6px;
+  color: #7a8090;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fc-info {
+  margin: -6px 0 14px;
+  color: #3a404c;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.fc-info.small {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.fc-note {
+  margin: 16px 0 0;
+  color: #7a8090;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.fc-warn {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fde8ea;
+  color: #a12a36;
+  font-size: 15px;
+}
+
+.fc-bad {
+  color: #d8465a;
+}
+
+.business .fc-link {
+  display: block;
+  margin-top: 12px;
+  color: var(--fc);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.business .fc-link.small {
+  margin: 10px 0 0;
+  font-size: 16px;
+}
+
+.business .fc-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--fc);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.business .fc-btn.poor,
+.business .fc-btn:disabled {
+  opacity: 0.5;
+}
+
+.business .fc-btn.confirm {
+  background: #7a1c36;
+}
+
+/* --- Logoer og bilder --- */
+.fc-logo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.fc-logo::before {
+  content: attr(data-short);
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #e6e7ec;
+  color: #4b5160;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.fc-logo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.fc-logo.me::before {
+  content: none;
+}
+
+.fc-logo.me {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b8323e, #2c0f2e);
+  color: #fff;
+}
+
+.fc-logo.me svg {
+  width: 62%;
+  height: 62%;
+}
+
+.fc-logo.xs {
+  width: 22px;
+  height: 22px;
+}
+
+.fc-logo.xs::before {
+  font-size: 7px;
+}
+
+.fc-logo.sm {
+  width: 30px;
+  height: 30px;
+}
+
+.fc-logo.lg {
+  width: 72px;
+  height: 72px;
+}
+
+.fc-logo.lg::before {
+  font-size: 16px;
+}
+
+.fc-face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #d9dbe1;
+  color: #8d929e;
+}
+
+.fc-face svg {
+  width: 60%;
+  height: 60%;
+}
+
+.fc-face img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.fc-face.xl {
+  width: 130px;
+  height: 130px;
+}
+
+/* --- Forsiden --- */
+.fc-news {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fff5e6;
+  color: #7a4b00;
+}
+
+.fc-news p {
+  margin: 0 0 8px;
+}
+
+.business .fc-news button {
+  color: var(--fc);
+  font-weight: 700;
+}
+
+.business .fc-champ {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--fc-gray);
+}
+
+.fc-champ-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fc-champ-head svg {
+  width: 52px;
+  height: 52px;
+  color: #7a1c36;
+}
+
+.fc-champ-head h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.fc-champ p {
+  margin: 16px 0 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.fc-champ .fc-champ-status {
+  font-weight: 600;
+}
+
+.fc-live {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e5484d;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  animation: fc-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes fc-blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.fc-live-text {
+  color: #e5484d;
+  font-weight: 700;
+}
+
+.fc-band {
+  margin: 30px -18px 0;
+  padding: 30px 18px;
+  background: var(--fc-gray);
+}
+
+.fc-plain {
+  padding: 30px 0 4px;
+}
+
+.fc-plain p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.fc-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.fc-grid.top {
+  grid-template-columns: 1fr 1.6fr;
+}
+
+.fc-grid.two {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 14px;
+}
+
+.business .fc-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 120px;
+  padding: 16px;
+  border-radius: 24px;
+  background: #fff;
+  text-align: center;
+}
+
+.fc-tile svg {
+  width: 52px;
+  height: 52px;
+  color: var(--fc);
+}
+
+.fc-tile strong {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.fc-tile span {
+  color: #7a8090;
+  font-size: 14px;
+}
+
+.fc-tile.rating strong {
+  font-size: 40px;
+}
+
+.fc-tile.rating span {
+  color: var(--fc);
+  font-size: 18px;
+}
+
+.business .fc-tile.trophies {
+  flex-direction: row;
+  gap: 14px;
+  background: var(--fc-navy);
+  color: #fff;
+}
+
+.fc-tile.trophies svg {
+  color: #fff;
+}
+
+.fc-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e5484d;
+}
+
+.fc-contract {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.fc-contract strong {
+  font-size: 18px;
+}
+
+.fc-contract.unpaid {
+  border: 2px solid #e5484d;
+}
+
+.fc-contract.unpaid strong {
+  color: #c2303c;
+}
+
+.business .fc-history-btn {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  padding: 20px 24px;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.fc-history-btn svg {
+  width: 56px;
+  height: 56px;
+  color: var(--fc);
+}
+
+.fc-history-btn strong {
+  font-size: 22px;
+}
+
+/* --- Ligaer --- */
+.fc-leagues {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fc-league {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--fc-gray);
+}
+
+.fc-league.mine {
+  outline: 2px solid var(--fc);
+}
+
+.fc-cup svg {
+  width: 40px;
+  height: 40px;
+}
+
+.fc-cup.big svg {
+  width: 64px;
+  height: 64px;
+}
+
+.fc-league-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.fc-league-text strong {
+  font-size: 18px;
+}
+
+.fc-league-text span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.business .fc-join {
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--fc);
+  color: #fff;
+  font-weight: 600;
+}
+
+.business .fc-join:disabled {
+  background: #c9cbd2;
+}
+
+.fc-joined {
+  color: var(--fc);
+}
+
+/* --- Turnering og kamp --- */
+.business .fc-next,
+.fc-match-head {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--fc-gray);
+  text-align: center;
+}
+
+.fc-next.done {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-next-round {
+  display: block;
+  margin-bottom: 12px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fc-next-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.fc-next-teams > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fc-next-teams strong {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.fc-next-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.fc-vs {
+  color: #1c2230;
+  font-size: 22px;
+}
+
+.fc-score {
+  color: #1c2230;
+  font-size: 36px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-group {
+  margin-bottom: 16px;
+}
+
+.fc-group h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.fc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-table th {
+  padding: 6px 4px;
+  color: #8a909b;
+  font-weight: 500;
+  text-align: center;
+}
+
+.fc-table td {
+  padding: 8px 4px;
+  border-top: 1px solid #eceef2;
+  text-align: center;
+}
+
+.fc-table td.fc-td-team,
+.fc-table th:nth-child(2) {
+  text-align: left;
+}
+
+.fc-td-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fc-td-team span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.fc-table tr.me td {
+  background: #fbecee;
+  font-weight: 700;
+}
+
+.fc-table tr.through td:first-child {
+  color: #2fa35a;
+  font-weight: 800;
+}
+
+.business .fc-pair {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f4f4f6;
+  font-size: 14px;
+}
+
+.business .fc-pair.mine {
+  background: #fbecee;
+  font-weight: 600;
+}
+
+.fc-pair-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fc-pair-team span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-pair-team.right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.fc-pair b {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.business .fc-leave {
+  display: block;
+  width: 100%;
+  margin-top: 26px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #f4f4f6;
+  color: #c2303c;
+  font-weight: 600;
+  text-align: center;
+}
+
+.business .fc-leave.confirm {
+  background: #c2303c;
+  color: #fff;
+}
+
+/* Hendelser i kampen */
+.fc-events {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f4f4f6;
+  font-size: 15px;
+}
+
+.fc-event.side-0 {
+  background: #fbecee;
+}
+
+.fc-event-min {
+  min-width: 34px;
+  color: #6b7280;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-event-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.ev-goal .fc-event-icon svg,
+.ev-pen-goal .fc-event-icon svg {
+  color: #1c2230;
+}
+
+.ev-yellow .fc-event-icon svg {
+  color: #f2c230;
+}
+
+.ev-red .fc-event-icon svg,
+.ev-pen-miss .fc-event-icon svg {
+  color: #e5484d;
+}
+
+.ev-goal,
+.ev-pen-goal {
+  font-weight: 500;
+}
+
+.fc-event-text {
+  flex: 1;
+}
+
+/* Kamphistorikk */
+.fc-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.business .fc-hist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f4f4f6;
+}
+
+.fc-hist-meta {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.fc-hist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.fc-hist-row b {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-hist-row span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-hist-row i {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: #fff;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.fc-hist.win i {
+  background: #2fa35a;
+}
+
+.fc-hist.draw i {
+  background: #9aa0ab;
+}
+
+.fc-hist.loss i {
+  background: #e5484d;
+}
+
+/* --- Spillere --- */
+.fc-players {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fc-players.pad {
+  padding-bottom: 100px;
+}
+
+.business .fc-player {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 16px 12px 12px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: #f4f4f6;
+}
+
+.business .fc-player.pick.on {
+  border-color: var(--fc);
+  background: #fbecee;
+}
+
+.fc-player-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.fc-player-text strong {
+  font-size: 17px;
+}
+
+.fc-player-text > span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.fc-club-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc-player-text .fc-price {
+  color: #1c2230;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.fc-rating {
+  display: grid;
+  place-items: center;
+  min-width: 52px;
+  height: 52px;
+  padding: 0 6px;
+  border-radius: 14px;
+  background: var(--fc-navy);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.business .fc-float {
+  position: fixed;
+  z-index: 5;
+  left: 18px;
+  bottom: calc(env(safe-area-inset-bottom) + 24px);
+  min-width: 160px;
+  padding: 17px 40px;
+  border-radius: 999px;
+  background: var(--fc);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(176, 48, 61, 0.35);
+}
+
+.business .fc-float:disabled {
+  background: #d9a3aa;
+  box-shadow: none;
+}
+
+.fc-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 50px;
+  text-align: center;
+}
+
+.fc-profile h1 {
+  margin: 8px 0 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.fc-profile-club {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+}
+
+.fc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.fc-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f4f4f6;
+}
+
+.fc-stats span {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.fc-stats strong {
+  font-size: 20px;
+}
+
+.fc-buy-bar {
+  margin-top: 10px;
+}
+
+/* --- Trening --- */
+.fc-act-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+}
+
+.fc-act-status strong {
+  font-size: 19px;
+}
+
+.fc-act-status.ready {
+  background: #e8f6ec;
+  color: #1f7a3c;
+}
+
+.fc-act-status.busy {
+  background: #fbecee;
+  color: #a12a36;
+}
+
+.fc-act-status.pause {
+  background: #f4f4f6;
+  color: #4b5160;
+}
+
+.fc-act {
+  margin-bottom: 12px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #f4f4f6;
+}
+
+.fc-act-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fc-act-head svg {
+  width: 32px;
+  height: 32px;
+  color: var(--fc);
+}
+
+.fc-act-head strong {
+  flex: 1;
+  font-size: 19px;
+}
+
+.fc-act-head span {
+  color: #6b7280;
+}
+
+.fc-act p {
+  margin: 10px 0 0;
+  color: #4b5160;
+  font-size: 15px;
+}
+
+.fc-act .fc-btn {
+  margin-top: 12px;
+  padding: 13px;
+  font-size: 16px;
+}
+
+/* --- Trofeer --- */
+.fc-trophies {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fc-trophy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 12px;
+  border-radius: 20px;
+  background: #f4f4f6;
+  text-align: center;
+}
+
+.fc-trophy strong {
+  font-size: 16px;
+}
+
+.fc-trophy span {
+  color: #1c2230;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.fc-trophy.empty span {
+  color: #9aa0ab;
+  font-size: 14px;
+  font-weight: 500;
+}

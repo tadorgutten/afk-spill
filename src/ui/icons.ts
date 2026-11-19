@@ -144,6 +144,28 @@ export const icons = {
   /** Pengeseddel */
   bill: svg('<rect x="2.5" y="6" width="19" height="12" rx="1"/><circle cx="12" cy="12" r="2.8"/><path d="M5.5 9v.01M18.5 15v.01"/>', 1.5),
 
+  // --- Fotballklubb ---
+  /** Fotballbane med ball (fotballklubb) */
+  pitch: svg('<rect x="2.5" y="8" width="19" height="13" rx="1.5"/><path d="M12 8v13"/><circle cx="12" cy="14.5" r="2"/><path d="M2.5 11.5h2.5v6H2.5M21.5 11.5H19v6h2.5"/><circle cx="12" cy="4" r="2.5"/>', 1.5),
+  /** Pokal */
+  trophy: svg('<path d="M8 3h8v6a4 4 0 0 1-8 0Z"/><path d="M8 5H4.5v1.5A3.5 3.5 0 0 0 8 10M16 5h3.5v1.5A3.5 3.5 0 0 1 16 10"/><path d="M12 13v4M8 21h8M9.5 17h5v4h-5Z"/>', 1.6),
+  /** Fotball */
+  ball: svg('<circle cx="12" cy="12" r="9.5"/><path d="m12 7.5 3.5 2.5-1.3 4h-4.4L8.5 10Z"/><path d="M12 7.5V2.5M15.5 10l4.5-1.5M14.2 14l2.8 4M9.8 14 7 18M8.5 10 4 8.5"/>', 1.4),
+  /** Spiller som skyter (spillere) */
+  kick: svg('<circle cx="14" cy="4" r="2"/><path d="M13 7 9 9.5l-3-1.5M13 7l1.5 5-3.5 3-1.5 6M14.5 12l4 1 1.5-2.5"/><circle cx="18.5" cy="19" r="2"/>', 1.6),
+  /** Manual (trening) */
+  dumbbell: svg('<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>', 2),
+  /** Fløyte (frispark) */
+  whistle: svg('<circle cx="9" cy="14" r="5"/><path d="M11 9.5h10v3h-6"/><path d="M5 4l2 3M9 3v3M13 4l-1.5 3"/>', 1.6),
+  /** Hjørneflagg / offside-flagg */
+  flag: svg('<path d="M5 21V3"/><path d="M5 4h12l-3 3.5 3 3.5H5"/>', 1.7),
+  /** Kort (gult/rødt) */
+  card: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3.5" width="10" height="17" rx="1.5" fill="currentColor" transform="rotate(8 12 12)"/></svg>',
+  /** Hanske (redning) */
+  glove: svg('<path d="M7 21v-4.5L4.5 13a1.5 1.5 0 0 1 2.3-2l1.7 1.5V5a1.5 1.5 0 0 1 3 0v5V3.5a1.5 1.5 0 0 1 3 0V10V5a1.5 1.5 0 0 1 3 0v5.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-3.5 5.5V21Z"/>', 1.4),
+  /** Liste med klokke (kamphistorikk) */
+  history: svg('<path d="M14 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9l4 4v4"/><path d="M8 8h6M8 12h4"/><circle cx="17" cy="17" r="4.5"/><path d="M17 15v2l1.5 1"/>', 1.5),
+
   // --- Bank ---
   /** Billett med % (innskudd) */
   percentTicket: svg('<path d="M2.5 6h19v3.2a2.8 2.8 0 0 0 0 5.6V18h-19v-3.2a2.8 2.8 0 0 0 0-5.6Z"/><path d="m9.5 14.5 5-5"/><circle cx="9.7" cy="9.7" r=".9"/><circle cx="14.3" cy="14.3" r=".9"/>', 1.8),

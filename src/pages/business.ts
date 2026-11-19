@@ -32,6 +32,7 @@ import {
   sellProject,
   startProject,
   dealerPay,
+  footballPay,
   type Business,
   type BusinessCategoryId,
 } from '../game/business';
@@ -106,6 +107,35 @@ import {
 } from './itViews';
 import { bankOf, DEFAULT_DEPOSIT, DEFAULT_LOAN, expandVault, setRates } from '../game/bank';
 import { bindBankSliders, renderBankControl, renderBankDetail } from './bankViews';
+import {
+  buyPlayer,
+  clubRating,
+  fcOf,
+  joinLeague,
+  leaveLeague,
+  liveRound,
+  payContracts,
+  refreshMarket,
+  sellPlayer,
+  squadValue,
+  startActivity,
+  type ActivityId,
+} from '../game/football';
+import { leagueById } from '../game/footballData';
+import {
+  renderBuy,
+  renderFootballDetail,
+  renderHistory,
+  renderLeagues,
+  renderMarket as renderFcMarket,
+  renderMatch,
+  renderPlayer,
+  renderRecord,
+  renderSquad,
+  renderTournament,
+  renderTraining,
+  renderTrophies,
+} from './footballViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyFull, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -154,7 +184,18 @@ type View =
   | { name: 'iHire'; id: string; role: RoleId }
   | { name: 'iOffers'; id: string }
   | { name: 'iOffer'; id: string; offer: string }
-  | { name: 'bControl'; id: string; deposit: number; loan: number };
+  | { name: 'bControl'; id: string; deposit: number; loan: number }
+  | { name: 'fLeagues'; id: string }
+  | { name: 'fTournament'; id: string; all: boolean }
+  | { name: 'fMatch'; id: string; round: number }
+  | { name: 'fRecord'; id: string; index: number }
+  | { name: 'fSquad'; id: string }
+  | { name: 'fPlayer'; id: string; player: string }
+  | { name: 'fMarket'; id: string }
+  | { name: 'fBuy'; id: string; ref: string; replace: string | null }
+  | { name: 'fTraining'; id: string }
+  | { name: 'fTrophies'; id: string }
+  | { name: 'fHistory'; id: string };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -166,6 +207,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   dealer: icons.dealer,
   it: icons.monitor,
   bank: icons.bank,
+  football: icons.pitch,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -199,6 +241,9 @@ export function createBusinessPage(state: GameState): Page {
   /** IT-selskap: "trykk igjen" for å avbryte et prosjekt / gi en ansatt sparken. */
   let confirmDrop = false;
   let confirmFire = false;
+  /** Fotballklubb: "trykk igjen" for å selge en spiller / trekke laget fra turneringen. */
+  let confirmSell = false;
+  let confirmLeave = false;
   /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
   let slotsOpen = false;
   /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
@@ -248,6 +293,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (engineOf(b) === 'dealer') element.innerHTML = renderDealerDetail(b, heroHtml(b));
         else if (engineOf(b) === 'it') element.innerHTML = renderItDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'bank') element.innerHTML = renderBankDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'football') element.innerHTML = renderFootballDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -336,6 +382,42 @@ export function createBusinessPage(state: GameState): Page {
       case 'dSkills': {
         const b = find(view.id);
         element.innerHTML = b ? backBtn + renderSkills(b) : '';
+        break;
+      }
+      // --- Fotballklubb ---
+      case 'fLeagues':
+      case 'fTournament':
+      case 'fMatch':
+      case 'fRecord':
+      case 'fSquad':
+      case 'fPlayer':
+      case 'fMarket':
+      case 'fBuy':
+      case 'fTraining':
+      case 'fTrophies':
+      case 'fHistory': {
+        const b = find(view.id);
+        if (!b) break;
+        let html = '';
+        if (view.name === 'fLeagues') html = renderLeagues(b);
+        else if (view.name === 'fTournament') html = renderTournament(b, confirmLeave, view.all);
+        else if (view.name === 'fMatch') html = renderMatch(b, view.round);
+        else if (view.name === 'fRecord') html = renderRecord(b, view.index);
+        else if (view.name === 'fSquad') html = renderSquad(b);
+        else if (view.name === 'fMarket') html = renderFcMarket(b);
+        else if (view.name === 'fBuy') html = renderBuy(state, b, view.ref, view.replace);
+        else if (view.name === 'fTraining') html = renderTraining(state, b);
+        else if (view.name === 'fTrophies') html = renderTrophies(b);
+        else if (view.name === 'fHistory') html = renderHistory(b);
+        else if (view.name === 'fPlayer') {
+          const x = fcOf(b).squad.find((p) => p.id === view.player);
+          if (!x) {
+            stack.pop();
+            return renderView();
+          }
+          html = renderPlayer(b, x, confirmSell);
+        }
+        element.innerHTML = backBtn + html;
         break;
       }
       // --- Bank ---
@@ -514,6 +596,8 @@ export function createBusinessPage(state: GameState): Page {
     if (action !== 'close') confirmClose = false;
     if (action !== 'i-drop') confirmDrop = false;
     if (action !== 'i-fire') confirmFire = false;
+    if (action !== 'f-sell') confirmSell = false;
+    if (action !== 'f-leave') confirmLeave = false;
 
     switch (action) {
       case 'back':
@@ -731,6 +815,141 @@ export function createBusinessPage(state: GameState): Page {
       }
       case 'd-skills':
         return go({ name: 'dSkills', id });
+
+      // --- Fotballklubb ---
+      case 'f-leagues':
+        return go({ name: 'fLeagues', id });
+      case 'f-tournament':
+        return go({ name: 'fTournament', id, all: false });
+      case 'f-groups':
+        if (view.name === 'fTournament') view.all = !view.all;
+        return render();
+      case 'f-match':
+        return go({ name: 'fMatch', id, round: Number(target.dataset.round) });
+      case 'f-record':
+        return go({ name: 'fRecord', id, index: Number(target.dataset.index) });
+      case 'f-history':
+        return go({ name: 'fHistory', id });
+      case 'f-trophies':
+        return go({ name: 'fTrophies', id });
+      case 'f-squad':
+        return go({ name: 'fSquad', id });
+      case 'f-player':
+        if (view.name !== 'fSquad') return;
+        return go({ name: 'fPlayer', id: view.id, player: target.dataset.player! });
+      case 'f-training':
+        return go({ name: 'fTraining', id });
+      case 'f-news': {
+        const b = find(id);
+        if (b) fcOf(b).news = [];
+        return render();
+      }
+      case 'f-market': {
+        const b = find(id);
+        if (!b) return;
+        // Første gang (eller tom liste): lag en liste med en gang
+        if (!fcOf(b).market.length) refreshMarket(fcOf(b), Date.now(), true);
+        return go({ name: 'fMarket', id });
+      }
+      case 'f-refresh': {
+        const b = find(id);
+        if (b && refreshMarket(fcOf(b))) showToast('Overgangslista er oppdatert');
+        return render();
+      }
+      case 'f-buy':
+        return go({ name: 'fBuy', id, ref: target.dataset.ref!, replace: null });
+      case 'f-replace':
+        if (view.name === 'fBuy') view.replace = view.replace === target.dataset.player ? null : target.dataset.player!;
+        return render();
+      case 'f-buy-do': {
+        const b = find(id);
+        if (!b || view.name !== 'fBuy') return;
+        const result = buyPlayer(fcOf(b), footballPay(state, b), view.ref, view.replace);
+        const messages: Partial<Record<typeof result, string>> = {
+          full: 'Laget er fullt – velg hvem som skal ut',
+          money: 'Du har ikke nok penger',
+          live: 'Kampen pågår – du kan ikke kjøpe spillere nå',
+          gone: 'Spilleren er ikke lenger på lista',
+        };
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(messages[result] ?? 'Det gikk ikke');
+        }
+        showToast('Spilleren er kjøpt!');
+        stack = [{ name: 'home' }, { name: 'detail', id }, { name: 'fSquad', id }];
+        render();
+        window.scrollTo(0, 0);
+        return;
+      }
+      case 'f-sell': {
+        const b = find(id);
+        if (!b) return;
+        if (!confirmSell) {
+          confirmSell = true;
+          return render();
+        }
+        confirmSell = false;
+        const result = sellPlayer(fcOf(b), footballPay(state, b), target.dataset.player!);
+        if (result === 'live') return showToast('Kampen pågår – du kan ikke selge nå');
+        if (result === 'ok') showToast('Spilleren har forlatt klubben');
+        return back();
+      }
+      case 'f-pay': {
+        const b = find(id);
+        if (!b) return;
+        if (payContracts(fcOf(b), footballPay(state, b)) === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        showToast('Kontraktene er betalt');
+        return render();
+      }
+      case 'f-activity': {
+        const b = find(id);
+        if (!b) return;
+        const result = startActivity(fcOf(b), footballPay(state, b), target.dataset.activity as ActivityId);
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'live') return showToast('Kampen pågår – dere kan ikke trene nå');
+        if (result === 'ok') showToast('Aktiviteten har startet');
+        return render();
+      }
+      case 'f-join': {
+        const b = find(id);
+        if (!b) return;
+        const league = target.dataset.league!;
+        const result = joinLeague(fcOf(b), league);
+        const messages: Partial<Record<typeof result, string>> = {
+          closed: 'Påmeldingen er stengt',
+          need: 'Dere må ha 11 spillere',
+          rating: `Klubben trenger rating ${leagueById(league).minRating} (har ${clubRating(fcOf(b)).toFixed(1)})`,
+          joined: 'Dere er allerede med i en turnering',
+        };
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(messages[result] ?? 'Det gikk ikke');
+        }
+        showToast(`Dere er med i ${leagueById(league).name}!`);
+        stack = [{ name: 'home' }, { name: 'detail', id }, { name: 'fTournament', id, all: false }];
+        render();
+        window.scrollTo(0, 0);
+        return;
+      }
+      case 'f-leave': {
+        const b = find(id);
+        if (!b) return;
+        if (!confirmLeave) {
+          confirmLeave = true;
+          return render();
+        }
+        confirmLeave = false;
+        if (liveRound(fcOf(b)) !== null) return showToast('Kampen pågår – vent til den er ferdig');
+        leaveLeague(fcOf(b));
+        showToast('Dere har trukket dere fra turneringen');
+        return render();
+      }
 
       // --- Bank ---
       case 'b-control': {
@@ -1136,6 +1355,11 @@ export function createBusinessPage(state: GameState): Page {
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
+    if (engineOf(b) === 'football') {
+      const t = fcOf(b).tournament;
+      const league = t && !t.finished ? ` · ${leagueById(t.league).name}` : '';
+      return `<span>${icons.trophy} Rating ${clubRating(fcOf(b)).toFixed(1)}${league}</span>`;
+    }
     if (engineOf(b) === 'bank') return `<span>${icons.bill} ${formatMoneyWhole(bankOf(b).funds)} i hvelvet</span>`;
     if (engineOf(b) === 'it') return `<span>${icons.hourglass} ${inProgress(b).length} pågår · ${completed(b).length} ferdige · ${formatMoneyWhole(wagesPerHour(b))} lønn per time</span>`;
     return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
@@ -1155,6 +1379,8 @@ export function createBusinessPage(state: GameState): Page {
         </span>
         ${engineOf(b) === 'build'
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(readyValue(b))}</b> klart for salg</span>`
+          : engineOf(b) === 'football'
+          ? `<span class="biz-row-income"><b>${formatMoneyRounded(squadValue(fcOf(b)))}</b> lagverdi</span>`
           : engineOf(b) === 'dealer'
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(showroomValue(b))}</b> til salgs</span>`
           : `<span class="biz-row-income ${incomePerHour(b) < 0 ? 'negative' : ''}"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
@@ -1344,6 +1570,8 @@ export function createBusinessPage(state: GameState): Page {
       confirmClose = false;
       confirmDrop = false;
       confirmFire = false;
+      confirmSell = false;
+      confirmLeave = false;
       slotsOpen = false;
       procureFor = null;
       render();
@@ -1370,7 +1598,9 @@ export function createBusinessPage(state: GameState): Page {
       const view = current().name;
       if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire' || view === 'bControl') return;
       // Ikke tegn på nytt mens man bekrefter (teksten "Trykk igjen" skal bli stående)
-      if (confirmDrop || confirmFire) return;
+      if (confirmDrop || confirmFire || confirmSell || confirmLeave) return;
+      // Kamphistorikk, trofeer og lister med bilder endrer seg ikke av seg selv
+      if (view === 'fRecord' || view === 'fTrophies' || view === 'fHistory' || view === 'fSquad' || view === 'fBuy') return;
       // Bruktbilmarkedet (100 bilder) og ferdighetene endrer seg ikke av seg selv
       if (view === 'dMarket' || view === 'dMarketCar' || view === 'dSkills') return;
       if (view === 'settings' && confirmClose) return;
