@@ -32,6 +32,7 @@ import {
   type Resources,
 } from './construction';
 import { DEALER_TYPE, isDealerType, newDealer, tickDealer, type DealerPay, type DealerState } from './dealer';
+import { IT_TYPE, isItType, newIt, tickIt, wagesPerHour, type ItState } from './it';
 
 /*
  * BEDRIFTER
@@ -50,6 +51,7 @@ import { DEALER_TYPE, isDealerType, newDealer, tickDealer, type DealerPay, type 
  *   - fleet: taxi og fraktselskap – kjøp kjøretøy (taxi.ts)
  *   - build: byggefirma – kjøp ressurser, bygg og selg bygg (construction.ts)
  *   - dealer: bilforhandler – kjøp brukte biler, reparer og selg dem (dealer.ts)
+ *   - it: IT-selskap – ansett folk, lag prosjekter og selg dem (it.ts)
  *
  * Kapitalisering = alt du har puttet inn i bedriften (åpningskostnad + investeringer).
  * Legger du ned bedriften, får du tilbake 30 % av kapitaliseringen.
@@ -61,9 +63,10 @@ export type BusinessCategoryId =
   | 'shipping'
   | 'factory'
   | 'construction'
-  | 'dealer';
+  | 'dealer'
+  | 'it';
 
-export type Engine = 'stage' | 'fleet' | 'build' | 'dealer';
+export type Engine = 'stage' | 'fleet' | 'build' | 'dealer' | 'it';
 
 export interface BusinessCategory {
   id: BusinessCategoryId;
@@ -104,6 +107,7 @@ export const CATEGORIES: BusinessCategory[] = [
   { id: 'factory', name: 'Fabrikk', chooseTitle: 'Velg type fabrikk', nameTitle: 'Skriv inn navnet på fabrikken', color: 'blue' },
   { id: 'construction', name: 'Byggefirma', chooseTitle: '', nameTitle: 'Skriv inn navnet på byggefirmaet', color: 'red' },
   { id: 'dealer', name: 'Bilforhandler', chooseTitle: '', nameTitle: 'Skriv inn navnet på bilforhandleren', color: 'dark' },
+  { id: 'it', name: 'IT-selskap', chooseTitle: '', nameTitle: 'Skriv inn navnet på IT-selskapet', color: 'purple' },
 ];
 
 // Tallene er 1/10 av Business Empire sine (spillet har 10 ganger lavere verdier).
@@ -212,6 +216,19 @@ export const BUSINESS_TYPES: BusinessType[] = [
     firstExpansionSec: 0,
     timeGrowth: 1,
   },
+  // IT-selskap: inntekten kommer fra prosjektene som selges, og de ansatte får lønn (se it.ts)
+  {
+    id: IT_TYPE,
+    category: 'it',
+    name: 'IT-selskap',
+    coins: 1,
+    openingCost: 35_000, // vises som $ 350 000
+    baseIncome: 0,
+    baseInvestment: 0,
+    growth: 0,
+    firstExpansionSec: 0,
+    timeGrowth: 1,
+  },
   // Trinn 1 = $ 3 853/t, investering $ 27 748,50 (+15 % per trinn), +17 % inntekt per trinn,
   // første utvidelse 2 min, så 3 min 36 s, 6 min 29 s ... (×1,8 som lokal butikk)
   {
@@ -314,6 +331,9 @@ export interface Business {
   // --- Bare for bilforhandler ---
   dealer?: DealerState;
 
+  // --- Bare for IT-selskap ---
+  it?: ItState;
+
   /** Hvor mange plasser utvidelsen som pågår gir. */
   pendingPlaces?: number;
 
@@ -335,6 +355,7 @@ export function incomeAt(type: BusinessType, stage: number): number {
 export function engineOf(b: Business): Engine {
   if (isFleetType(b.type)) return 'fleet';
   if (isDealerType(b.type)) return 'dealer';
+  if (isItType(b.type)) return 'it';
   return isConstructionType(b.type) ? 'build' : 'stage';
 }
 
@@ -349,6 +370,8 @@ export function incomePerHour(b: Business): number {
     case 'build':
     case 'dealer':
       return 0; // tjener penger når byggene/bilene selges
+    case 'it':
+      return -wagesPerHour(b); // tjener penger når prosjektene selges, men betaler lønn hele tiden
     default:
       return incomeAt(typeById(b.type), b.stage);
   }
@@ -430,6 +453,8 @@ export function startBusiness(state: GameState, typeId: string, name: string): B
     b.built = {};
   } else if (engineOf(b) === 'dealer') {
     b.dealer = newDealer();
+  } else if (engineOf(b) === 'it') {
+    b.it = newIt();
   }
   state.businesses.unshift(b); // nyeste øverst
   return b;
@@ -485,6 +510,11 @@ export function tickBusinesses(state: GameState, now: number) {
       }
       continue;
     }
+    // IT-selskap: lønn trekkes hele tiden (også mens appen var lukket)
+    if (engineOf(b) === 'it') {
+      payWages(state, b, tickIt(b, from, now));
+      continue;
+    }
     if (isTaxi(b)) {
       // Taxi: utvidelse gir flere plasser, og bilene kjører og tjener penger
       if (b.expansionEnd !== null && b.expansionEnd <= now) {
@@ -510,7 +540,15 @@ export function tickBusinesses(state: GameState, now: number) {
 
 /** Butikker er i forenklet skatteordning: 5 % av inntekten trekkes automatisk. */
 export const businessTaxRate = () => SIMPLIFIED_RATE;
-export const taxPerHour = (b: Business) => incomePerHour(b) * businessTaxRate();
+export const taxPerHour = (b: Business) => Math.max(0, incomePerHour(b)) * businessTaxRate();
+
+/** Lønn til de ansatte (IT-selskap). Trekkes fra saldoen – saldoen kan gå i minus. */
+function payWages(state: GameState, b: Business, wages: number) {
+  if (wages <= 0) return;
+  state.balance -= wages;
+  state.businessEarned -= wages;
+  b.earned -= wages;
+}
 
 function pay(state: GameState, b: Business, hours: number) {
   if (hours <= 0) return;

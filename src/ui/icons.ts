@@ -143,4 +143,32 @@ export const icons = {
   diagnostics: svg('<rect x="2.5" y="3.5" width="19" height="13" rx="1.5"/><path d="M8 21h8M12 16.5V21"/><path d="M6.5 12.5v-2l1.5-2.5h8l1.5 2.5v2Z"/><circle cx="9" cy="12.5" r=".8"/><circle cx="15" cy="12.5" r=".8"/>', 1.4),
   /** Pengeseddel */
   bill: svg('<rect x="2.5" y="6" width="19" height="12" rx="1"/><circle cx="12" cy="12" r="2.8"/><path d="M5.5 9v.01M18.5 15v.01"/>', 1.5),
+
+  // --- IT-selskap ---
+  /** Dataskjerm (IT-selskap) */
+  monitor: svg('<rect x="2.5" y="3.5" width="19" height="13" rx="2"/><path d="M8 21h8M10 16.5 9.5 21M14 16.5l.5 4.5"/>', 1.8),
+  /** </> (utvikling) */
+  code: svg('<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>', 2.2),
+  /** Bærbar PC med </> (utvikler) */
+  laptopCode: svg('<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/><path d="m10 8.5-2 2 2 2M14 8.5l2 2-2 2"/>', 1.7),
+  /** Kopp med pensler (design) */
+  mug: svg('<path d="M5 11h11v6a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3Z"/><path d="M16 13h1.5a2 2 0 0 1 0 4H16"/><path d="m8 11-1.5-6M12 11l1.5-7"/>', 1.8),
+  /** Personer over en hånd (teamleder) */
+  team: svg('<circle cx="6" cy="5" r="2"/><circle cx="12" cy="4.5" r="2"/><circle cx="18" cy="5" r="2"/><path d="M3.5 11a2.5 2.5 0 0 1 5 0M9.5 10.5a2.5 2.5 0 0 1 5 0M15.5 11a2.5 2.5 0 0 1 5 0"/><path d="M3 21v-6h3l4 2h4a1.5 1.5 0 0 1 0 3H9"/><path d="M14 20h4.5l2.5-3.5"/>', 1.6),
+  /** Tannhjul med skiftenøkkel (testing) */
+  gearWrench: svg('<path d="M12 3.5 13.3 5l2-.4.7 1.9 1.9.7-.4 2L19 10.5l-1 1.5"/><path d="M12 20.5 10.7 19l-2 .4-.7-1.9-1.9-.7.4-2L5 13.5l1-1.5"/><path d="M5 12V10.5L6.5 9.2l-.4-2 1.9-.7.7-1.9 2 .4L12 3.5"/><path d="m8.5 15.5 7-7a2.5 2.5 0 1 1 1.5 3l-7 7a2.5 2.5 0 1 1-1.5-3Z"/>', 1.5),
+  /** Timeglass (pågår) */
+  hourglass: svg('<path d="M7 3h10M7 21h10"/><path d="M8 3v3.5L12 12l4-5.5V3M8 21v-3.5L12 12l4 5.5V21"/><path d="M3.5 12a8.5 8.5 0 0 1 15-5.5M20.5 12a8.5 8.5 0 0 1-15 5.5"/>', 1.5),
+  /** Nettleservindu (nettside-prosjekt) */
+  web: svg('<rect x="2.5" y="4" width="19" height="16" rx="1.5"/><path d="M2.5 8h19M5 6h.01M7 6h.01M9 6h.01"/><rect x="5.5" y="10.5" width="13" height="4" rx=".5"/><path d="M5.5 17.5h5M13.5 17.5h5"/>', 1.4),
+  /** Programvindu med tannhjul (program-prosjekt) */
+  app: svg('<rect x="2.5" y="4" width="19" height="16" rx="1.5"/><path d="M2.5 8h19M5 6h.01M7 6h.01M9 6h.01"/><circle cx="12" cy="14" r="2"/><path d="M12 10.5v1.5M12 16v1.5M8.5 14H10M14 14h1.5M9.5 11.5l1 1M13.5 15.5l1 1M9.5 16.5l1-1M13.5 12.5l1-1"/>', 1.4),
+  /** Person (ansatte) */
+  person: svg('<circle cx="12" cy="7" r="3.5"/><path d="M5 21v-3a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v3Z"/><path d="m12 14-1 3 1 2 1-2Z"/>', 1.5),
+  /** Person med pluss (rekrutterere) */
+  personPlus: svg('<circle cx="10" cy="8" r="3.5"/><path d="M3 21v-3a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v3Z"/><circle cx="18.5" cy="5.5" r="3"/><path d="M18.5 4v3M17 5.5h3"/>', 1.5),
+  /** Laurbærkrans (senior) */
+  laurel: svg('<path d="M7 20c-3-2-4.5-5.5-4-9.5M17 20c3-2 4.5-5.5 4-9.5"/><path d="M4 14.5c1.5.2 2.5 1 3 2.3M3.3 10.8c1.4.4 2.2 1.3 2.5 2.6M20 14.5c-1.5.2-2.5 1-3 2.3M20.7 10.8c-1.4.4-2.2 1.3-2.5 2.6"/><rect x="8" y="7" width="8" height="6" rx="1"/><path d="M7 15h10"/>', 1.4),
+  /** Kontorbygg (forbedringer) */
+  office: svg('<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h.01M12 7h.01M15 7h.01M9 11h.01M12 11h.01M15 11h.01M9 15h.01M15 15h.01"/><path d="M10.5 21v-3.5h3V21"/>', 2),
 };

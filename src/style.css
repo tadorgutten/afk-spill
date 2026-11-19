@@ -12,7 +12,7 @@
   /* Gradienten øverst på Inntekt-siden */
   --header-gradient: linear-gradient(165deg, #3ccfae 0%, #2a8a93 38%, #253f7d 72%, #1d1d5e 100%);
   --nav-height: 68px;
-  --nav-gap: 8px; /* avstand fra menyen ned til bunnen av skjermen */
+  --nav-gap: 18px; /* avstand fra menyen ned til bunnen av skjermen */
   --nav-space: calc(var(--nav-height) + var(--nav-gap) + env(safe-area-inset-bottom));
   /* Hele appen er zoomet litt ned (se src/ui/zoom.ts). Inni sidene må høyder fra skjermen
      derfor deles på zoomen, ellers blir de for små. */

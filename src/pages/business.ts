@@ -67,6 +67,43 @@ import {
   renderSpec,
   type ServiceFilter,
 } from './dealerViews';
+import {
+  autoPick,
+  buyOffice,
+  completed,
+  dropProject,
+  emptyPicks,
+  employeeById,
+  fire,
+  hireOffer,
+  inProgress,
+  itOf,
+  projectDef,
+  quickHire,
+  refreshOffers,
+  roleById,
+  sellItProject,
+  startItProject,
+  validPicks,
+  wagesPerHour,
+  type Picks,
+  type RoleId,
+  type SkillId,
+} from '../game/it';
+import {
+  renderItDetail,
+  renderItEmployee,
+  renderItHire,
+  renderItNew,
+  renderItOffer,
+  renderItOffers,
+  renderItProject,
+  renderItProjects,
+  renderItRole,
+  renderItSetup,
+  renderItTeam,
+  type StaffSort,
+} from './itViews';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyFull, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
@@ -104,7 +141,17 @@ type View =
   | { name: 'dCar'; id: string; car: string; sel: PartId[] }
   | { name: 'dSpec'; id: string; pick: SegmentId | null }
   | { name: 'dExpand'; id: string; kind: 'service' | 'showroom' }
-  | { name: 'dSkills'; id: string };
+  | { name: 'dSkills'; id: string }
+  | { name: 'iProjects'; id: string; tab: 'progress' | 'done' }
+  | { name: 'iProject'; id: string; project: string }
+  | { name: 'iNew'; id: string }
+  | { name: 'iSetup'; id: string; def: string; picks: Picks }
+  | { name: 'iTeam'; id: string; def: string; picks: Picks; skill: SkillId }
+  | { name: 'iRole'; id: string; role: RoleId; sort: StaffSort }
+  | { name: 'iEmployee'; id: string; emp: string }
+  | { name: 'iHire'; id: string; role: RoleId }
+  | { name: 'iOffers'; id: string }
+  | { name: 'iOffer'; id: string; offer: string };
 
 /** Ikon for hver kategori. */
 export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
@@ -114,6 +161,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   factory: icons.factory,
   construction: icons.hook,
   dealer: icons.dealer,
+  it: icons.monitor,
 };
 
 /** Mynt-ikon med 1–3 mynter (billig → dyr). */
@@ -144,6 +192,9 @@ export function createBusinessPage(state: GameState): Page {
 
   let lastRender = 0;
   let confirmClose = false;
+  /** IT-selskap: "trykk igjen" for å avbryte et prosjekt / gi en ansatt sparken. */
+  let confirmDrop = false;
+  let confirmFire = false;
   /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
   let slotsOpen = false;
   /** Spill av åpne-animasjonen bare første gang (siden tegnes på nytt hvert sekund). */
@@ -191,6 +242,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (isTaxi(b)) element.innerHTML = renderTaxiDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'build') element.innerHTML = renderConstructionDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'dealer') element.innerHTML = renderDealerDetail(b, heroHtml(b));
+        else if (engineOf(b) === 'it') element.innerHTML = renderItDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
       }
@@ -281,6 +333,79 @@ export function createBusinessPage(state: GameState): Page {
         element.innerHTML = b ? backBtn + renderSkills(b) : '';
         break;
       }
+      // --- IT-selskap ---
+      case 'iProjects': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderItProjects(b, view.tab) : '';
+        break;
+      }
+      case 'iProject': {
+        const b = find(view.id);
+        const p = b && itOf(b).projects.find((x) => x.id === view.project);
+        if (!b || !p) {
+          stack.pop();
+          return renderView();
+        }
+        element.innerHTML = backBtn + renderItProject(b, p, confirmDrop);
+        break;
+      }
+      case 'iNew': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderItNew(b) : '';
+        break;
+      }
+      case 'iSetup': {
+        const b = find(view.id);
+        if (!b) break;
+        // Fjern valgte som ikke lenger er ledige (fått sparken eller startet et annet prosjekt)
+        Object.assign(view.picks, validPicks(b, view.picks));
+        element.innerHTML = backBtn + renderItSetup(b, projectDef(view.def), view.picks);
+        break;
+      }
+      case 'iTeam': {
+        const b = find(view.id);
+        if (!b) break;
+        Object.assign(view.picks, validPicks(b, view.picks));
+        element.innerHTML = backBtn + renderItTeam(b, projectDef(view.def), view.picks, view.skill);
+        break;
+      }
+      case 'iRole': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderItRole(b, view.role, view.sort) : '';
+        break;
+      }
+      case 'iEmployee': {
+        const b = find(view.id);
+        const e = b && employeeById(b, view.emp);
+        if (!b || !e) {
+          stack.pop();
+          return renderView();
+        }
+        element.innerHTML = backBtn + renderItEmployee(b, e, confirmFire);
+        break;
+      }
+      case 'iHire': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderItHire(state, b, view.role) : '';
+        bindHireInput();
+        break;
+      }
+      case 'iOffers': {
+        const b = find(view.id);
+        element.innerHTML = b ? backBtn + renderItOffers(b) : '';
+        break;
+      }
+      case 'iOffer': {
+        const b = find(view.id);
+        const e = b && itOf(b).offers.find((o) => o.id === view.offer);
+        if (!b || !e) {
+          stack.pop();
+          showToast('Tilbudet er ikke lenger tilgjengelig');
+          return renderView();
+        }
+        element.innerHTML = backBtn + renderItOffer(state, b, e);
+        break;
+      }
       case 'settings': {
         const b = find(view.id);
         element.innerHTML = b ? backBtn + renderSettings(b) : '';
@@ -305,6 +430,27 @@ export function createBusinessPage(state: GameState): Page {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !btn.disabled) btn.click();
     });
+    refresh();
+  }
+
+  // --- IT-selskap: antall å ansette (intervjukostnaden regnes ut mens man skriver) ---------
+  function hireQty(): number {
+    const input = element.querySelector<HTMLInputElement>('[data-hire-qty]');
+    return Math.max(0, Math.floor(Number(input?.value) || 0));
+  }
+  function bindHireInput() {
+    const view = current();
+    const input = element.querySelector<HTMLInputElement>('[data-hire-qty]');
+    const cost = element.querySelector<HTMLElement>('[data-hire-cost]');
+    const btn = element.querySelector<HTMLButtonElement>('[data-hire-btn]');
+    if (!input || !cost || !btn || view.name !== 'iHire') return;
+    const refresh = () => {
+      const total = hireQty() * roleById(view.role).interview;
+      cost.textContent = formatMoneyWhole(total);
+      btn.disabled = hireQty() <= 0;
+      btn.classList.toggle('poor', total > state.balance);
+    };
+    input.addEventListener('input', refresh);
     refresh();
   }
 
@@ -350,6 +496,8 @@ export function createBusinessPage(state: GameState): Page {
     const { action, id = '', category, type } = target.dataset;
     const view = current();
     if (action !== 'close') confirmClose = false;
+    if (action !== 'i-drop') confirmDrop = false;
+    if (action !== 'i-fire') confirmFire = false;
 
     switch (action) {
       case 'back':
@@ -567,6 +715,144 @@ export function createBusinessPage(state: GameState): Page {
       }
       case 'd-skills':
         return go({ name: 'dSkills', id });
+
+      // --- IT-selskap ---
+      case 'i-projects':
+        return go({ name: 'iProjects', id, tab: target.dataset.tab as 'progress' | 'done' });
+      case 'i-project':
+        return go({ name: 'iProject', id, project: target.dataset.project! });
+      case 'i-sell': {
+        const b = find(id);
+        if (!b) return;
+        const before = state.balance;
+        if (sellItProject(b, dealerPay(state, b), target.dataset.project!) > 0) {
+          showToast(`Solgt for ${formatMoney(state.balance - before)}`);
+        }
+        if (view.name === 'iProject') return back();
+        return render();
+      }
+      case 'i-drop': {
+        const b = find(id);
+        if (!b) return;
+        if (!confirmDrop) {
+          confirmDrop = true;
+          return render();
+        }
+        confirmDrop = false;
+        dropProject(b, target.dataset.project!);
+        showToast('Prosjektet er avbrutt');
+        return back();
+      }
+      case 'i-new':
+        return go({ name: 'iNew', id });
+      case 'i-setup':
+        return go({ name: 'iSetup', id, def: target.dataset.def!, picks: emptyPicks() });
+      case 'i-team':
+        if (view.name !== 'iSetup') return;
+        return go({ name: 'iTeam', id, def: view.def, picks: view.picks, skill: target.dataset.skill as SkillId });
+      case 'i-pick': {
+        if (view.name !== 'iTeam') return;
+        const emp = target.dataset.emp!;
+        const list = view.picks[view.skill];
+        view.picks[view.skill] = list.includes(emp) ? list.filter((x) => x !== emp) : [...list, emp];
+        return render();
+      }
+      case 'i-auto': {
+        if (view.name !== 'iTeam') return;
+        const b = find(view.id);
+        if (!b) return;
+        view.picks[view.skill] = autoPick(b, projectDef(view.def), view.skill);
+        return render();
+      }
+      case 'i-start': {
+        const b = find(id);
+        if (!b || view.name !== 'iSetup') return;
+        if (startItProject(b, view.def, view.picks) !== 'ok') {
+          shake(target);
+          return showToast('Teamene har ikke nok skill');
+        }
+        showToast(`${projectDef(view.def).name} er startet`);
+        // Tilbake til forsiden av IT-selskapet
+        stack = [{ name: 'home' }, { name: 'detail', id }];
+        render();
+        window.scrollTo(0, 0);
+        return;
+      }
+      case 'i-role':
+        return go({ name: 'iRole', id, role: target.dataset.role as RoleId, sort: 'salary-desc' });
+      case 'i-sort':
+        if (view.name === 'iRole') view.sort = target.dataset.sort as StaffSort;
+        return render();
+      case 'i-emp':
+        if (view.name !== 'iRole') return;
+        return go({ name: 'iEmployee', id: view.id, emp: target.dataset.emp! });
+      case 'i-fire': {
+        const b = find(id);
+        if (!b) return;
+        if (!confirmFire) {
+          confirmFire = true;
+          return render();
+        }
+        confirmFire = false;
+        const e = employeeById(b, target.dataset.emp!);
+        const result = fire(b, target.dataset.emp!);
+        if (result === 'busy') return showToast('Personen jobber på et prosjekt');
+        if (result === 'ok' && e) showToast(`${e.name} har fått sparken`);
+        return back();
+      }
+      case 'i-hire':
+        return go({ name: 'iHire', id, role: target.dataset.role as RoleId });
+      case 'i-hire-do': {
+        const b = find(id);
+        if (!b) return;
+        const qty = hireQty();
+        const result = quickHire(b, dealerPay(state, b), target.dataset.role as RoleId, qty);
+        if (result === 'places') {
+          shake(target);
+          return showToast('Ikke nok ledige arbeidsplasser – kjøp et større kontor');
+        }
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result !== 'ok') return;
+        showToast(`Ansatte ${qty} × ${roleById(target.dataset.role as RoleId).name.toLowerCase()}`);
+        return back();
+      }
+      case 'i-offers':
+        return go({ name: 'iOffers', id });
+      case 'i-refresh': {
+        const b = find(id);
+        if (!b) return;
+        refreshOffers(b);
+        return render();
+      }
+      case 'i-offer':
+        if (view.name !== 'iOffers') return;
+        return go({ name: 'iOffer', id: view.id, offer: target.dataset.offer! });
+      case 'i-offer-hire': {
+        const b = find(id);
+        if (!b) return;
+        const e = itOf(b).offers.find((o) => o.id === target.dataset.offer);
+        const result = hireOffer(b, target.dataset.offer!);
+        if (result === 'places') {
+          shake(target);
+          return showToast('Ikke nok ledige arbeidsplasser – kjøp et større kontor');
+        }
+        if (result === 'ok' && e) showToast(`${e.name} er ansatt`);
+        return back();
+      }
+      case 'i-office': {
+        const b = find(id);
+        if (!b) return;
+        const result = buyOffice(b, dealerPay(state, b), target.dataset.office!);
+        if (result === 'money') {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        if (result === 'ok') showToast('Utvidelsen har startet');
+        return render();
+      }
 
       case 'expand-cap': {
         const b = find(id);
@@ -806,6 +1092,7 @@ export function createBusinessPage(state: GameState): Page {
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
+    if (engineOf(b) === 'it') return `<span>${icons.hourglass} ${inProgress(b).length} pågår · ${completed(b).length} ferdige · ${formatMoneyWhole(wagesPerHour(b))} lønn per time</span>`;
     return `<span>${icons.stage} Trinn ${b.stage} av ${MAX_STAGE}</span>`;
   }
 
@@ -825,7 +1112,7 @@ export function createBusinessPage(state: GameState): Page {
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(readyValue(b))}</b> klart for salg</span>`
           : engineOf(b) === 'dealer'
           ? `<span class="biz-row-income"><b>${formatMoneyRounded(showroomValue(b))}</b> til salgs</span>`
-          : `<span class="biz-row-income"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
+          : `<span class="biz-row-income ${incomePerHour(b) < 0 ? 'negative' : ''}"><b>${formatMoneyRounded(incomePerHour(b))}</b> per time</span>`}
       </button>`;
   }
 
@@ -1010,6 +1297,8 @@ export function createBusinessPage(state: GameState): Page {
     onShow() {
       stack = [{ name: 'home' }];
       confirmClose = false;
+      confirmDrop = false;
+      confirmFire = false;
       slotsOpen = false;
       procureFor = null;
       render();
@@ -1034,7 +1323,9 @@ export function createBusinessPage(state: GameState): Page {
       // Tall som endres (inntekt, nedtelling, saldo) tegnes på nytt én gang i sekundet.
       // Sider med skrivefelt tegnes ikke på nytt (da ville teksten man skriver forsvinne).
       const view = current().name;
-      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources') return;
+      if (view === 'name' || view === 'rename' || view === 'categories' || view === 'types' || view === 'resources' || view === 'iHire') return;
+      // Ikke tegn på nytt mens man bekrefter (teksten "Trykk igjen" skal bli stående)
+      if (confirmDrop || confirmFire) return;
       // Bruktbilmarkedet (100 bilder) og ferdighetene endrer seg ikke av seg selv
       if (view === 'dMarket' || view === 'dMarketCar' || view === 'dSkills') return;
       if (view === 'settings' && confirmClose) return;

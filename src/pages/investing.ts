@@ -15,7 +15,7 @@ import {
   priceChange,
   SORTS,
   sortedStocks,
-  stockParams,
+  dividendPerShare,
   topDividendStock,
   incomeStocks,
   growthStocks,
@@ -743,7 +743,7 @@ export function createInvestingPage(state: GameState): Page {
       const diff = value - h.invested;
       const pct = h.invested > 0 ? (diff / h.invested) * 100 : 0;
       const sharePct = (h.owned / def.shares) * 100;
-      const perHour = (h.owned * stockParams(def).dividendPerShare) / DIVIDEND_PERIOD_HOURS;
+      const perHour = (h.owned * dividendPerShare(state, def)) / DIVIDEND_PERIOD_HOURS;
       mine = `
         <div class="detail">
           <span class="detail-label">Verdi av dine aksjer</span>

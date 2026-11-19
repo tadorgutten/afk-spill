@@ -9,6 +9,9 @@ import { taxDividend } from './taxes';
  * Hver aksje har en PRIS og en "RIKTIG VERDI" (det selskapet egentlig er verdt).
  *
  * 1. Riktig verdi vokser (eller synker) sakte over tid, med litt tilfeldighet.
+ *    Over uker kan en aksje stige mye (20–50 % er mulig for vekstaksjer), men den faller
+ *    sjelden mer enn ca. 10 % under snittet sitt de siste ukene (et "gulv" henter den opp).
+ *    Derfor er tapene som regel mindre enn gevinstene.
  * 2. Prisen svinger tilfeldig rundt den riktige verdien, og trekkes mot den over tid.
  * 2b. VEKSTPOTENSIAL: analytikerne har et KURSMÅL for hver aksje (f.eks. 25 % over prisen).
  *    Riktig verdi trekkes sakte mot kursmålet – men hvor mye analytikerne "treffer" er
@@ -16,9 +19,11 @@ import { taxDividend } from './taxes';
  *    i døgnet. Høyt vekstpotensial betyr altså at aksjen KAN stige mye over dager,
  *    ikke at den gjør det. Ingenting er garantert.
  * 3. Av og til kommer det NYHETER: et plutselig hopp opp eller ned.
+ *    Gode nyheter er sjeldnere, men større (3–10 %) enn dårlige (1–6 %).
  *    En del av hoppet er varig (endrer riktig verdi), resten går tilbake.
- * 4. UTBYTTE: hver aksje betaler et fast beløp per aksje per periode (3 timer).
- *    Faller prisen, blir utbytte-prosenten høyere (og omvendt) – akkurat som i virkeligheten.
+ * 4. UTBYTTE: hver aksje betaler et beløp per aksje per periode (3 timer). Beløpet følger
+ *    den riktige verdien, så det vokser når selskapet vokser.
+ *    Faller prisen under verdien, blir utbytte-prosenten høyere (og omvendt).
  *    Utbyttet betales løpende rett inn på saldoen, også mens appen er lukket.
  *
  * Markedet går i ekte tid. Når appen åpnes, regnes alt som skjedde mens den var lukket ut.
@@ -33,16 +38,26 @@ export const HISTORY_POINTS = 120;
 const HOUR_MS = 3_600_000;
 /** Hvor raskt prisen trekkes mot riktig verdi (per time). */
 const PRICE_REVERSION = 0.35;
-/** Hvor raskt riktig verdi trekkes tilbake mot startprisen (hindrer at alt løper løpsk over uker). */
-const VALUE_REVERSION = 0.01;
+/** Hvor mye av de vanlige svingningene som går inn i riktig verdi (resten er bare støy i prisen). */
+const VALUE_NOISE = 0.3;
+/** "Gulvet": riktig verdi faller ikke mer enn ca. så mye under snittet sitt de siste ukene. */
+const FLOOR = 0.05;
+/** Hvor raskt verdien hentes opp igjen når den er under gulvet (per time). */
+const FLOOR_PULL = 0.15;
+/** Hvor mange timer snittet (gulvet) regnes over (336 t = 2 uker). */
+const FLOOR_HOURS = 336;
 /** Hvor ofte det kommer nyheter (per time per aksje). */
 const NEWS_RATE = 0.03;
+/** Andelen nyheter som er gode. Gode nyheter er sjeldnere, men større. */
+const GOOD_NEWS = 0.35;
+const GOOD_NEWS_SIZE: [number, number] = [0.03, 0.1];
+const BAD_NEWS_SIZE: [number, number] = [0.01, 0.06];
 /** Økes når reglene for markedet endres – da lages markedet på nytt (aksjene du eier beholdes). */
 const MARKET_VERSION = 3;
 /** Hvor ofte analytikerne lager et nytt kursmål (per time per aksje – 1/24 = ca. én gang i døgnet). */
 const TARGET_REVISION_RATE = 1 / 24;
 /** Hvor raskt riktig verdi trekkes mot kursmålet (per time, for en aksje der analytikerne treffer helt). */
-const TARGET_PULL = 0.004;
+const TARGET_PULL = 0.0005;
 
 interface ProfileRange {
   /** Kursmålet ligger så mye over (eller under) riktig verdi (0,2 = ca. 20 %). */
@@ -55,19 +70,19 @@ interface ProfileRange {
   drift: [number, number];
   /** Utbytte i % per periode, ved startprisen. */
   dividend: [number, number];
-  /** Størrelse på nyhetshopp. */
+  /** Størrelse på nyhetshopp (1 = vanlig). */
   newsSize: number;
 }
 
-// Svingningene er valgt så endringen de siste 2 timene som regel ligger mellom −1 % og +1 %,
-// og bare sjelden rundt 2 % (de urolige aksjene svinger litt mer enn de stabile).
+// Svingningene er valgt så endringen de siste 2 timene som regel ligger innenfor ±2 %.
+// Over en uke kan en vekstaksje stige 20–40 %, men faller sjelden mer enn ca. 10 %.
 // Kursmålene gir et vekstpotensial på ca. 0–40 %. Vekstaksjene har de høyeste,
 // mens de urolige aksjene kan ha høyt potensial som sjelden slår til.
 const PROFILES: Record<StockProfile, ProfileRange> = {
-  stable: { upside: [0.02, 0.18], reliability: [0.5, 1], volatility: [0.0025, 0.004], drift: [0, 0.0002], dividend: [0.2, 1.0], newsSize: 0.005 },
-  balanced: { upside: [0.05, 0.28], reliability: [0.4, 1], volatility: [0.004, 0.006], drift: [0.00005, 0.0003], dividend: [0.03, 0.4], newsSize: 0.007 },
-  growth: { upside: [0.12, 0.4], reliability: [0.3, 1], volatility: [0.005, 0.008], drift: [0.0002, 0.0006], dividend: [0, 0.03], newsSize: 0.009 },
-  risky: { upside: [-0.08, 0.4], reliability: [0, 0.6], volatility: [0.006, 0.009], drift: [-0.0004, 0.0003], dividend: [0, 1.5], newsSize: 0.012 },
+  stable: { upside: [0.02, 0.18], reliability: [0.5, 1], volatility: [0.0025, 0.004], drift: [0, 0.00002], dividend: [0.2, 1.0], newsSize: 0.6 },
+  balanced: { upside: [0.05, 0.28], reliability: [0.4, 1], volatility: [0.004, 0.006], drift: [0.000005, 0.00003], dividend: [0.03, 0.4], newsSize: 0.8 },
+  growth: { upside: [0.12, 0.4], reliability: [0.3, 1], volatility: [0.005, 0.008], drift: [0.00002, 0.00006], dividend: [0, 0.03], newsSize: 1 },
+  risky: { upside: [-0.08, 0.4], reliability: [0, 0.6], volatility: [0.006, 0.009], drift: [-0.00004, 0.00003], dividend: [0, 1.5], newsSize: 1.3 },
 };
 
 // --- Typer ------------------------------------------------------------------
@@ -87,6 +102,8 @@ export interface StockMarketState {
   fair: number;
   /** Analytikernes kursmål (vekstpotensial = hvor mye over prisen det ligger). */
   target: number;
+  /** Snittet av riktig verdi de siste ukene (ln) – gulvet ligger litt under. */
+  ref?: number;
   /** Prisen hvert minutt de siste 2 timene. */
   history: number[];
 }
@@ -140,12 +157,16 @@ function newTarget(p: StockParams, value: number): number {
 /** Flytter én aksje `dt` timer frem i tid. */
 function stepStock(def: StockDef, s: StockMarketState, dt: number) {
   const p = stockParams(def);
-  const anchor = Math.log(def.price);
 
-  // 1. Riktig verdi: vekst + tilfeldighet, trekkes svakt mot startprisen
+  // 1. Riktig verdi: vekst + tilfeldighet
   let lnFair = Math.log(s.fair);
-  const valueDecay = Math.exp(-VALUE_REVERSION * dt);
-  lnFair = anchor + (lnFair - anchor) * valueDecay + p.drift * dt + p.volatility * 0.35 * Math.sqrt(dt) * randomNormal();
+  lnFair += p.drift * dt + p.volatility * VALUE_NOISE * Math.sqrt(dt) * randomNormal();
+
+  // 1a. Gulvet: faller verdien langt under snittet de siste ukene, hentes den opp igjen
+  s.ref ??= lnFair;
+  s.ref += (lnFair - s.ref) * (1 - Math.exp(-dt / FLOOR_HOURS));
+  const floor = s.ref - FLOOR;
+  if (lnFair < floor) lnFair += (floor - lnFair) * (1 - Math.exp(-FLOOR_PULL * dt));
 
   // 1b. Kursmålet: riktig verdi trekkes sakte mot det (mer eller mindre, avhengig av aksjen)
   const pull = 1 - Math.exp(-TARGET_PULL * p.reliability * dt);
@@ -159,11 +180,12 @@ function stepStock(def: StockDef, s: StockMarketState, dt: number) {
   deviation =
     deviation * decay + p.volatility * Math.sqrt((1 - decay * decay) / (2 * PRICE_REVERSION)) * randomNormal();
 
-  // 3. Nyheter: plutselig hopp. 60 % er varig, 40 % går tilbake over tid.
+  // 3. Nyheter: plutselig hopp. 70 % er varig, 30 % går tilbake over tid.
   if (Math.random() < 1 - Math.exp(-NEWS_RATE * dt)) {
-    const jump = randomNormal() * p.newsSize;
-    lnFair += jump * 0.6;
-    deviation += jump * 0.4;
+    const between = ([min, max]: [number, number]) => min + (max - min) * Math.random();
+    const jump = (Math.random() < GOOD_NEWS ? between(GOOD_NEWS_SIZE) : -between(BAD_NEWS_SIZE)) * p.newsSize;
+    lnFair += jump * 0.7;
+    deviation += jump * 0.3;
   }
 
   s.fair = Math.exp(lnFair);
@@ -178,7 +200,7 @@ function advanceAll(state: GameState, dtHours: number) {
     stepStock(def, s, dtHours);
 
     const owned = state.holdings[def.id]?.owned ?? 0;
-    if (owned > 0) gross += owned * stockParams(def).dividendPerShare * (dtHours / DIVIDEND_PERIOD_HOURS);
+    if (owned > 0) gross += owned * dividendPerShare(state, def) * (dtHours / DIVIDEND_PERIOD_HOURS);
   }
   if (gross > 0) {
     // Skatt: trekkes automatisk, eller legges til skattegjelden (se taxes.ts)
@@ -265,9 +287,14 @@ export function holdingOf(state: GameState, def: StockDef): Holding {
   return state.holdings[def.id] ?? { owned: 0, invested: 0 };
 }
 
+/** Utbytte per aksje per periode. Følger selskapets riktige verdi (vokser når selskapet vokser). */
+export function dividendPerShare(state: GameState, def: StockDef): number {
+  return stockParams(def).dividendPerShare * (marketOf(state, def).fair / def.price);
+}
+
 /** Utbytte i % per periode, ved dagens pris. */
 export function dividendYield(state: GameState, def: StockDef): number {
-  return (stockParams(def).dividendPerShare / marketOf(state, def).price) * 100;
+  return (dividendPerShare(state, def) / marketOf(state, def).price) * 100;
 }
 
 /** Endring i pris de siste 2 timene. */
@@ -301,7 +328,7 @@ export function portfolioSummary(state: GameState) {
     if (h.owned <= 0) continue;
     value += h.owned * marketOf(state, def).price;
     invested += h.invested;
-    perHour += (h.owned * stockParams(def).dividendPerShare) / DIVIDEND_PERIOD_HOURS;
+    perHour += (h.owned * dividendPerShare(state, def)) / DIVIDEND_PERIOD_HOURS;
   }
   return { value, invested, perHour };
 }

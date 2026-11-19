@@ -4,6 +4,7 @@ import './taxi.css';
 import './empire.css';
 import './construction.css';
 import './dealer.css';
+import './it.css';
 import './profile.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
@@ -89,9 +90,11 @@ initLogos();
 
 // --- Mobilens tilbakeknapp (Android) ---------------------------------------------
 // Går ett steg tilbake inne på siden (f.eks. Aksjemarkedet → Investering).
-// Er man allerede på en hovedside, legges appen i bakgrunnen (spillet lagres).
+// Er man på en annen hovedside enn Inntekt, går man til Inntekt (midten).
+// Er man allerede på Inntekt, legges appen i bakgrunnen (spillet lagres).
 App.addListener('backButton', () => {
   if (currentPage.onBack?.()) return;
+  if (currentPage.id !== 'earnings') return showPage('earnings');
   saveState(state);
   void App.minimizeApp();
 }).catch(() => {
