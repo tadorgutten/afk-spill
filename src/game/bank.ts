@@ -20,7 +20,8 @@ import type { DealerPay } from './dealer';
  *
  * TILTRUKKET INNSKUDD: med innskuddsrente over 7,04 % kommer nye kunder, og pengene
  * i hvelvet vokser – helt opp til hvelvets kapasitet. Mer penger = mer av alt over.
- * UTVID HVELVET: koster en investering og tar tid. Kapasiteten blir 36 % større.
+ * UTVID HVELVET: koster en investering (24 % dyrere hver gang) og tar tid (15 min lengre
+ * hver gang). Kapasiteten blir 36 % større.
  *
  * Tallene er 1/10 av det som vises (som resten av spillet).
  */
@@ -48,13 +49,14 @@ const ATTRACT_PER_POINT = 0.04;
 /** Penger i hvelvet fra start ($ 10 M) og kapasitet ($ 15 M). */
 const START_FUNDS = 1_000_000;
 const START_CAPACITY = 1_500_000;
-/** Hver utvidelse gjør kapasiteten så mye større ($ 15 M → $ 20,4 M). */
+/** Hver utvidelse gjør kapasiteten så mye større ($ 15 M → $ 20,4 M → $ 27,744 M ...). */
 const CAPACITY_GROWTH = 1.36;
-/** Investering per dollar ny kapasitet ($ 1,85 M for $ 5,4 M mer). */
-const INVEST_PER_CAPACITY = 185_000 / 540_000;
-/** Første utvidelse tar 30 min, hver neste 50 % lengre (maks 8 timer). */
+/** Første investering ($ 1,85 M), og hver neste blir 24 % dyrere ($ 2,294 M, $ 2,84456 M ...). */
+const FIRST_INVESTMENT = 185_000;
+const INVESTMENT_GROWTH = 1.24;
+/** Første utvidelse tar 30 min, hver neste 15 min lengre (45 min, 1 t, 1 t 15 min ...), maks 8 timer. */
 const FIRST_EXPANSION_SEC = 30 * 60;
-const EXPANSION_TIME_GROWTH = 1.5;
+const EXPANSION_TIME_STEP = 15 * 60;
 const MAX_EXPANSION_SEC = 8 * 3600;
 /** Flest utvidelser. */
 export const MAX_VAULT_LEVEL = 25;
@@ -123,9 +125,9 @@ export function setRates(b: Business, deposit: number, loan: number) {
 // --- Utvidelse av hvelvet ----------------------------------------------------------------
 export const isMaxVault = (b: Business) => bankOf(b).level >= MAX_VAULT_LEVEL;
 export const nextCapacity = (b: Business) => bankOf(b).capacity * CAPACITY_GROWTH;
-export const vaultCost = (b: Business) => Math.round((nextCapacity(b) - bankOf(b).capacity) * INVEST_PER_CAPACITY * 10) / 10;
+export const vaultCost = (b: Business) => Math.round(FIRST_INVESTMENT * INVESTMENT_GROWTH ** bankOf(b).level * 1000) / 1000;
 export const vaultSeconds = (b: Business) =>
-  Math.min(MAX_EXPANSION_SEC, Math.round(FIRST_EXPANSION_SEC * EXPANSION_TIME_GROWTH ** bankOf(b).level));
+  Math.min(MAX_EXPANSION_SEC, FIRST_EXPANSION_SEC + EXPANSION_TIME_STEP * bankOf(b).level);
 
 /** Starter en utvidelse av hvelvet (betaler investeringen). */
 export function expandVault(b: Business, pay: DealerPay, now = Date.now()): 'ok' | 'money' | 'busy' | 'max' {

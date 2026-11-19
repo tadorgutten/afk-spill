@@ -68,15 +68,28 @@ public class MainActivity extends BridgeActivity {
         hideSystemBars();
     }
 
+    private boolean waiting = false;
+
     private void markReady(WebView view) {
+        if (webReady || waiting) return;
+        waiting = true;
+        // Vent til WebView-en faktisk har TEGNET siden (den svarte logoskjermen) på skjermen.
+        // Tar vi bort startbildet før det, kan et tomt (hvitt) vindu blinke forbi.
+        view.postVisualStateCallback(1, new WebView.VisualStateCallback() {
+            @Override
+            public void onComplete(long requestId) {
+                view.postDelayed(() -> reveal(view), AFTER_READY_MS);
+            }
+        });
+    }
+
+    private void reveal(WebView view) {
         if (webReady) return;
-        view.postDelayed(() -> {
-            webReady = true;
-            // Nå forsvinner det svarte startbildet: si fra til spillet, så logo-animasjonen starter
-            view.evaluateJavascript(
-                "document.documentElement.classList.remove('hold');window.__appVisible=performance.now();window.dispatchEvent(new Event('app-visible'))",
-                null);
-        }, AFTER_READY_MS);
+        webReady = true;
+        // Nå forsvinner det svarte startbildet: si fra til spillet, så logo-animasjonen starter
+        view.evaluateJavascript(
+            "document.documentElement.classList.remove('hold');window.__appVisible=performance.now();window.dispatchEvent(new Event('app-visible'))",
+            null);
     }
 
     @Override
