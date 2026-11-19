@@ -55,6 +55,23 @@ const pages = [
   profilePage,
 ];
 
+// --- MIDLERTIDIG TESTKNAPP (slettes senere): +$ 1 T på Eiendeler-siden -----------------
+{
+  const itemsPage = pages.find((p) => p.id === 'items')!;
+  const testBtn = document.createElement('button');
+  testBtn.className = 'test-money-btn';
+  testBtn.textContent = 'TEST: +$ 1 T';
+  testBtn.style.cssText =
+    'display:block;margin:24px auto;padding:16px 28px;border:none;border-radius:16px;background:#e5484d;color:#fff;font:inherit;font-size:18px;font-weight:700;';
+  testBtn.addEventListener('click', () => {
+    state.balance += 100_000_000_000; // vises 10x høyere = $ 1 T
+    saveState(state);
+    showToast(`Saldo: ${formatMoney(state.balance)}`);
+  });
+  itemsPage.element.appendChild(testBtn);
+}
+// --- slutt på testknapp ---------------------------------------------------------------
+
 const pageContainer = document.getElementById('page')!;
 const nav = createNav(document.getElementById('nav')!, pages, showPage);
 let currentPage = pages[2];
