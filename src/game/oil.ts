@@ -6,7 +6,7 @@ import type { Business } from './business';
  * Man eier oljeplattformer, men bare ÉN pumper olje om gangen (den man har valgt).
  * Oljen havner på lageret, og man selger selv når oljeprisen er god (prisen går opp og ned som en aksje).
  *
- * PLATTFORMER: 7 stykker, kjøpes i rekkefølge. Den første følger med bedriften.
+ * PLATTFORMER: 7 stykker, én i hvert land (Norge først, den største sist), kjøpes i rekkefølge. Den første følger med bedriften.
  *   Hver ny plattform pumper mer, men koster mer og tar lengre tid å bygge.
  *   Mens en bygges, pumper den som er valgt som før, og man kan ikke kjøpe flere.
  *   Når den nye er ferdig, tas den i bruk med en gang (man kan bytte tilbake når man vil).
@@ -39,14 +39,18 @@ export interface PlatformDef {
 
 /** Bildene ligger i public/oil/<id>.jpg (fra Wikimedia Commons, se public/oil/KILDER.txt). */
 export const PLATFORMS: PlatformDef[] = [
-  { id: 'ekofisk', name: 'Ekofisk', place: 'Nordsjøen', country: 'Norge', rate: 190_000, price: 0, buildHours: 0 },
-  { id: 'statfjord', name: 'Statfjord A', place: 'Nordsjøen', country: 'Norge', rate: 440_000, price: 400_000_000, buildHours: 2 },
+  { id: 'gullfaks', name: 'Gullfaks A', place: 'Nordsjøen', country: 'Norge', rate: 190_000, price: 0, buildHours: 0 },
+  { id: 'oilrocks', name: 'Oljesteinene', place: 'Kaspihavet', country: 'Aserbajdsjan', rate: 440_000, price: 400_000_000, buildHours: 2 },
   { id: 'prirazlomnaya', name: 'Prirazlomnaja', place: 'Petsjorahavet', country: 'Russland', rate: 840_000, price: 640_000_000, buildHours: 4 },
-  { id: 'troll', name: 'Troll A', place: 'Nordsjøen', country: 'Norge', rate: 1_480_000, price: 1_020_000_000, buildHours: 8 },
-  { id: 'thunderhorse', name: 'Thunder Horse', place: 'Mexicogolfen', country: 'USA', rate: 2_500_000, price: 1_640_000_000, buildHours: 12 },
+  { id: 'p51', name: 'P-51', place: 'Campos-bassenget', country: 'Brasil', rate: 1_480_000, price: 1_020_000_000, buildHours: 8 },
+  { id: 'hebron', name: 'Hebron', place: 'Grand Banks', country: 'Canada', rate: 2_500_000, price: 1_640_000_000, buildHours: 12 },
   { id: 'perdido', name: 'Perdido', place: 'Mexicogolfen', country: 'USA', rate: 4_100_000, price: 2_620_000_000, buildHours: 18 },
-  { id: 'sverdrup', name: 'Johan Sverdrup', place: 'Nordsjøen', country: 'Norge', rate: 6_750_000, price: 4_190_000_000, buildHours: 24 },
+  { id: 'prelude', name: 'Prelude FLNG', place: 'Browse-bassenget', country: 'Australia', rate: 6_750_000, price: 4_190_000_000, buildHours: 24 },
 ];
+/** Bildefilen (de fleste er .jpg). */
+export const platformImage = (id: string) => `oil/${id}.${id === 'prelude' ? 'png' : 'jpg'}`;
+/** Gamle id-er (før én plattform per land) → nye. */
+const OLD_IDS: Record<string, string> = { ekofisk: 'gullfaks', statfjord: 'oilrocks', troll: 'p51', thunderhorse: 'hebron', sverdrup: 'prelude' };
 export const platformById = (id: string) => PLATFORMS.find((p) => p.id === id) ?? PLATFORMS[0];
 export const platformIndex = (id: string) => PLATFORMS.findIndex((p) => p.id === id);
 
@@ -150,7 +154,15 @@ export function newOil(now = Date.now()): OilState {
 
 export function oilOf(b: Business): OilState {
   b.oil ??= newOil();
-  return b.oil;
+  const s = b.oil;
+  // Gamle lagringer: bytt til de nye plattformene (samme plass i rekken)
+  const fix = (id: string) => OLD_IDS[id] ?? id;
+  if (OLD_IDS[s.active] || s.owned.some((o) => OLD_IDS[o.id]) || (s.building && OLD_IDS[s.building.id])) {
+    s.active = fix(s.active);
+    for (const o of s.owned) o.id = fix(o.id);
+    if (s.building) s.building.id = fix(s.building.id);
+  }
+  return s;
 }
 export const ownedPlatform = (s: OilState, id: string) => s.owned.find((p) => p.id === id);
 

@@ -205,12 +205,12 @@ body.scrolled .items .ei-back {
   display: grid;
   place-items: center;
   width: 100%;
-  padding: 16px 0 12px;
+  padding: 10px 0 8px;
 }
 
 .ei-shops svg {
-  width: 58px;
-  height: 58px;
+  width: 76px;
+  height: 76px;
 }
 
 .ei-shops b {

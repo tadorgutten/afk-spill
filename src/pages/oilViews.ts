@@ -15,6 +15,7 @@ import {
   oilPrice,
   ownedPlatform,
   platformById,
+  platformImage,
   platformRate,
   pumpRate,
   storageHours,
@@ -40,7 +41,7 @@ export function barrels(n: number): string {
   return `${formatInt(n)} fat`;
 }
 const time = (ms: number) => formatDuration(Math.max(0, ms) / 1000, false);
-const photo = (id: string) => `<img src="oil/${id}.jpg" alt="" loading="lazy" onerror="this.style.display='none'" />`;
+const photo = (id: string) => `<img src="${platformImage(id)}" alt="" onerror="this.style.display='none'" />`;
 const bar = (fill: number, cls = '') =>
   `<div class="oil-bar ${cls}"><span style="width:${Math.max(0, Math.min(100, fill * 100))}%"></span></div>`;
 const balanceLine = (state: GameState) => `<p class="oil-sub">Saldo: <b>${formatMoneyFull(state.balance)}</b></p>`;
@@ -159,14 +160,23 @@ function platformRow(state: GameState, b: Business, p: PlatformDef, next: Platfo
       </div>`;
   }
 
-  // Bygges
+  // Bygges: et større kort med bilde, nedtelling og fremdrift
   if (s.building?.id === p.id) {
     const total = p.buildHours * 3_600_000;
-    const left = s.building.doneAt - now;
+    const left = Math.max(0, s.building.doneAt - now);
+    const done = Math.min(1, 1 - left / total);
     return `
-      <div class="oil-row building">
-        <div class="oil-row-main">${head(`<small>Ferdig om ${time(left)}</small>${bar(1 - left / total)}`)}</div>
-        <span class="oil-chip soft">${icons.hourglass}</span>
+      <div class="oil-build">
+        <div class="oil-build-photo">${photo(p.id)}<span class="oil-build-tag">${icons.hourglass}Bygges</span></div>
+        <div class="oil-build-body">
+          <div class="oil-build-head"><div><strong>${p.name}</strong><span>${p.place}, ${p.country}</span></div><b>${Math.floor(done * 100)} %</b></div>
+          ${bar(done, 'build')}
+          <div class="oil-build-stats">
+            <div>${icons.clock}<span><b>${formatDuration(left / 1000)}</b><small>Tid igjen</small></span></div>
+            <div>${icons.drop}<span><b>${barrels(p.rate)} / t</b><small>Når den er ferdig</small></span></div>
+          </div>
+          <p class="oil-muted">Plattformen du har nå, pumper som før mens denne bygges. Den nye tas i bruk med en gang den er ferdig.</p>
+        </div>
       </div>`;
   }
 

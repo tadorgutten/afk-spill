@@ -1,4 +1,5 @@
 import {
+  ALL_ITEMS,
   OPTIONS,
   PLACES,
   buyItem,
@@ -50,8 +51,8 @@ const ROOM: Record<ItemKind, { title: string; empty: string; shop: string }> = {
 };
 
 const img = (def: ItemDef, cls = '') =>
-  `<img class="ei-img ${def.flip ? 'flip' : ''} ${cls}" src="${def.image}" alt="" loading="lazy" draggable="false" />`;
-const placeImg = (id: string) => `<img src="items/places/${id}.jpg" alt="" loading="lazy" onerror="this.style.display='none'" />`;
+  `<img class="ei-img ${def.flip ? 'flip' : ''} ${cls}" src="${def.image}" alt="" decoding="async" draggable="false" />`;
+const placeImg = (id: string) => `<img src="items/places/${id}.jpg" alt="" onerror="this.style.display='none'" />`;
 /** Fargen på kortet: bilene etter klasse, fly blått, yachter havblått. */
 const tone = (def: ItemDef) => (def.kind === 'car' ? `tier-${def.tier}` : def.kind);
 const optionText = (o: OwnedItem, def: ItemDef) => {
@@ -59,7 +60,24 @@ const optionText = (o: OwnedItem, def: ItemDef) => {
   return [ga.options[o.a]?.short, gb.options[o.b]?.short];
 };
 
+/** Henter alle bildene i bakgrunnen, så listene vises med en gang. */
+let preloaded = false;
+const keep: HTMLImageElement[] = [];
+function preloadImages() {
+  if (preloaded) return;
+  preloaded = true;
+  const urls = [...ALL_ITEMS.map((d) => d.image), ...PLACES.map((p) => `items/places/${p.id}.jpg`)];
+  for (const url of urls) {
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = url;
+    keep.push(im);
+  }
+}
+
 export function createItemsPage(state: GameState): Page {
+  // Start å hente bildene litt etter at appen har startet
+  setTimeout(preloadImages, 3000);
   const element = html(`<section class="page items"></section>`);
   let stack: View[] = [{ name: 'home' }];
   const current = () => stack[stack.length - 1];
@@ -67,7 +85,11 @@ export function createItemsPage(state: GameState): Page {
   let confirmSell = false;
   let lastRender = 0;
 
+  /** Hvor langt ned man var på hver side i stabelen (så man kommer tilbake til samme sted i lista). */
+  let scrolls: number[] = [];
+
   function go(view: View) {
+    scrolls[stack.length - 1] = window.scrollY;
     stack.push(view);
     confirmSell = false;
     render();
@@ -77,7 +99,9 @@ export function createItemsPage(state: GameState): Page {
     if (stack.length > 1) stack.pop();
     confirmSell = false;
     render();
-    window.scrollTo(0, 0);
+    // Tilbake til en liste: samme sted som før. Går man ut av lista og inn igjen, starter den på toppen.
+    window.scrollTo(0, scrolls[stack.length - 1] ?? 0);
+    scrolls.length = stack.length;
   }
 
   function shake(el: HTMLElement) {
@@ -113,7 +137,7 @@ export function createItemsPage(state: GameState): Page {
       <div class="ei-worth">
         <div><span>Verdien av eiendelene</span><strong>${formatMoneyFull(itemsValue(s))}</strong></div>
         <div class="ei-worth-counts">
-          <span>${icons.carShop}${ownedOfKind(s, 'car').length}</span>
+          <span>${icons.dealer}${ownedOfKind(s, 'car').length}</span>
           <span>${icons.plane}${ownedOfKind(s, 'plane').length}</span>
           <span>${icons.yacht}${ownedOfKind(s, 'yacht').length}</span>
         </div>
@@ -212,7 +236,7 @@ export function createItemsPage(state: GameState): Page {
 
   function renderShop(kind: ItemKind): string {
     return `
-      <div class="ei-head two"><h1>${ROOM[kind].shop}</h1><span>Saldo: <b>${formatMoneyFull(state.balance)}</b></span></div>
+      <div class="ei-head two"><h1>${ROOM[kind].shop}</h1><span>Saldo: <b data-balance>${formatMoneyFull(state.balance)}</b></span></div>
       <div class="ei-list">${itemsOfKind(kind).map(shopCard).join('')}</div>`;
   }
 
@@ -256,7 +280,7 @@ export function createItemsPage(state: GameState): Page {
         <hr class="ei-sep" />
         <p class="ei-sum">Sum: <strong>${formatMoneyFull(price)}</strong></p>
         <button class="ei-btn buy ${state.balance >= price ? '' : 'off'}" data-action="purchase">Kjøp</button>
-        <p class="ei-balance">Saldo: ${formatMoneyFull(state.balance)}</p>
+        <p class="ei-balance">Saldo: <span data-balance>${formatMoneyFull(state.balance)}</span></p>
       </div>`;
   }
 
@@ -284,7 +308,7 @@ export function createItemsPage(state: GameState): Page {
         </div>`;
     }).join('');
     return `
-      <div class="ei-head two"><h1>Yachtens plassering</h1><span>Saldo: <b>${formatMoneyFull(state.balance)}</b></span></div>
+      <div class="ei-head two"><h1>Yachtens plassering</h1><span>Saldo: <b data-balance>${formatMoneyFull(state.balance)}</b></span></div>
       <p class="ei-note">Et sted du kjøper, kan brukes av alle yachtene dine – også dem du kjøper senere.</p>
       <div class="ei-list">${cards}</div>`;
   }
@@ -431,8 +455,10 @@ export function createItemsPage(state: GameState): Page {
     element,
     onShow() {
       stack = [{ name: 'home' }];
+      scrolls = [];
       confirmSell = false;
       render();
+      preloadImages();
     },
     onBack() {
       if (stack.length <= 1) return false;
@@ -441,9 +467,19 @@ export function createItemsPage(state: GameState): Page {
     },
     navHidden: () => stack.length > 1,
     update() {
-      // Saldoen endrer seg hele tiden: tegn sidene som viser den på nytt én gang i sekundet
+      // Saldoen endrer seg hele tiden: bytt bare tallet (å tegne lista på nytt får bildene til å blinke)
+      if (performance.now() - lastRender < 250) return;
+      lastRender = performance.now();
+      const text = formatMoneyFull(state.balance);
+      element.querySelectorAll<HTMLElement>('[data-balance]').forEach((el) => {
+        if (el.textContent !== text) el.textContent = text;
+      });
       const v = current();
-      if ((v.name === 'shop' || v.name === 'buy' || v.name === 'places') && performance.now() - lastRender > 1000) render();
+      if (v.name === 'buy') {
+        const btn = element.querySelector('[data-action=purchase]');
+        const def = itemDef(v.id);
+        if (btn && def) btn.classList.toggle('off', state.balance < priceWith(def, v.a, v.b));
+      }
     },
   };
 }

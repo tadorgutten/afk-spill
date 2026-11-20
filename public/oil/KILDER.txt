@@ -1,9 +1,9 @@
 Bilder av oljeplattformene fra Wikimedia Commons (frie lisenser, se lenkene).
 
-ekofisk.jpg: https://commons.wikimedia.org/wiki/File:Ekofisk_Central_1983.jpg
-statfjord.jpg: https://commons.wikimedia.org/wiki/File:Statfjord_A.JPG
+gullfaks.jpg: https://commons.wikimedia.org/wiki/File:Gullfaks_A.jpg
+oilrocks.jpg: https://commons.wikimedia.org/wiki/File:Oil_Rocks_near_Baku.jpg
 prirazlomnaya.jpg: https://commons.wikimedia.org/wiki/File:PRIRAZLOMNAYA_129_wpk.jpg
-troll.jpg: https://commons.wikimedia.org/wiki/File:Troll_A_Platform.jpg
-thunderhorse.jpg: https://commons.wikimedia.org/wiki/File:Thunder_Horse_Semisub.jpg
+p51.jpg: https://commons.wikimedia.org/wiki/File:Oil_platform_P-51_(Brazil).jpg
+hebron.jpg: https://commons.wikimedia.org/wiki/File:Hebron_Oil_Platform,_Newfoundland,_Canada.jpg
 perdido.jpg: https://commons.wikimedia.org/wiki/File:Shell_Perdido_deepwater_offshore_production_platform_(51115227891).jpg
-sverdrup.jpg: https://commons.wikimedia.org/wiki/File:Johan_Sverdrup_ULQ.jpg
+prelude.png: https://commons.wikimedia.org/wiki/File:Prelude_FLNG_Marine_Terminal.webp

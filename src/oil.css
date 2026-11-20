@@ -840,3 +840,122 @@ body.scrolled .business[data-view='oPlat'] .biz-back {
 .oil-row-photo {
   background: linear-gradient(160deg, #3d9aa2, #155760 60%, #0b2a30);
 }
+
+/* --- Plattformen som bygges: et større kort midt i lista --- */
+.oil-build {
+  margin: 6px 0;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(10, 40, 50, 0.16);
+  border: 2px solid var(--oil-amber);
+}
+
+.oil-build-photo {
+  position: relative;
+  height: 170px;
+  background: linear-gradient(160deg, #3d9aa2, #155760 60%, #0b2a30);
+}
+
+.oil-build-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.oil-build-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: var(--oil-amber);
+  color: #3d2a05;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.oil-build-tag svg {
+  width: 18px;
+  height: 18px;
+}
+
+.oil-build-body {
+  padding: 16px 18px 18px;
+}
+
+.oil-build-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.oil-build-head div {
+  display: flex;
+  flex-direction: column;
+}
+
+.oil-build-head strong {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.oil-build-head span {
+  color: #6b7383;
+  font-size: 14px;
+}
+
+.oil-build-head b {
+  color: #a46d12;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.oil-bar.build {
+  height: 12px;
+}
+
+.oil-bar.build span {
+  background: linear-gradient(90deg, #f0b44c, #e8892f);
+}
+
+.oil-build-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.oil-build-stats > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--oil-card);
+}
+
+.oil-build-stats svg {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: #a46d12;
+}
+
+.oil-build-stats span {
+  display: flex;
+  flex-direction: column;
+}
+
+.oil-build-stats b {
+  font-size: 15px;
+}
+
+.oil-build-stats small {
+  color: #8a92a1;
+  font-size: 12px;
+}
