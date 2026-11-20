@@ -1,9 +1,6 @@
 import {
-  CARS,
   OPTIONS,
   PLACES,
-  PLANES,
-  YACHTS,
   buyItem,
   buyPlace,
   itemDef,
@@ -94,34 +91,29 @@ export function createItemsPage(state: GameState): Page {
   // =========================================================================
   function renderHome(): string {
     const s = state.assets;
-    const room = (kind: ItemKind, fallback: ItemDef) => {
-      const owned = ownedOfKind(s, kind);
-      // Bildet: det dyreste man eier av typen (ellers et eksempel)
-      const best = owned.map((o) => itemDef(o.id)!).sort((x, y) => y.price - x.price)[0] ?? fallback;
+    const ROOM_IMG: Record<ItemKind, string> = { car: 'items/rooms/garage.png', plane: 'items/rooms/hangar.jpg', yacht: 'items/rooms/harbor.jpg' };
+    const room = (kind: ItemKind) => {
+      const n = ownedOfKind(s, kind).length;
       return `
         <button class="ei-room ${kind}" data-action="owned" data-kind="${kind}">
-          ${img(best)}
+          <img class="ei-room-photo" src="${ROOM_IMG[kind]}" alt="" draggable="false" />
           <span class="ei-room-name">${ROOM[kind].title}</span>
-          <span class="ei-room-count">${owned.length}</span>
+          ${n ? `<span class="ei-room-count">${n}</span>` : ''}
         </button>`;
     };
     return `
       <h1 class="ei-title">Eiendeler</h1>
-      <div class="ei-rooms">
-        ${room('car', CARS.find((c) => c.id === 'chiron')!)}
-        ${room('plane', PLANES.find((p) => p.id === 'falcon7x')!)}
-        ${room('yacht', YACHTS.find((y) => y.id === 'y95')!)}
-      </div>
+      <div class="ei-rooms">${room('car')}${room('plane')}${room('yacht')}</div>
       <div class="ei-shops">
-        <button data-action="shop" data-kind="car"><span>${icons.showroom}</span><b>Bilbutikk</b></button>
-        <button data-action="shop" data-kind="plane"><span>${icons.hangar}</span><b>Flybutikk</b></button>
-        <button data-action="shop" data-kind="yacht"><span>${icons.yacht}</span><b>Yachtbutikk</b></button>
+        <button data-action="shop" data-kind="car"><span>${icons.carShop}</span><b>Bilbutikk</b></button>
+        <button data-action="shop" data-kind="plane"><span>${icons.planeShop}</span><b>Flybutikk</b></button>
+        <button data-action="shop" data-kind="yacht"><span>${icons.yachtShop}</span><b>Yachtbutikk</b></button>
       </div>
       <hr class="ei-sep" />
       <div class="ei-worth">
         <div><span>Verdien av eiendelene</span><strong>${formatMoneyFull(itemsValue(s))}</strong></div>
         <div class="ei-worth-counts">
-          <span>${icons.showroom}${ownedOfKind(s, 'car').length}</span>
+          <span>${icons.carShop}${ownedOfKind(s, 'car').length}</span>
           <span>${icons.plane}${ownedOfKind(s, 'plane').length}</span>
           <span>${icons.yacht}${ownedOfKind(s, 'yacht').length}</span>
         </div>
@@ -162,7 +154,7 @@ export function createItemsPage(state: GameState): Page {
       ${
         list.length
           ? `<div class="ei-list">${list.map(ownedCard).join('')}</div>`
-          : `<div class="ei-empty">${kind === 'car' ? icons.showroom : kind === 'plane' ? icons.hangar : icons.yacht}<p>${ROOM[kind].empty}</p>
+          : `<div class="ei-empty">${kind === 'car' ? icons.carShop : kind === 'plane' ? icons.planeShop : icons.yachtShop}<p>${ROOM[kind].empty}</p>
               <button class="ei-btn ${kind}" data-action="shop" data-kind="${kind}">Til ${ROOM[kind].shop.toLowerCase()}en</button></div>`
       }`;
   }
@@ -341,6 +333,7 @@ export function createItemsPage(state: GameState): Page {
     }
     const kind = v.name === 'owned' || v.name === 'shop' ? v.kind : v.name === 'buy' ? itemDef(v.id)?.kind : undefined;
     element.dataset.kind = kind ?? '';
+    element.dataset.sea = body.includes('ei-hero-sea') ? '1' : '';
     element.innerHTML = body;
   }
 

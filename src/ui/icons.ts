@@ -263,6 +263,12 @@ export const icons = {
   yacht: svg('<path d="M3 15h16.5l-2.5 3.5H5.5Z"/><path d="M6 15v-3h9l2.5 3"/><path d="M8.5 12V9.5h4.5l1.5 2.5"/><path d="M11 9.5V6"/><path d="M2 21c1.7 0 1.7-1.2 3.3-1.2S7 21 8.7 21s1.7-1.2 3.3-1.2 1.7 1.2 3.3 1.2 1.7-1.2 3.3-1.2S20.3 21 22 21"/>', 1.5),
   /** Hangar med fly (eiendeler) */
   hangar: svg('<path d="M3 21V10l9-5 9 5v11"/><path d="M6.5 21v-7h11v7"/><path d="M12 15v4M9.5 17.5h5"/><circle cx="10" cy="19.5" r=".6"/><circle cx="14" cy="19.5" r=".6"/>', 1.5),
+  /** Bilbutikk: bil foran et utstillingsbygg */
+  carShop: svg('<path d="M2.5 10 12 4l9.5 6"/><path d="M4.5 9v11.5M19.5 9v11.5"/><path d="M7.2 15.5 8.4 12.6A1.5 1.5 0 0 1 9.8 11.7h4.4a1.5 1.5 0 0 1 1.4.9l1.2 2.9"/><rect x="6.2" y="15.5" width="11.6" height="3.5" rx="1.2"/><path d="M7.5 19v1.5M16.5 19v1.5"/><circle cx="8.8" cy="17.25" r=".5"/><circle cx="15.2" cy="17.25" r=".5"/>', 1.5),
+  /** Flybutikk: fly sett ovenfra */
+  planeShop: svg('<path d="M12 2.5c.9 0 1.5.8 1.5 1.8v5.4l7.5 4.3v2l-7.5-2.3v4.6l2.2 1.7v1.6L12 20.5l-3.7 1.1V20l2.2-1.7v-4.6L3 16v-2l7.5-4.3V4.3c0-1 .6-1.8 1.5-1.8Z"/>', 1.5),
+  /** Yachtbutikk: yacht sett fra siden */
+  yachtShop: svg('<path d="M2 15.5h18.5l-2.8 3.5H5Z"/><path d="M5 15.5 6.5 12h10l2 3.5"/><path d="M8.5 12l1.2-2.5h5l1.3 2.5"/><path d="M12 9.5V6.5M10.5 6.5h3"/><path d="M8 13.8h1.5M11.2 13.8h1.5M14.4 13.8h1.5"/>', 1.5),
   /** Oljedråpe */
   drop: svg('<path d="M12 3s-6.5 7.2-6.5 11.5a6.5 6.5 0 0 0 13 0C18.5 10.2 12 3 12 3Z"/><path d="M9 15a3 3 0 0 0 3 3"/>', 1.6),
 };

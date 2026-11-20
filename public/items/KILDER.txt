@@ -59,3 +59,6 @@ yachts/dilbar.png	https://pngimg.com/uploads/ship/ship_PNG5412.png
 yachts/azzam.png	https://pngimg.com/uploads/ship/ship_PNG5410.png
 yachts/historysupreme.png	https://pngimg.com/uploads/ship/ship_PNG5419.png
 yachts/streetsofmonaco.png	https://pngimg.com/uploads/ship/ship_PNG5413.png
+
+Rom-bilder (rooms/): garage.png = public/dealer/hall-showroom.png, harbor.jpg = places/public.jpg,
+hangar.jpg https://commons.wikimedia.org/wiki/File:OO-FLN.JPG
