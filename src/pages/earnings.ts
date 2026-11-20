@@ -76,6 +76,9 @@ export function createEarningsPage(state: GameState): Page {
   const perClickEl = q('[data-per-click]');
   const barPill = q('[data-bars]');
   const barCountEl = q('[data-bar-count]');
+  let shownBars: number | null = null;
+  // Fjern spretten når den er ferdig, ellers spilles den av igjen hver gang siden vises
+  barPill.addEventListener('animationend', () => barPill.classList.remove('bump'));
   const levelEl = q('[data-level]');
   const nextEl = q('[data-next]');
   const nextValueEl = q('[data-next-value]');
@@ -242,11 +245,16 @@ export function createEarningsPage(state: GameState): Page {
     update(s) {
       if (cardsOpen) return updateCardList(s);
 
-      // Gullbarrer (spretter litt når tallet øker)
-      const bars = String(s.goldBars ?? 0);
-      if (barCountEl.textContent !== bars) {
-        if (barCountEl.textContent !== '0' || bars !== '0') barPill.classList.remove('bump'), void barPill.offsetWidth, barPill.classList.add('bump');
-        barCountEl.textContent = bars;
+      // Gullbarrer: spretter bare når man nettopp har fått en (ikke når man kommer til siden)
+      const bars = s.goldBars ?? 0;
+      if (shownBars !== bars) {
+        if (shownBars !== null && bars > shownBars) {
+          barPill.classList.remove('bump');
+          void barPill.offsetWidth;
+          barPill.classList.add('bump');
+        }
+        shownBars = bars;
+        barCountEl.textContent = String(bars);
       }
 
       // Valgt kort er byttet: tegn det på nytt

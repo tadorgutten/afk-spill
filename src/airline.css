@@ -1168,6 +1168,9 @@ body.scrolled .business[data-view='aRegion'] .biz-back {
   border-radius: 24px 24px 0 0;
   background: #fff;
   box-shadow: 0 -8px 30px rgba(20, 40, 80, 0.15);
+}
+
+.air-sheet.slide {
   animation: air-sheet-in 0.22s ease-out;
 }
 

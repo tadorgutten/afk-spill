@@ -43,6 +43,7 @@ import { CLUB_LOGOS, PLAYER_PHOTOS } from '../game/footballImages';
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoney, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til fotballklubben:
@@ -608,8 +609,8 @@ export function renderTraining(state: GameState, b: Business): string {
   const now = Date.now();
   const live = liveRound(s, now) !== null;
   let status: string;
-  if (s.activity) status = `<div class="fc-act-status busy"><strong>${activityById(s.activity.id).name} pågår</strong><span>Ferdig om ${formatDuration((s.activity.end - now) / 1000)}</span></div>`;
-  else if (now < s.cooldownEnd) status = `<div class="fc-act-status pause"><strong>Pause</strong><span>Spillerne hviler. Neste aktivitet om ${formatDuration((s.cooldownEnd - now) / 1000)}</span></div>`;
+  if (s.activity) status = `<div class="fc-act-status busy"><strong>${activityById(s.activity.id).name} pågår</strong><span>Ferdig om ${formatDuration((s.activity.end - now) / 1000)}</span></div>${skipBtn('activity', b.id)}`;
+  else if (now < s.cooldownEnd) status = `<div class="fc-act-status pause"><strong>Pause</strong><span>Spillerne hviler. Neste aktivitet om ${formatDuration((s.cooldownEnd - now) / 1000)}</span></div>${skipBtn('cooldown', b.id)}`;
   else status = `<div class="fc-act-status ready"><strong>Klar</strong><span>Velg hva laget skal gjøre.</span></div>`;
   const free = !s.activity && now >= s.cooldownEnd && !live;
   const cards = ACTIVITIES.map((a) => {

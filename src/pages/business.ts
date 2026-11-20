@@ -163,6 +163,7 @@ import { formatDuration, formatMoney, formatMoneyFull, formatMoneyRounded, forma
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
 import { html, type Page } from './page';
+import { skipBtn, useSkip, type SkipKind } from '../game/skip';
 
 /*
  * Bedrifter-siden har flere "visninger" oppå hverandre:
@@ -679,6 +680,17 @@ export function createBusinessPage(state: GameState): Page {
     switch (action) {
       case 'back':
         return back();
+      // Gullbarre: hopp over ventingen (overalt i bedriftene)
+      case 'skip': {
+        const result = useSkip(state, target.dataset.skip as SkipKind, id, target.dataset.key ?? '');
+        if (result === 'bars') {
+          shake(target);
+          return showToast('Du har ingen gullbarrer. Du får én hver dag du åpner appen.', 3500);
+        }
+        if (result !== 'ok') return render();
+        showToast('Ferdig! Du brukte 1 gullbarre.');
+        return render();
+      }
       case 'start':
         if (slotsFull(state)) {
           showToast('Alle plassene er i bruk – kjøp flere plasser');
@@ -1564,7 +1576,8 @@ export function createBusinessPage(state: GameState): Page {
           ${slotsArt()}
           <div class="slots-progress"><span style="width:${pct}%"></span></div>
           <span class="slots-pct">${pct} %</span>
-        </div>`;
+        </div>
+        ${skipBtn('slot')}`;
     } else if (state.businessSlots >= MAX_SLOTS) {
       main = `
         <div class="slots-card">
@@ -1728,6 +1741,7 @@ export function createBusinessPage(state: GameState): Page {
           <div class="biz-outlets-head">${headIcon}<h2>Utvidelse pågår</h2></div>
           <strong class="biz-big">${formatDuration((b.expansionEnd! - Date.now()) / 1000)}</strong>
           <span class="biz-muted">Gjenstående tid</span>
+          ${skipBtn('expand', b.id)}
         </div>`;
     } else if (isMaxStage(b)) {
       action = `

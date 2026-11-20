@@ -19,6 +19,7 @@ import {
 } from '../game/taxi';
 import { formatDuration, formatInt, formatMoney, formatMoneyRounded, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Visningene for et taxiselskap:
@@ -85,6 +86,7 @@ export function renderTaxiDetail(state: GameState, b: Business, hero: string): s
         <div class="taxi-expanding-head">${FLEET_ICON[fleet]}<h2>Utvidelse pågår</h2></div>
         <strong>${formatDuration((b.expansionEnd! - Date.now()) / 1000)}</strong>
         <span>Gjenstående tid · +${b.pendingPlaces ?? 0} plasser</span>
+        ${skipBtn('expand', b.id)}
       </div>`
     : `
       <h2 class="taxi-title">Utvid kapasiteten</h2>

@@ -14,6 +14,7 @@ import {
 import type { GameState } from '../game/state';
 import { formatDuration, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til banken:
@@ -36,6 +37,7 @@ export function renderBankDetail(state: GameState, b: Business, hero: string): s
         <div class="bank-expand-head">${icons.vault}<h2>Utvidelse pågår</h2></div>
         <strong>${formatDuration((s.expansionEnd - now) / 1000)}</strong>
         <span>Gjenstående tid</span>
+        ${skipBtn('bank', b.id)}
       </div>`;
   } else if (isMaxVault(b)) {
     vault = `

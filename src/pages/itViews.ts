@@ -33,6 +33,7 @@ import {
 import type { GameState } from '../game/state';
 import { formatDuration, formatInt, formatMoney, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til IT-selskapet:
@@ -123,6 +124,7 @@ export function renderItDetail(state: GameState, b: Business, hero: string): str
           <span class="it-office-icon">${icons.office}</span>
           <div><strong>${o.name}</strong><span>Utvidelse pågår · + ${formatInt(o.places)} arbeidsplasser</span>
           <b class="it-office-time">${icons.clock}${formatDuration((it.building!.end - now) / 1000)}</b></div>
+          ${skipBtn('office', b.id, '', true)}
         </div>`;
     }
     const body = `
@@ -249,6 +251,7 @@ export function renderItProject(b: Business, p: ItProject, confirmDrop: boolean)
          <button class="it-main-btn green" data-action="i-sell" data-id="${b.id}" data-project="${p.id}">Selg prosjektet</button>`
       : `<p class="it-label">Gjenstående tid</p>
          <strong class="it-big">${formatDuration((p.end - now) / 1000, false)}</strong>
+         ${skipBtn('itproject', b.id, p.id)}
          <button class="it-main-btn ${confirmDrop ? 'confirm' : ''}" data-action="i-drop" data-id="${b.id}" data-project="${p.id}">${confirmDrop ? 'Trykk igjen for å avbryte' : 'Avbryt prosjektet'}</button>
          <p class="it-note">Er prosjektet ulønnsomt, kan du avbryte det når som helst. Avbryter du, får du ingen betaling for arbeidet som er gjort, og de ansatte blir ledige igjen.</p>`}`;
 }

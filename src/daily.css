@@ -235,3 +235,61 @@
   transform: translateY(4px);
   box-shadow: 0 2px 0 #b8740a;
 }
+
+/* --- Knappen "Hopp over" (bruker en gullbarre) --- */
+.gb-skip,
+.business .gb-skip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffe17a, #f2a612);
+  color: #4a2c00;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow: 0 4px 0 #b8740a, 0 8px 16px rgba(242, 166, 18, 0.25);
+  cursor: pointer;
+}
+
+.gb-skip:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #b8740a;
+}
+
+.gb-skip .gold-bar {
+  width: 28px;
+}
+
+/* Liten variant (i lister og kort) */
+.gb-skip.small,
+.business .gb-skip.small {
+  width: auto;
+  margin-top: 6px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  font-size: 14px;
+  box-shadow: 0 2px 0 #b8740a;
+}
+
+.gb-skip.small .gold-bar {
+  width: 22px;
+}
+
+.gb-skip.shake {
+  animation: gb-shake 0.35s;
+}
+
+@keyframes gb-shake {
+  25% {
+    translate: -6px;
+  }
+  75% {
+    translate: 6px;
+  }
+}

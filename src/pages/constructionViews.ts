@@ -23,6 +23,7 @@ import {
 import type { GameState } from '../game/state';
 import { formatBalance, formatDuration, formatInt, formatMoney, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til byggefirmaet:
@@ -105,16 +106,17 @@ export function renderProjects(b: Business): string {
   const cards = list.map((p) => {
     const def = buildingById(p.building);
     const ready = isReady(p, now);
+    const tagName = ready ? 'button' : 'div';
     return `
-      <button class="con-project ${ready ? 'ready' : ''}" ${ready ? `data-action="c-sell" data-id="${b.id}" data-project="${p.id}"` : ''}>
+      <${tagName} class="con-project ${ready ? 'ready' : ''}" ${ready ? `data-action="c-sell" data-id="${b.id}" data-project="${p.id}"` : ''}>
         <div class="con-project-text">
           <strong>${def.name}</strong>
-          ${ready ? '<span class="con-sell-label">Klar for salg</span>' : `<span>${icons.clock}${formatDuration((p.end - now) / 1000, false)}</span>`}
+          ${ready ? '<span class="con-sell-label">Klar for salg</span>' : `<span>${icons.clock}${formatDuration((p.end - now) / 1000, false)}</span>${skipBtn('project', b.id, p.id, true)}`}
           <span>${icons.tag}${formatMoneyWhole(def.price)}</span>
         </div>
         ${ready ? `<span class="con-sell">${icons.dollar}</span>` : ''}
         <img src="${def.image}" alt="" />
-      </button>`;
+      </${tagName}>`;
   });
   return `
     <h1 class="con-page-title">Prosjektliste</h1>

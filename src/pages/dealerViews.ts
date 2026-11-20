@@ -34,6 +34,7 @@ import {
 import type { GameState } from '../game/state';
 import { formatBalance, formatDuration, formatInt, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til bilforhandleren (trykk håndteres i business.ts):
@@ -310,7 +311,8 @@ export function renderOwnedCar(state: GameState, b: Business, c: DealerCar, sele
           <span>Reparasjon pågår: ${c.repair.parts.map((id) => PARTS.find((p) => p.id === id)!.name.toLowerCase()).join(', ')}</span>
           <strong>${formatDuration(left / 1000)}</strong>
           <div class="dl-progress"><span style="width:${pct(1 - left / Math.max(1, total))}"></span></div>
-        </div>`;
+        </div>
+        ${skipBtn('repair', b.id, c.id)}`;
     } else {
       const cost = repairCost(c, sel);
       const min = repairMinutes(c, sel);
@@ -377,7 +379,8 @@ export function renderSpec(b: Business, pick: SegmentId | null): string {
       ${card(d.segmentChange.to, false, `
         <strong class="dl-seg-time">${formatDuration(left / 1000)}</strong>
         <span class="dl-seg-left">Gjenstående tid</span>
-        <div class="dl-progress light"><span style="width:${pct(1 - left / SEGMENT_CHANGE_MS)}"></span></div>`)}`;
+        <div class="dl-progress light"><span style="width:${pct(1 - left / SEGMENT_CHANGE_MS)}"></span></div>`)}
+      ${skipBtn('segment', b.id)}`;
   }
   const chosen = pick ?? d.segment;
   return `
@@ -409,7 +412,8 @@ export function renderExpand(state: GameState, b: Business, kind: 'service' | 's
           <b>${formatDuration(left / 1000)}</b>
           <div class="dl-progress light"><span style="width:${pct(1 - left / (opt.seconds * 1000))}"></span></div>
         </div>
-      </div>`;
+      </div>
+      ${skipBtn(kind, b.id)}`;
   } else {
     body = EXPANSIONS[kind]
       .map(

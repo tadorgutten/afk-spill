@@ -27,6 +27,7 @@ import type { GameState } from '../game/state';
 import { stockChart } from '../ui/chart';
 import { formatDuration, formatInt, formatMoney, formatMoneyFull, formatMoneyWhole, formatPrice, formatSignedPercent, priceNumber } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til oljeselskapet (enkelt og ryddig, i samme stil som flyselskapet):
@@ -67,7 +68,7 @@ export function renderOilDetail(state: GameState, b: Business, hero: string, con
     </button>`;
   const storageUpgrade =
     s.levelDoneAt !== null
-      ? `<div class="oil-upgrading">${icons.hourglass}<div><strong>Lageret bygges ut</strong><span>Plass til ${barrels(capacity(s.level + 1))} om ${time(s.levelDoneAt - now)}</span></div></div>`
+      ? `<div class="oil-upgrading">${icons.hourglass}<div><strong>Lageret bygges ut</strong><span>Plass til ${barrels(capacity(s.level + 1))} om ${time(s.levelDoneAt - now)}</span></div>${skipBtn('oilstore', b.id, '', true)}</div>`
       : s.level >= MAX_LEVEL
         ? `<p class="oil-muted center">Lageret er bygd ut så mye det går.</p>`
         : `<button class="oil-soft-btn" data-action="o-storage" data-id="${b.id}">
@@ -176,6 +177,7 @@ function platformRow(state: GameState, b: Business, p: PlatformDef, next: Platfo
             <div>${icons.drop}<span><b>${barrels(p.rate)} / t</b><small>Når den er ferdig</small></span></div>
           </div>
           <p class="oil-muted">Plattformen du har nå, pumper som før mens denne bygges. Den nye tas i bruk med en gang den er ferdig.</p>
+          ${skipBtn('oilbuild', b.id)}
         </div>
       </div>`;
   }

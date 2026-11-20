@@ -30,6 +30,7 @@ import { AIRPORTS, DOMESTIC_COUNT, type ContinentId, type FlightDef, type PlaneI
 import type { GameState } from '../game/state';
 import { formatDuration, formatInt, formatMoney, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
+import { skipBtn } from '../game/skip';
 
 /*
  * Sidene til flyselskapet:
@@ -40,6 +41,9 @@ import { icons } from '../ui/icons';
  *   aShop      – kjøp fly (med et vindu nederst for antall)
  *   aLicenses  – lisenser for kontinentene og den internasjonale
  */
+
+/** Flyet som kjøpevinduet sist ble vist for (så det ikke spretter inn hver gang siden tegnes). */
+let lastSheet: string | null | undefined;
 
 // --- Små hjelpere -------------------------------------------------------------------------------
 const flag = (cc: string) => `<img class="air-flag" src="airline/flags/${cc}.png" alt="" />`;
@@ -172,7 +176,8 @@ export function renderRegion(state: GameState, b: Business, id: ContinentId): st
         ${routeHtml(f)}
         <div class="air-progress"><span style="width:${(1 - left / LAUNCH_MS) * 100}%"></span></div>
         <p class="air-muted center">I lufta om <b>${formatDuration(left / 1000)}</b>. Så kommer neste flyvning.</p>
-      </div>`;
+      </div>
+      ${skipBtn('launch', b.id, f.id)}`;
   } else if (next.kind === 'hub') {
     body = `
       <div class="air-card air-empty">
@@ -330,9 +335,12 @@ export function renderPlaneShop(state: GameState, b: Business, sel: PlaneId | nu
       </div>
     </button>`,
   ).join('');
+  // Vinduet glir bare inn første gang (siden tegnes på nytt hvert sekund)
+  const slideIn = sel !== lastSheet;
+  lastSheet = sel;
   const sheet = sel
     ? `
-    <div class="air-sheet">
+    <div class="air-sheet ${slideIn ? 'slide' : ''}">
       <div class="air-sheet-title"><strong>Kjøper ${planeById(sel).name}</strong><button data-action="a-unpick" aria-label="Lukk">${icons.close}</button></div>
       <div class="air-sheet-row">
         <div class="air-qty">
