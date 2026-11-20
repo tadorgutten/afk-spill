@@ -6,6 +6,7 @@ import { MAX_LEVEL } from './click';
 import { createMarket, ensureMarket, type Holding, type MarketState } from './market';
 import { createCrypto, ensureCrypto, type CryptoState } from './crypto';
 import type { OwnedProperty } from './realEstate';
+import type { ItemsState } from './items';
 
 /**
  * Spillets tilstand: alt som skal huskes mellom økter.
@@ -69,6 +70,9 @@ export interface GameState {
   businessSlots: number;
   /** Når plassen som bygges nå er ferdig (ms), eller null. */
   slotExpansionEnd: number | null;
+
+  // --- Eiendeler (biler, fly og yachter) ---
+  assets: ItemsState;
 }
 
 const SAVE_KEY = 'afk-game-save-v3';
@@ -103,6 +107,7 @@ function baseState(): Omit<GameState, 'market' | 'crypto'> {
     businessUpdate: Date.now(),
     businessSlots: 5,
     slotExpansionEnd: null,
+    assets: { items: [], places: [] },
   };
 }
 

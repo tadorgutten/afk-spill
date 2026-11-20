@@ -10,6 +10,7 @@ import './football.css';
 import './oil.css';
 import './airline.css';
 import './profile.css';
+import './items.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
 import { removeRetiredBusinesses, tickBusinesses } from './game/business';
@@ -21,12 +22,11 @@ import { initStorage, loadState, saveState } from './game/state';
 import { createBusinessPage } from './pages/business';
 import { createEarningsPage } from './pages/earnings';
 import { createInvestingPage } from './pages/investing';
-import { createPlaceholderPage } from './pages/placeholder';
+import { createItemsPage } from './pages/items';
 import { createProfilePage } from './pages/profile';
 import { checkTaxes } from './game/taxes';
 import { applyZoom } from './ui/zoom';
 import type { PageId } from './pages/page';
-import { icons } from './ui/icons';
 import { createNav } from './ui/nav';
 import { initLogos } from './ui/stockLogo';
 import { initUpdater } from './ui/updater';
@@ -53,7 +53,7 @@ const pages = [
   createInvestingPage(state),
   createBusinessPage(state),
   createEarningsPage(state),
-  createPlaceholderPage('items', 'Eiendeler', icons.items),
+  createItemsPage(state),
   profilePage,
 ];
 

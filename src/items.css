@@ -1,0 +1,899 @@
+/* =========================================================================
+ * EIENDELER (src/pages/items.ts) – garasje, hangar, havn og butikkene
+ * Klassene starter med ei- (it- er brukt av IT-selskapet).
+ * ========================================================================= */
+.items {
+  --ei-blue: #4a6fe0;
+  --ei-sea: #2f8fb0;
+  --ei-ink: #2b3240;
+  --ei-card: #eef1f6;
+  padding-bottom: 40px;
+}
+
+/* Knappene starter uten nettleserens egen stil */
+.items button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.items[data-view]:not([data-view='home']) {
+  padding-top: 0;
+}
+
+.ei-title {
+  margin: 62px 0 28px;
+  font-size: 40px;
+  font-weight: 800;
+}
+
+/* Bildene: speilvend de som peker feil vei */
+.ei-img.flip {
+  transform: scaleX(-1);
+}
+
+.ei-img {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* --- Tilbake-pila (svever øverst til venstre) --- */
+.items .ei-back {
+  position: fixed;
+  z-index: 5;
+  top: calc(env(safe-area-inset-top) + 18px);
+  left: 10px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  transition: box-shadow 0.2s;
+}
+
+body.scrolled .items .ei-back {
+  box-shadow: 0 2px 10px rgba(20, 30, 60, 0.18);
+}
+
+.ei-back svg {
+  width: 28px;
+  height: 28px;
+}
+
+.ei-head {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 52px;
+  margin: calc(env(safe-area-inset-top) + 14px) 0 14px;
+  padding-left: 56px;
+}
+
+.ei-head h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.ei-head span {
+  color: #4b5262;
+  font-size: 16px;
+}
+
+.ei-head span b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.ei-sep {
+  width: 40%;
+  height: 2px;
+  margin: 30px auto;
+  border: 0;
+  background: #e3e6ec;
+}
+
+.ei-note {
+  margin: 10px 0 0;
+  color: #7a8291;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.ei-note.center {
+  text-align: center;
+}
+
+/* --- Oversikten: garasje, hangar og havn --- */
+.ei-rooms {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.items .ei-room {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 150px;
+  border-radius: 26px;
+  overflow: hidden;
+  color: #fff;
+}
+
+.ei-room.car {
+  background: radial-gradient(circle at 50% 20%, #59606c, #23272f 75%);
+}
+
+.ei-room.plane {
+  background: linear-gradient(180deg, #6f97ec, #b9d3f6);
+}
+
+.ei-room.yacht {
+  background: linear-gradient(180deg, #4fb6d6, #1f6f97);
+}
+
+.ei-room .ei-img {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 118%;
+  max-height: 70%;
+  object-fit: contain;
+  translate: -50% -50%;
+}
+
+.ei-room .ei-img.flip {
+  transform: scaleX(-1);
+}
+
+.ei-room-name {
+  position: relative;
+  margin-bottom: 14px;
+  font-size: 22px;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.ei-room-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 26px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ei-ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Butikkene: tre ikoner med en fargestripe under */
+.ei-shops {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 12px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f3f6fb, #e6edf8);
+}
+
+.items .ei-shops button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #1c2230;
+}
+
+.ei-shops button + button span {
+  border-left: 1px solid #dfe4ec;
+}
+
+.ei-shops span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 18px 0 14px;
+}
+
+.ei-shops svg {
+  width: 62px;
+  height: 62px;
+}
+
+.ei-shops b {
+  width: 100%;
+  padding: 11px 0;
+  background: linear-gradient(90deg, #3a4253, #4a6fe0);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Verdien av eiendelene */
+.ei-worth {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--ei-card);
+}
+
+.ei-worth > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ei-worth > div:first-child span {
+  color: #6b7383;
+  font-size: 14px;
+}
+
+.ei-worth strong {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.ei-worth-counts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ei-worth-counts span {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  color: #4b5262;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ei-worth-counts svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Sortering --- */
+.ei-chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.items .ei-chip {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #e2e5ea;
+  color: #2b3240;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.items .ei-chip.active {
+  background: var(--ei-ink);
+  color: #fff;
+}
+
+.ei-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ei-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 10px;
+  color: #7a8291;
+  text-align: center;
+}
+
+.ei-empty > svg {
+  width: 64px;
+  height: 64px;
+}
+
+/* Fargene på kortene: bilklassene, fly og yachter */
+.items .tier-grey {
+  --tone: #b9bec6;
+  --tone-text: #fff;
+}
+.items .tier-sky {
+  --tone: #7fc0ea;
+  --tone-text: #fff;
+}
+.items .tier-navy {
+  --tone: #3d5fb5;
+  --tone-text: #fff;
+}
+.items .tier-purple {
+  --tone: #8b5cc4;
+  --tone-text: #fff;
+}
+.items .tier-red {
+  --tone: #e45a5e;
+  --tone-text: #fff;
+}
+.items .tier-gold {
+  --tone: #f0c24f;
+  --tone-text: #fff;
+}
+.items .plane {
+  --tone: #4a6fe0;
+  --tone-text: #fff;
+}
+.items .yacht {
+  --tone: #3d4a5c;
+  --tone-text: #fff;
+}
+
+/* --- Garasje: bilde over et kort som går fra hvitt til fargen --- */
+.items .ei-owned {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: 8px;
+}
+
+.ei-owned .ei-img {
+  position: relative;
+  z-index: 1;
+  width: 72%;
+  max-height: 170px;
+  object-fit: contain;
+  margin-bottom: -50px;
+}
+
+.ei-owned-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 62px 16px 18px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, #fff 0%, color-mix(in srgb, var(--tone) 70%, #fff) 100%);
+}
+
+.ei-owned-text strong {
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.ei-owned-text span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #3a4252;
+  font-size: 17px;
+}
+
+.ei-owned-text i {
+  width: 1px;
+  height: 18px;
+  background: #3a4252;
+}
+
+/* Hangar: blå himmel over flyet */
+.items .ei-owned.plane {
+  flex-direction: column-reverse;
+  padding-top: 0;
+}
+
+.ei-owned.plane .ei-owned-text {
+  padding: 20px 16px 70px;
+  background: linear-gradient(180deg, #4a6fe0 0%, #9cc2f5 75%, #fff 100%);
+  color: #fff;
+}
+
+.ei-owned.plane .ei-owned-text span {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.ei-owned.plane .ei-owned-text i {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.ei-owned.plane .ei-img {
+  width: 92%;
+  margin: -64px 0 0;
+}
+
+/* Havn: havet med yachten, og en mørk stripe under */
+.items .ei-yacht-card,
+.items .ei-yacht-shop {
+  display: block;
+  width: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.ei-sea {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 210px;
+  padding: 20px 18px;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.25), transparent 55%),
+    linear-gradient(180deg, #57c2dd 0%, #2f9cc0 55%, #1d7aa2 100%);
+}
+
+.ei-sea .ei-img {
+  max-width: 92%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 8px rgba(5, 40, 60, 0.35));
+}
+
+.ei-yacht-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 18px;
+  background: linear-gradient(110deg, #2f3a4b, #56869a);
+  color: #fff;
+}
+
+.ei-tags {
+  display: flex;
+  gap: 8px;
+}
+
+.ei-tags span {
+  padding: 7px 16px;
+  border-radius: 99px;
+  background: #253040;
+  font-size: 15px;
+}
+
+.ei-yacht-foot strong {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* --- Butikken --- */
+.items .ei-shop-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 186px;
+  margin-bottom: 30px;
+  padding: 20px 22px;
+  border-radius: 26px;
+  background: var(--tone);
+  color: var(--tone-text);
+  text-align: left;
+}
+
+.ei-shop-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.ei-shop-text strong {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.ei-shop-text span {
+  font-size: 16px;
+  opacity: 0.92;
+}
+
+.ei-shop-card.car .ei-img {
+  position: absolute;
+  right: 18px;
+  bottom: -34px;
+  width: 58%;
+  max-height: 140px;
+  object-fit: contain;
+  object-position: bottom right;
+}
+
+.items .ei-shop-card.plane {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  background: linear-gradient(180deg, #4a6fe0 0%, #9cc2f5 60%, #fff 100%);
+  text-align: center;
+}
+
+.ei-shop-card.plane .ei-shop-text {
+  align-items: center;
+}
+
+.ei-shop-card.plane .ei-img {
+  width: 92%;
+  max-height: 170px;
+  margin: 12px auto -10px;
+  object-fit: contain;
+}
+
+.ei-yacht-shop .ei-sea {
+  height: 200px;
+}
+
+
+.ei-yacht-shop-text {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 20px 18px;
+  background: linear-gradient(110deg, #2f3a4b, #56869a);
+  color: #fff;
+}
+
+.ei-yacht-shop-text strong {
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.ei-yacht-shop-text span {
+  margin-top: 4px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.ei-yacht-shop-text b {
+  font-size: 19px;
+}
+
+/* --- Én eiendel / kjøp --- */
+.ei-item-head {
+  margin: calc(env(safe-area-inset-top) + 72px) 0 0;
+}
+
+.ei-item-head h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.ei-item-head span {
+  font-size: 17px;
+  color: #3a4252;
+}
+
+.ei-item-head.right {
+  margin-top: calc(env(safe-area-inset-top) + 20px);
+  padding-left: 56px;
+  text-align: right;
+}
+
+.ei-item-head.on-sea {
+  position: relative;
+  margin: -28px -18px 0;
+  padding: 26px 18px 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--bg, #fff);
+}
+
+.ei-big {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  margin: 18px -8px 8px;
+}
+
+.ei-big .ei-img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+}
+
+.ei-hero-sea {
+  display: grid;
+  place-items: center;
+  height: 300px;
+  margin: 0 -18px;
+  padding: 50px 20px 46px;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.25), transparent 55%),
+    linear-gradient(180deg, #57c2dd 0%, #2f9cc0 55%, #1d7aa2 100%);
+}
+
+.ei-hero-sea .ei-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 10px rgba(5, 40, 60, 0.35));
+}
+
+.items[data-view='item'] .ei-back,
+.items[data-view='buy'] .ei-back {
+  top: calc(env(safe-area-inset-top) + 18px);
+}
+
+.ei-sub {
+  margin: 26px 0 12px;
+  font-size: 19px;
+  font-weight: 500;
+  color: #2b3240;
+}
+
+.ei-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.items .ei-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 112px;
+  padding: 18px 22px;
+  border-radius: 22px;
+  background: #f1f2f4;
+  color: var(--text);
+  text-align: left;
+}
+
+.ei-opt strong {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.ei-opt span {
+  color: #4b5262;
+  font-size: 15px;
+}
+
+.items .ei-opt.chosen {
+  background: var(--tone);
+  color: var(--tone-text);
+}
+
+.ei-opt.chosen span {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.ei-opt.static {
+  min-width: 140px;
+}
+
+.ei-place-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.ei-place-photo {
+  flex-shrink: 0;
+  width: 140px;
+  height: 92px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #6fd0e6, #1f84aa);
+}
+
+.ei-place-photo img,
+.ei-place-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ei-place-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ei-place-row strong {
+  font-size: 20px;
+}
+
+.ei-place-row span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7a8291;
+  font-size: 16px;
+}
+
+.ei-place-row span svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ei-sum {
+  margin: 0 0 16px;
+  font-size: 19px;
+}
+
+.ei-sum strong {
+  margin-left: 6px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.items .ei-btn {
+  display: block;
+  width: 100%;
+  padding: 17px;
+  border-radius: 22px;
+  background: var(--ei-blue);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.items .ei-btn.buy {
+  background: var(--tone);
+  color: var(--tone-text);
+}
+
+.items .ei-btn.off {
+  opacity: 0.5;
+}
+
+.items .ei-btn.sell {
+  background: #3b82f6;
+}
+
+.items[data-kind='yacht'] .ei-btn.sell,
+.items .ei-btn.sell.yacht {
+  background: #3d4a5c;
+}
+
+.items .ei-btn.confirm {
+  background: #e0565b;
+}
+
+.items .ei-btn.car {
+  background: #3d5fb5;
+}
+
+.items .ei-btn.yacht {
+  background: #3d4a5c;
+}
+
+.ei-balance {
+  margin: 10px 0 0;
+  color: var(--tone);
+  font-size: 16px;
+  text-align: center;
+  filter: brightness(0.85);
+}
+
+.ei-buy.tier-grey .ei-balance {
+  color: #7a8291;
+}
+
+/* --- Plasseringer --- */
+.ei-place {
+  border-radius: 26px;
+  overflow: hidden;
+  background: #dff4f2;
+}
+
+.ei-place-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 16px 12px;
+}
+
+.ei-place-top strong {
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.ei-place-top span {
+  color: #5d6b72;
+  font-size: 14px;
+}
+
+.ei-place-img {
+  height: 190px;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  background: linear-gradient(160deg, #6fd0e6, #1f84aa);
+}
+
+.ei-place-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 2px solid #dff4f2;
+  border-top: 0;
+  border-radius: 0 0 26px 26px;
+}
+
+.ei-place.owned .ei-place-foot {
+  justify-content: center;
+}
+
+.ei-place-foot > b {
+  font-size: 18px;
+}
+
+.items .ei-pill {
+  padding: 11px 28px;
+  border-radius: 999px;
+  background: #3d4a5c;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.items .ei-pill.off {
+  opacity: 0.45;
+}
+
+.ei-chosen {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #2f9e57;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ei-chosen svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ei-place.chosen {
+  box-shadow: 0 0 0 3px #2f9e57;
+}
+
+.ei-shake {
+  animation: ei-shake 0.35s;
+}
+
+@keyframes ei-shake {
+  0%,
+  100% {
+    translate: 0;
+  }
+  25% {
+    translate: -6px;
+  }
+  75% {
+    translate: 6px;
+  }
+}
+
+/* Bildet må holde seg inne i havet (ellers stikker det ned i stripen under) */
+.ei-sea {
+  overflow: hidden;
+}
+
+.ei-sea .ei-img {
+  max-height: 170px;
+}

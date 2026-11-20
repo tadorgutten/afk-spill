@@ -1,0 +1,456 @@
+import {
+  CARS,
+  OPTIONS,
+  PLACES,
+  PLANES,
+  YACHTS,
+  buyItem,
+  buyPlace,
+  itemDef,
+  itemsOfKind,
+  itemsValue,
+  movePlace,
+  ownedOfKind,
+  ownsPlace,
+  placeDef,
+  priceWith,
+  saleValue,
+  sellItem,
+  type ItemDef,
+  type ItemKind,
+  type OwnedItem,
+} from '../game/items';
+import type { GameState } from '../game/state';
+import { formatMoney, formatMoneyFull, formatMoneyWhole } from '../ui/format';
+import { icons } from '../ui/icons';
+import { showToast } from '../ui/toast';
+import { html, type Page } from './page';
+
+/*
+ * EIENDELER-SIDEN: garasje, hangar og havn (det man eier), og en butikk for biler, fly og yachter.
+ *   home   – oversikten
+ *   owned  – garasjen / hangaren / havna (det man eier av én type)
+ *   item   – én eiendel man eier: valgene, plasseringen (yacht) og salg
+ *   shop   – butikken for én type
+ *   buy    – kjøp: velg motor/utstyr, team/design og plassering (yacht)
+ *   places – plasseringene for yachter (velg eller kjøp)
+ * Eiendelene gir ingen inntekt – de er bare for moro skyld (men teller i formuen).
+ */
+
+type Sort = 'desc' | 'asc';
+type View =
+  | { name: 'home' }
+  | { name: 'owned'; kind: ItemKind; sort: Sort }
+  | { name: 'item'; uid: string }
+  | { name: 'shop'; kind: ItemKind }
+  | { name: 'buy'; id: string; a: number; b: number; place: string }
+  | { name: 'places'; uid?: string };
+
+const ROOM: Record<ItemKind, { title: string; empty: string; shop: string }> = {
+  car: { title: 'Garasje', empty: 'Du har ingen biler ennå.', shop: 'Bilbutikk' },
+  plane: { title: 'Hangar', empty: 'Du har ingen fly ennå.', shop: 'Flybutikk' },
+  yacht: { title: 'Havn', empty: 'Du har ingen yachter ennå.', shop: 'Yachtbutikk' },
+};
+
+const img = (def: ItemDef, cls = '') =>
+  `<img class="ei-img ${def.flip ? 'flip' : ''} ${cls}" src="${def.image}" alt="" loading="lazy" draggable="false" />`;
+const placeImg = (id: string) => `<img src="items/places/${id}.jpg" alt="" loading="lazy" onerror="this.style.display='none'" />`;
+/** Fargen på kortet: bilene etter klasse, fly blått, yachter havblått. */
+const tone = (def: ItemDef) => (def.kind === 'car' ? `tier-${def.tier}` : def.kind);
+const optionText = (o: OwnedItem, def: ItemDef) => {
+  const [ga, gb] = OPTIONS[def.kind];
+  return [ga.options[o.a]?.short, gb.options[o.b]?.short];
+};
+
+export function createItemsPage(state: GameState): Page {
+  const element = html(`<section class="page items"></section>`);
+  let stack: View[] = [{ name: 'home' }];
+  const current = () => stack[stack.length - 1];
+  /** "Trykk igjen" for å selge. */
+  let confirmSell = false;
+  let lastRender = 0;
+
+  function go(view: View) {
+    stack.push(view);
+    confirmSell = false;
+    render();
+    window.scrollTo(0, 0);
+  }
+  function back() {
+    if (stack.length > 1) stack.pop();
+    confirmSell = false;
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function shake(el: HTMLElement) {
+    el.classList.remove('ei-shake');
+    void el.offsetWidth;
+    el.classList.add('ei-shake');
+  }
+
+  // =========================================================================
+  // Oversikten
+  // =========================================================================
+  function renderHome(): string {
+    const s = state.assets;
+    const room = (kind: ItemKind, fallback: ItemDef) => {
+      const owned = ownedOfKind(s, kind);
+      // Bildet: det dyreste man eier av typen (ellers et eksempel)
+      const best = owned.map((o) => itemDef(o.id)!).sort((x, y) => y.price - x.price)[0] ?? fallback;
+      return `
+        <button class="ei-room ${kind}" data-action="owned" data-kind="${kind}">
+          ${img(best)}
+          <span class="ei-room-name">${ROOM[kind].title}</span>
+          <span class="ei-room-count">${owned.length}</span>
+        </button>`;
+    };
+    return `
+      <h1 class="ei-title">Eiendeler</h1>
+      <div class="ei-rooms">
+        ${room('car', CARS.find((c) => c.id === 'chiron')!)}
+        ${room('plane', PLANES.find((p) => p.id === 'falcon7x')!)}
+        ${room('yacht', YACHTS.find((y) => y.id === 'y95')!)}
+      </div>
+      <div class="ei-shops">
+        <button data-action="shop" data-kind="car"><span>${icons.showroom}</span><b>Bilbutikk</b></button>
+        <button data-action="shop" data-kind="plane"><span>${icons.hangar}</span><b>Flybutikk</b></button>
+        <button data-action="shop" data-kind="yacht"><span>${icons.yacht}</span><b>Yachtbutikk</b></button>
+      </div>
+      <hr class="ei-sep" />
+      <div class="ei-worth">
+        <div><span>Verdien av eiendelene</span><strong>${formatMoneyFull(itemsValue(s))}</strong></div>
+        <div class="ei-worth-counts">
+          <span>${icons.showroom}${ownedOfKind(s, 'car').length}</span>
+          <span>${icons.plane}${ownedOfKind(s, 'plane').length}</span>
+          <span>${icons.yacht}${ownedOfKind(s, 'yacht').length}</span>
+        </div>
+      </div>
+      <p class="ei-note">Eiendelene gir ingen inntekt – de er for moro skyld, men teller med i formuen din.</p>`;
+  }
+
+  // =========================================================================
+  // Garasje / hangar / havn
+  // =========================================================================
+  function ownedCard(o: OwnedItem): string {
+    const def = itemDef(o.id)!;
+    const [x, y] = optionText(o, def);
+    if (def.kind === 'yacht') {
+      return `
+        <button class="ei-yacht-card" data-action="item" data-uid="${o.uid}">
+          <div class="ei-sea">${img(def)}</div>
+          <div class="ei-yacht-foot">
+            <div class="ei-tags"><span>${y}</span><span>${x}</span></div>
+            <strong>${def.name}</strong>
+          </div>
+        </button>`;
+    }
+    return `
+      <button class="ei-owned ${def.kind} ${tone(def)}" data-action="item" data-uid="${o.uid}">
+        ${img(def)}
+        <div class="ei-owned-text"><strong>${def.name}</strong><span>${x}<i></i>${y}</span></div>
+      </button>`;
+  }
+
+  function renderOwned(kind: ItemKind, sort: Sort): string {
+    const list = ownedOfKind(state.assets, kind).sort((p, q) => (sort === 'asc' ? 1 : -1) * (p.paid - q.paid));
+    const chip = (key: Sort, label: string) =>
+      `<button class="ei-chip ${sort === key ? 'active' : ''}" data-action="sort" data-sort="${key}">${label}</button>`;
+    return `
+      <div class="ei-head"><h1>${ROOM[kind].title}</h1></div>
+      <div class="ei-chips">${chip('desc', 'Dyreste først')}${chip('asc', 'Billigste først')}</div>
+      ${
+        list.length
+          ? `<div class="ei-list">${list.map(ownedCard).join('')}</div>`
+          : `<div class="ei-empty">${kind === 'car' ? icons.showroom : kind === 'plane' ? icons.hangar : icons.yacht}<p>${ROOM[kind].empty}</p>
+              <button class="ei-btn ${kind}" data-action="shop" data-kind="${kind}">Til ${ROOM[kind].shop.toLowerCase()}en</button></div>`
+      }`;
+  }
+
+  // =========================================================================
+  // Én eiendel man eier
+  // =========================================================================
+  function renderItem(o: OwnedItem): string {
+    const def = itemDef(o.id)!;
+    const [ga, gb] = OPTIONS[def.kind];
+    const optCard = (value: string | undefined, caption: string) =>
+      `<div class="ei-opt static"><strong>${value}</strong><span>${caption}</span></div>`;
+    const p = o.place ? placeDef(o.place) : null;
+    return `
+      ${def.kind === 'yacht' ? `<div class="ei-hero-sea">${img(def)}</div>` : ''}
+      <div class="ei-item-head ${def.kind === 'yacht' ? 'on-sea' : ''}">
+        <h1>${def.name}</h1>
+        <span>Kjøpspris: <b>${formatMoneyWhole(o.paid)}</b></span>
+      </div>
+      ${def.kind !== 'yacht' ? `<div class="ei-big">${img(def)}</div>` : ''}
+      <h2 class="ei-sub">Valg</h2>
+      <div class="ei-opts">${optCard(ga.options[o.a]?.short, ga.caption)}${optCard(gb.options[o.b]?.short, gb.caption)}</div>
+      ${
+        p
+          ? `<h2 class="ei-sub">Plassering</h2>
+             <button class="ei-place-row" data-action="places" data-uid="${o.uid}">
+               <span class="ei-place-photo">${placeImg(p.id)}</span>
+               <div><strong>${p.name}</strong><span>Endre ${icons.arrowRight}</span></div>
+             </button>`
+          : ''
+      }
+      <hr class="ei-sep" />
+      <p class="ei-sum">Salgspris: <strong>${formatMoneyFull(saleValue(o))}</strong></p>
+      <button class="ei-btn sell ${confirmSell ? 'confirm' : ''}" data-action="sell" data-uid="${o.uid}">${confirmSell ? 'Trykk igjen for å selge' : 'Selg'}</button>
+      <p class="ei-note center">Du får ${Math.round((saleValue(o) / o.paid) * 100)} % av det du betalte. Kjøper du den igjen, koster den det samme som før.</p>`;
+  }
+
+  // =========================================================================
+  // Butikken
+  // =========================================================================
+  function shopCard(def: ItemDef): string {
+    if (def.kind === 'yacht') {
+      return `
+        <button class="ei-yacht-shop" data-action="buy" data-id="${def.id}">
+          <div class="ei-sea">${img(def)}</div>
+          <div class="ei-yacht-shop-text"><strong>${def.name}</strong><span>Startpris:</span><b>${formatMoneyWhole(def.price)}</b></div>
+        </button>`;
+    }
+    return `
+      <button class="ei-shop-card ${def.kind} ${tone(def)}" data-action="buy" data-id="${def.id}">
+        <div class="ei-shop-text"><strong>${def.name}</strong><span>Pris fra ${formatMoneyWhole(def.price)}</span></div>
+        ${img(def)}
+      </button>`;
+  }
+
+  function renderShop(kind: ItemKind): string {
+    return `
+      <div class="ei-head two"><h1>${ROOM[kind].shop}</h1><span>Saldo: <b>${formatMoneyFull(state.balance)}</b></span></div>
+      <div class="ei-list">${itemsOfKind(kind).map(shopCard).join('')}</div>`;
+  }
+
+  // =========================================================================
+  // Kjøp
+  // =========================================================================
+  function renderBuy(v: Extract<View, { name: 'buy' }>): string {
+    const def = itemDef(v.id)!;
+    const [ga, gb] = OPTIONS[def.kind];
+    const price = priceWith(def, v.a, v.b);
+    const group = (title: string, opts: typeof ga.options, chosen: number, which: 'a' | 'b') => `
+      <h2 class="ei-sub">${title}</h2>
+      <div class="ei-opts">${opts
+        .map(
+          (opt, i) => `
+          <button class="ei-opt ${i === chosen ? 'chosen' : ''}" data-action="opt" data-group="${which}" data-index="${i}">
+            <strong>${opt.label}</strong>${opt.pct ? `<span>+ ${opt.pct} %</span>` : '<span>&nbsp;</span>'}
+          </button>`,
+        )
+        .join('')}</div>`;
+    const p = placeDef(v.place);
+    return `
+      ${def.kind === 'yacht' ? `<div class="ei-hero-sea">${img(def)}</div>` : ''}
+      <div class="ei-item-head ${def.kind === 'yacht' ? 'on-sea' : ''} ${def.kind === 'car' ? 'right' : ''}">
+        <h1>${def.name}</h1>
+        <span>Pris fra <b>${formatMoneyWhole(def.price)}</b></span>
+      </div>
+      ${def.kind !== 'yacht' ? `<div class="ei-big">${img(def)}</div>` : ''}
+      <div class="ei-buy ${tone(def)}">
+        ${group(ga.title, ga.options, v.a, 'a')}
+        ${group(gb.title, gb.options, v.b, 'b')}
+        ${
+          def.kind === 'yacht'
+            ? `<h2 class="ei-sub">Yachtens plassering</h2>
+               <button class="ei-place-row" data-action="places">
+                 <span class="ei-place-photo">${placeImg(p.id)}</span>
+                 <div><strong>${p.name}</strong><span>Endre ${icons.arrowRight}</span></div>
+               </button>`
+            : ''
+        }
+        <hr class="ei-sep" />
+        <p class="ei-sum">Sum: <strong>${formatMoneyFull(price)}</strong></p>
+        <button class="ei-btn buy ${state.balance >= price ? '' : 'off'}" data-action="purchase">Kjøp</button>
+        <p class="ei-balance">Saldo: ${formatMoneyFull(state.balance)}</p>
+      </div>`;
+  }
+
+  // =========================================================================
+  // Plasseringer (yacht)
+  // =========================================================================
+  function renderPlaces(uid?: string): string {
+    const chosen = uid ? state.assets.items.find((o) => o.uid === uid)?.place : buyView()?.place;
+    const cards = PLACES.map((p) => {
+      const owned = ownsPlace(state.assets, p.id);
+      const isChosen = chosen === p.id;
+      return `
+        <div class="ei-place ${owned ? 'owned' : ''} ${isChosen ? 'chosen' : ''}">
+          <div class="ei-place-top"><strong>${p.name}</strong><span>${p.where}</span></div>
+          <div class="ei-place-img">${placeImg(p.id)}</div>
+          <div class="ei-place-foot">
+            ${
+              owned
+                ? isChosen
+                  ? `<span class="ei-chosen">${icons.check} Valgt</span>`
+                  : `<button class="ei-pill" data-action="pick-place" data-place="${p.id}">Velg</button>`
+                : `<b>${formatMoneyWhole(p.price)}</b><button class="ei-pill ${state.balance >= p.price ? '' : 'off'}" data-action="buy-place" data-place="${p.id}">Kjøp</button>`
+            }
+          </div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="ei-head two"><h1>Yachtens plassering</h1><span>Saldo: <b>${formatMoneyFull(state.balance)}</b></span></div>
+      <p class="ei-note">Et sted du kjøper, kan brukes av alle yachtene dine – også dem du kjøper senere.</p>
+      <div class="ei-list">${cards}</div>`;
+  }
+
+  /** Kjøpssiden under plasseringslista (når man velger plassering før kjøp). */
+  function buyView() {
+    for (let i = stack.length - 1; i >= 0; i--) {
+      const v = stack[i];
+      if (v.name === 'buy') return v;
+    }
+    return null;
+  }
+
+  // =========================================================================
+  function render() {
+    lastRender = performance.now();
+    const v = current();
+    element.dataset.view = v.name;
+    const backBtn = `<button class="ei-back ${v.name === 'buy' || v.name === 'item' ? 'light' : ''}" data-action="back" aria-label="Tilbake">${icons.back}</button>`;
+    let body = '';
+    switch (v.name) {
+      case 'home':
+        body = renderHome();
+        break;
+      case 'owned':
+        body = backBtn + renderOwned(v.kind, v.sort);
+        break;
+      case 'item': {
+        const o = state.assets.items.find((x) => x.uid === v.uid);
+        if (!o) {
+          stack.pop();
+          return render();
+        }
+        body = backBtn + renderItem(o);
+        break;
+      }
+      case 'shop':
+        body = backBtn + renderShop(v.kind);
+        break;
+      case 'buy':
+        body = backBtn + renderBuy(v);
+        break;
+      case 'places':
+        body = backBtn + renderPlaces(v.uid);
+        break;
+    }
+    const kind = v.name === 'owned' || v.name === 'shop' ? v.kind : v.name === 'buy' ? itemDef(v.id)?.kind : undefined;
+    element.dataset.kind = kind ?? '';
+    element.innerHTML = body;
+  }
+
+  element.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest<HTMLElement>('[data-action]');
+    if (!target) return;
+    const { action } = target.dataset;
+    const v = current();
+    if (action !== 'sell') confirmSell = false;
+
+    switch (action) {
+      case 'back':
+        return back();
+      case 'owned':
+        return go({ name: 'owned', kind: target.dataset.kind as ItemKind, sort: 'desc' });
+      case 'shop':
+        return go({ name: 'shop', kind: target.dataset.kind as ItemKind });
+      case 'item':
+        return go({ name: 'item', uid: target.dataset.uid! });
+      case 'buy':
+        return go({ name: 'buy', id: target.dataset.id!, a: 0, b: 0, place: 'public' });
+      case 'places':
+        return go({ name: 'places', uid: target.dataset.uid });
+      case 'sort':
+        if (v.name === 'owned') v.sort = target.dataset.sort as Sort;
+        return render();
+      case 'opt':
+        if (v.name === 'buy') {
+          const i = Number(target.dataset.index);
+          if (target.dataset.group === 'a') v.a = i;
+          else v.b = i;
+        }
+        return render();
+      case 'purchase': {
+        if (v.name !== 'buy') return;
+        const def = itemDef(v.id)!;
+        const item = buyItem(state, state.assets, v.id, v.a, v.b, v.place);
+        if (!item) {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        showToast(`Du kjøpte ${def.name}!`);
+        // Gå til den nye eiendelen (i garasjen / hangaren / havna)
+        stack = [{ name: 'home' }, { name: 'owned', kind: def.kind, sort: 'desc' }, { name: 'item', uid: item.uid }];
+        render();
+        window.scrollTo(0, 0);
+        return;
+      }
+      case 'sell': {
+        if (v.name !== 'item') return;
+        if (!confirmSell) {
+          confirmSell = true;
+          return render();
+        }
+        confirmSell = false;
+        const def = itemDef(state.assets.items.find((o) => o.uid === v.uid)?.id ?? '');
+        const got = sellItem(state, state.assets, v.uid);
+        if (got > 0) showToast(`Solgt ${def?.name ?? ''} for ${formatMoney(got)}`);
+        return back();
+      }
+      case 'pick-place': {
+        if (v.name !== 'places') return;
+        const id = target.dataset.place!;
+        if (v.uid) movePlace(state.assets, v.uid, id);
+        else {
+          const bv = buyView();
+          if (bv) bv.place = id;
+        }
+        showToast(`Plassering: ${placeDef(id).name}`);
+        return back();
+      }
+      case 'buy-place': {
+        if (v.name !== 'places') return;
+        const id = target.dataset.place!;
+        if (!buyPlace(state, state.assets, id)) {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        // Velg det nye stedet med en gang
+        if (v.uid) movePlace(state.assets, v.uid, id);
+        else {
+          const bv = buyView();
+          if (bv) bv.place = id;
+        }
+        showToast(`Du kjøpte ${placeDef(id).name}!`);
+        return render();
+      }
+    }
+  });
+
+  return {
+    id: 'items',
+    label: 'Eiendeler',
+    icon: icons.items,
+    element,
+    onShow() {
+      stack = [{ name: 'home' }];
+      confirmSell = false;
+      render();
+    },
+    onBack() {
+      if (stack.length <= 1) return false;
+      back();
+      return true;
+    },
+    navHidden: () => stack.length > 1,
+    update() {
+      // Saldoen endrer seg hele tiden: tegn sidene som viser den på nytt én gang i sekundet
+      const v = current();
+      if ((v.name === 'shop' || v.name === 'buy' || v.name === 'places') && performance.now() - lastRender > 1000) render();
+    },
+  };
+}

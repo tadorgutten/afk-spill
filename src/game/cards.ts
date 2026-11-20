@@ -3,6 +3,7 @@ import { portfolioSummary } from './market';
 import { cryptoSummary } from './crypto';
 import { realEstateSummary } from './realEstate';
 import type { GameState } from './state';
+import { itemsValue } from './items';
 
 /*
  * BANKKORT
@@ -114,9 +115,9 @@ export function cardById(id: string): CardDef {
   return CARDS.find((c) => c.id === id) ?? CARDS[0];
 }
 
-/** Verdien av eiendelene dine (hus, biler osv.). Eiendeler-siden er ikke laget ennå. */
-export function assetsValue(_state: GameState): number {
-  return 0;
+/** Verdien av eiendelene dine (biler, fly og yachter – det du får ved å selge dem). */
+export function assetsValue(state: GameState): number {
+  return itemsValue(state.assets);
 }
 
 /** Formue = saldo + aksjer + krypto + bedrifter (kapitalisering) + eiendeler. */

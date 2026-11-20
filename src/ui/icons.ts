@@ -259,6 +259,10 @@ export const icons = {
   plusBox: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M12 8v8M8 12h8"/>', 1.7),
   /** Oljeplattform på havet (oljeselskap) */
   rig: svg('<path d="M3 13h18"/><path d="M6 13v5M12 13v5M18 13v5"/><path d="M5 13V9h7v4"/><path d="M15 13V3l3 4v6"/><path d="M15 6h3"/><path d="M2 21c1.7 0 1.7-1.2 3.3-1.2S7 21 8.7 21s1.7-1.2 3.3-1.2 1.7 1.2 3.3 1.2 1.7-1.2 3.3-1.2S20.3 21 22 21"/>', 1.5),
+  /** Yacht på bølger (eiendeler) */
+  yacht: svg('<path d="M3 15h16.5l-2.5 3.5H5.5Z"/><path d="M6 15v-3h9l2.5 3"/><path d="M8.5 12V9.5h4.5l1.5 2.5"/><path d="M11 9.5V6"/><path d="M2 21c1.7 0 1.7-1.2 3.3-1.2S7 21 8.7 21s1.7-1.2 3.3-1.2 1.7 1.2 3.3 1.2 1.7-1.2 3.3-1.2S20.3 21 22 21"/>', 1.5),
+  /** Hangar med fly (eiendeler) */
+  hangar: svg('<path d="M3 21V10l9-5 9 5v11"/><path d="M6.5 21v-7h11v7"/><path d="M12 15v4M9.5 17.5h5"/><circle cx="10" cy="19.5" r=".6"/><circle cx="14" cy="19.5" r=".6"/>', 1.5),
   /** Oljedråpe */
   drop: svg('<path d="M12 3s-6.5 7.2-6.5 11.5a6.5 6.5 0 0 0 13 0C18.5 10.2 12 3 12 3Z"/><path d="M9 15a3 3 0 0 0 3 3"/>', 1.6),
 };
