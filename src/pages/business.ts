@@ -122,9 +122,8 @@ import {
   type ActivityId,
 } from '../game/football';
 import { leagueById } from '../game/footballData';
-import { buyMine, buyTool, miningOf, ownedMine, sellMineral, upgradeStorage, type MinePay } from '../game/mine';
-import { mineById, mineralById, toolById, type MineralId } from '../game/mineData';
-import { renderMine, renderMineDetail, renderMines, renderResource, renderTools } from './mineViews';
+import { buyPlatform, buyUpgrade, nextPlatform, oilOf, ownedPlatform, platformById, selectPlatform, sellOil, storageHours, upgradeStorage, UPGRADES, type OilPay } from '../game/oil';
+import { renderOilDetail, renderPlatform } from './oilViews';
 import {
   airlineOf,
   buyLicense,
@@ -219,10 +218,7 @@ type View =
   | { name: 'fTraining'; id: string }
   | { name: 'fTrophies'; id: string }
   | { name: 'fHistory'; id: string }
-  | { name: 'mMine'; id: string; mine: string }
-  | { name: 'mTools'; id: string; mine: string }
-  | { name: 'mMines'; id: string }
-  | { name: 'mRes'; id: string; res: MineralId }
+  | { name: 'oPlat'; id: string; plat: string }
   | { name: 'aRegion'; id: string; cont: ContinentId }
   | { name: 'aHubs'; id: string; cont: ContinentId }
   | { name: 'aFleet'; id: string }
@@ -240,7 +236,7 @@ export const CATEGORY_ICON: Record<BusinessCategoryId, string> = {
   it: icons.monitor,
   bank: icons.bank,
   football: icons.pitch,
-  mine: icons.pickaxe,
+  oil: icons.rig,
   airline: icons.plane,
 };
 
@@ -254,8 +250,8 @@ export function createBusinessPage(state: GameState): Page {
   let stack: View[] = [{ name: 'home' }];
   const current = () => stack[stack.length - 1];
   const find = (id: string) => state.businesses.find((b) => b.id === id);
-  /** Gruveselskapet betaler på samme måte som bilforhandleren (gruver og lager blir en del av bedriftens verdi). */
-  const minePay = (b: Business): MinePay => dealerPay(state, b);
+  /** Oljeselskapet betaler på samme måte som bilforhandleren (plattformer og oppgraderinger blir en del av bedriftens verdi). */
+  const oilPay = (b: Business): OilPay => dealerPay(state, b);
   /** Flyselskapet: som fotballklubben (ledige fly selges uten skatt). */
   const airPay = (b: Business): AirlinePay => footballPay(state, b);
 
@@ -282,8 +278,8 @@ export function createBusinessPage(state: GameState): Page {
   /** Fotballklubb: "trykk igjen" for å selge en spiller / trekke laget fra turneringen. */
   let confirmSell = false;
   let confirmLeave = false;
-  /** Gruveselskap: hvilken knapp som venter på "trykk igjen" (f.eks. "buy:kiruna", "tool:wheel"). */
-  let mineConfirm: string | null = null;
+  /** Oljeselskap: hvilken knapp som venter på "trykk igjen" ("buy" eller "up:pumps"). */
+  let oilConfirm: string | null = null;
   /** Flyselskap: "trykk igjen" for å selge ledige fly. */
   let airSellConfirm = false;
   /** Vinduet "Kjøp plasser til bedrifter" er åpent. */
@@ -336,7 +332,7 @@ export function createBusinessPage(state: GameState): Page {
         else if (engineOf(b) === 'it') element.innerHTML = renderItDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'bank') element.innerHTML = renderBankDetail(state, b, heroHtml(b));
         else if (engineOf(b) === 'football') element.innerHTML = renderFootballDetail(state, b, heroHtml(b));
-        else if (engineOf(b) === 'mine') element.innerHTML = renderMineDetail(state, b, heroHtml(b));
+        else if (engineOf(b) === 'oil') element.innerHTML = renderOilDetail(state, b, heroHtml(b), oilConfirm === 'buy');
         else if (engineOf(b) === 'airline') element.innerHTML = renderAirlineDetail(state, b, heroHtml(b));
         else element.innerHTML = renderDetail(b);
         break;
@@ -428,26 +424,15 @@ export function createBusinessPage(state: GameState): Page {
         element.innerHTML = b ? backBtn + renderSkills(b) : '';
         break;
       }
-      // --- Gruveselskap ---
-      case 'mMine':
-      case 'mTools': {
+      // --- Oljeselskap ---
+      case 'oPlat': {
         const b = find(view.id);
-        const m = b && ownedMine(b, view.mine);
-        if (!b || !m) {
+        const p = b && ownedPlatform(oilOf(b), view.plat);
+        if (!b || !p) {
           stack.pop();
           return renderView();
         }
-        element.innerHTML = backBtn + (view.name === 'mMine' ? renderMine(state, b, m) : renderTools(state, b, m, mineConfirm));
-        break;
-      }
-      case 'mMines': {
-        const b = find(view.id);
-        element.innerHTML = b ? backBtn + renderMines(state, b, mineConfirm) : '';
-        break;
-      }
-      case 'mRes': {
-        const b = find(view.id);
-        element.innerHTML = b ? backBtn + renderResource(state, b, view.res) : '';
+        element.innerHTML = backBtn + renderPlatform(state, b, p, oilConfirm);
         break;
       }
       // --- Flyselskap ---
@@ -688,7 +673,7 @@ export function createBusinessPage(state: GameState): Page {
     if (action !== 'i-fire') confirmFire = false;
     if (action !== 'f-sell') confirmSell = false;
     if (action !== 'f-leave') confirmLeave = false;
-    if (action !== 'm-buy' && action !== 'm-tool') mineConfirm = null;
+    if (action !== 'o-buy' && action !== 'o-up') oilConfirm = null;
     if (action !== 'a-sell') airSellConfirm = false;
 
     switch (action) {
@@ -908,75 +893,81 @@ export function createBusinessPage(state: GameState): Page {
       case 'd-skills':
         return go({ name: 'dSkills', id });
 
-      // --- Gruveselskap ---
-      case 'm-mine':
-        return go({ name: 'mMine', id, mine: target.dataset.mine! });
-      case 'm-mines':
-        return go({ name: 'mMines', id });
-      case 'm-tools':
-        return go({ name: 'mTools', id, mine: target.dataset.mine! });
-      case 'm-res':
-        return go({ name: 'mRes', id, res: target.dataset.res as MineralId });
-      case 'm-buy': {
+      // --- Oljeselskap ---
+      case 'o-plat':
+        return go({ name: 'oPlat', id, plat: target.dataset.plat! });
+      case 'o-use': {
         const b = find(id);
-        const mineId = target.dataset.mine!;
+        const plat = target.dataset.plat!;
+        if (!b || selectPlatform(b, plat) !== 'ok') return;
+        showToast(`${platformById(plat).name} pumper nå olje`);
+        return render();
+      }
+      case 'o-buy': {
+        const b = find(id);
         if (!b) return;
-        // Trykk to ganger for å kjøpe (det er dyrt)
-        if (mineConfirm !== `buy:${mineId}`) {
-          mineConfirm = `buy:${mineId}`;
-          return render();
+        const s = oilOf(b);
+        if (s.building) {
+          shake(target);
+          return showToast('Vent til plattformen som bygges er ferdig');
         }
-        mineConfirm = null;
-        const result = buyMine(b, minePay(b), mineId);
-        if (result === 'money') {
+        const next = nextPlatform(s);
+        if (!next) return;
+        if (state.balance < next.price) {
           shake(target);
           return showToast('Du har ikke nok penger');
         }
-        if (result !== 'ok') return render();
-        showToast(`Du kjøpte ${mineById(mineId).name}! Kjøp et graveverktøy til den.`, 4000);
-        stack = [{ name: 'home' }, { name: 'detail', id }, { name: 'mMine', id, mine: mineId }];
-        render();
-        window.scrollTo(0, 0);
-        return;
-      }
-      case 'm-tool': {
-        const b = find(id);
-        const mineId = target.dataset.mine!;
-        const toolId = target.dataset.tool!;
-        if (!b) return;
-        const key = `tool:${toolId}`;
-        if (mineConfirm !== key) {
-          mineConfirm = key;
+        // Trykk to ganger for å kjøpe (det er dyrt)
+        if (oilConfirm !== 'buy') {
+          oilConfirm = 'buy';
           return render();
         }
-        mineConfirm = null;
-        const result = buyTool(b, minePay(b), mineId, toolId);
+        oilConfirm = null;
+        const result = buyPlatform(b, oilPay(b));
         if (result !== 'ok') {
           shake(target);
           return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Det gikk ikke');
         }
-        showToast(`${toolById(toolId).name} graver i ${mineById(mineId).name}`);
-        return back();
-      }
-      case 'm-sell': {
-        const b = find(id);
-        if (!b) return;
-        const res = target.dataset.res as MineralId;
-        const gross = sellMineral(b, minePay(b), res, Number(target.dataset.share));
-        if (gross <= 0) return showToast('Ingenting på lager');
-        showToast(`Solgt ${mineralById(res).name.toLowerCase()} for ${formatMoney(gross)}`);
+        showToast(`${next.name} bygges! Ferdig om ${next.buildHours} timer.`, 4000);
         return render();
       }
-      case 'm-storage': {
+      case 'o-up': {
         const b = find(id);
         if (!b) return;
-        const res = target.dataset.res as MineralId;
-        const result = upgradeStorage(b, minePay(b), res);
+        const plat = target.dataset.plat!;
+        const up = target.dataset.up!;
+        const key = `up:${up}`;
+        if (oilConfirm !== key) {
+          oilConfirm = key;
+          return render();
+        }
+        oilConfirm = null;
+        const result = buyUpgrade(b, oilPay(b), plat, up);
         if (result !== 'ok') {
           shake(target);
-          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Lageret er fullt utbygd');
+          return showToast(result === 'money' ? 'Du har ikke nok penger' : 'Det gikk ikke');
         }
-        showToast(`Lageret for ${mineralById(res).name.toLowerCase()} er bygd ut`);
+        showToast(`${UPGRADES.find((u) => u.id === up)!.name}: +10 % olje på ${platformById(plat).name}`);
+        return render();
+      }
+      case 'o-sell': {
+        const b = find(id);
+        if (!b) return;
+        const gross = sellOil(b, oilPay(b), Number(target.dataset.share));
+        if (gross <= 0) return showToast('Ingen olje på lager');
+        showToast(`Solgt olje for ${formatMoney(gross)}`);
+        return render();
+      }
+      case 'o-storage': {
+        const b = find(id);
+        if (!b) return;
+        const hours = storageHours(oilOf(b).level);
+        const result = upgradeStorage(b);
+        if (result !== 'ok') {
+          shake(target);
+          return showToast(result === 'busy' ? 'Lageret bygges allerede ut' : 'Lageret er fullt utbygd');
+        }
+        showToast(`Lageret bygges ut – ferdig om ${hours} ${hours === 1 ? 'time' : 'timer'}`);
         return render();
       }
 
@@ -1631,9 +1622,9 @@ export function createBusinessPage(state: GameState): Page {
     if (engineOf(b) === 'fleet') return `<span>${CATEGORY_ICON[t.category]} ${carsOf(b).length}/${capacityOf(b)}</span>`;
     if (engineOf(b) === 'build') return `<span>${icons.clockDashed} ${underConstruction(b).length} under bygging · ${readyForSale(b).length} klare</span>`;
     if (engineOf(b) === 'dealer') return `<span>${icons.wrench} ${inService(b).length} på verkstedet · ${forSale(b).length} til salgs</span>`;
-    if (engineOf(b) === 'mine') {
-      const n = miningOf(b).mines.length;
-      return `<span>${icons.pickaxe} ${n} ${n === 1 ? 'gruve' : 'gruver'}</span>`;
+    if (engineOf(b) === 'oil') {
+      const o = oilOf(b);
+      return `<span>${icons.rig} ${platformById(o.active).name}</span>${o.building ? `<span>${icons.hourglass} Bygger</span>` : ''}`;
     }
     if (engineOf(b) === 'airline') {
       const a = airlineOf(b);
@@ -1857,7 +1848,7 @@ export function createBusinessPage(state: GameState): Page {
       confirmFire = false;
       confirmSell = false;
       confirmLeave = false;
-      mineConfirm = null;
+      oilConfirm = null;
       slotsOpen = false;
       procureFor = null;
       render();

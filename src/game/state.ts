@@ -119,8 +119,7 @@ export function loadState(): GameState {
     const saved = JSON.parse(raw) as Partial<GameState>;
     const state = { ...baseState(), ...saved } as GameState;
     // Gamle lagringer (før bedriftsplasser fantes) beholder alle bedriftene sine
-    if (saved.businessSlots === undefined) state.businessSlots = Math.max(5, state.businesses.length);
-    ensureMarket(state, Date.now());
+    if (saved.businessSlots === undefined) state.businessSlots = Math.max(5, state.businesses.length);    ensureMarket(state, Date.now());
     ensureCrypto(state, Date.now());
     // Gamle lagringer kan ha høyere nivå enn dagens maks
     state.clickLevel = Math.max(1, Math.min(MAX_LEVEL, Math.floor(state.clickLevel) || 1));

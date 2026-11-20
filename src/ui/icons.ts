@@ -257,4 +257,8 @@ export const icons = {
   filePlus: svg('<path d="M13 3H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h4"/><path d="M13 3l5 5v3"/><path d="M13 3v5h5"/><path d="M8.5 10h5M8.5 13.5h3"/><circle cx="17" cy="17" r="4"/><path d="M17 15v4M15 17h4"/>', 1.5),
   /** Pluss i en firkant (kjøp flere) */
   plusBox: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M12 8v8M8 12h8"/>', 1.7),
+  /** Oljeplattform på havet (oljeselskap) */
+  rig: svg('<path d="M3 13h18"/><path d="M6 13v5M12 13v5M18 13v5"/><path d="M5 13V9h7v4"/><path d="M15 13V3l3 4v6"/><path d="M15 6h3"/><path d="M2 21c1.7 0 1.7-1.2 3.3-1.2S7 21 8.7 21s1.7-1.2 3.3-1.2 1.7 1.2 3.3 1.2 1.7-1.2 3.3-1.2S20.3 21 22 21"/>', 1.5),
+  /** Oljedråpe */
+  drop: svg('<path d="M12 3s-6.5 7.2-6.5 11.5a6.5 6.5 0 0 0 13 0C18.5 10.2 12 3 12 3Z"/><path d="M9 15a3 3 0 0 0 3 3"/>', 1.6),
 };

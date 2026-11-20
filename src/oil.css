@@ -1,0 +1,842 @@
+/* =========================================================================
+ * OLJESELSKAP (src/pages/oilViews.ts) – mørk petrol og rent, som flyselskapet
+ * ========================================================================= */
+.cat-petrol {
+  background: linear-gradient(115deg, #2a8f97, #155760 55%, #0b2a30);
+}
+
+.biz-hero.cat-petrol,
+.biz-hero.cat-petrol .biz-hero-icon,
+.business .biz-hero.cat-petrol .biz-hero-btn,
+.biz-icon.cat-petrol {
+  color: #fff;
+}
+
+.business[data-theme='oil'] {
+  --oil: #1d7f88;
+  --oil-dark: #0f3c43;
+  --oil-soft: #e6f3f4;
+  --oil-card: #f3f6f7;
+  --oil-amber: #f0b44c;
+  --oil-red: #d8465a;
+  --oil-green: #2f9e57;
+}
+
+/* Lavere topp (som flyselskapet) */
+.business[data-theme='oil'] .biz-hero {
+  padding-bottom: 46px;
+}
+
+.business[data-theme='oil'] .biz-income-card {
+  margin-top: -28px;
+}
+
+.oil-sub {
+  margin: 14px 0 18px;
+  color: #3a4252;
+  font-size: 16px;
+  text-align: center;
+}
+
+.oil-sub b {
+  font-weight: 600;
+}
+
+.oil-up {
+  color: var(--oil-green);
+}
+
+.oil-down {
+  color: var(--oil-red);
+}
+
+.oil-muted {
+  margin: 8px 0 0;
+  color: #6b7383;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.oil-muted.center {
+  margin: -6px 0 14px;
+  text-align: center;
+}
+
+.oil-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 34px 0 14px;
+  color: var(--oil);
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.oil-head svg {
+  width: 26px;
+  height: 26px;
+}
+
+.oil-card {
+  padding: 18px;
+  border-radius: 24px;
+  background: var(--oil-card);
+}
+
+.oil-bar {
+  height: 10px;
+  margin-top: 10px;
+  border-radius: 99px;
+  background: #dbe3e6;
+  overflow: hidden;
+}
+
+.oil-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--oil);
+  transition: width 0.4s;
+}
+
+.oil-bar.full span {
+  background: var(--oil-red);
+}
+
+/* Knapper */
+.business .oil-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 17px;
+  border-radius: 20px;
+  background: var(--oil);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.business .oil-soft-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--oil-soft);
+  color: var(--oil);
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.business .oil-soft-btn svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.oil-soft-btn span {
+  display: flex;
+  flex-direction: column;
+}
+
+.oil-soft-btn small {
+  color: #5d8f95;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.business .oil-pill-btn {
+  flex-shrink: 0;
+  padding: 13px 28px;
+  border-radius: 999px;
+  background: var(--oil);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.business .oil-pill-btn.small {
+  padding: 10px 20px;
+  font-size: 15px;
+}
+
+.business .oil-pill-btn.off {
+  opacity: 0.45;
+}
+
+.business .oil-pill-btn.confirm {
+  background: var(--oil-amber);
+  color: #1c2230;
+  opacity: 1;
+}
+
+/* Varsel: fullt lager */
+.oil-alert {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 20px;
+  background: #fdeced;
+  color: var(--oil-red);
+}
+
+.oil-alert svg {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.oil-alert div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.oil-alert strong {
+  font-size: 16px;
+}
+
+.oil-alert span {
+  color: #7a5a55;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* --- Forsiden: plattformen i drift (stort bilde) --- */
+.business .oil-hero-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 300px;
+  margin-top: 24px;
+  border-radius: 28px;
+  overflow: hidden;
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 10px 26px rgba(10, 40, 50, 0.22);
+}
+
+.oil-hero-card > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.oil-hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(5, 25, 30, 0.35), transparent 30%, transparent 45%, rgba(5, 30, 36, 0.92));
+}
+
+.oil-live {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--oil-dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.oil-live i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--oil-green);
+  animation: oil-pulse 1.6s infinite;
+}
+
+.oil-live.off i {
+  background: var(--oil-red);
+  animation: none;
+}
+
+@keyframes oil-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(47, 158, 87, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 9px rgba(47, 158, 87, 0);
+  }
+}
+
+.oil-hero-text {
+  position: absolute;
+  inset: auto 18px 84px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oil-hero-text strong {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.oil-hero-text span {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.oil-hero-stats {
+  position: absolute;
+  inset: auto 12px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.oil-hero-stats div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  align-items: center;
+  padding: 9px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+}
+
+.oil-hero-stats svg {
+  grid-row: span 2;
+  width: 22px;
+  height: 22px;
+  color: var(--oil-amber);
+}
+
+.oil-hero-stats b {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.oil-hero-stats small {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* --- Lager --- */
+.oil-store {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.oil-store div {
+  display: flex;
+  flex-direction: column;
+}
+
+.oil-store strong {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.oil-store div span {
+  color: #6b7383;
+  font-size: 14px;
+}
+
+.oil-level {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--oil-soft);
+  color: var(--oil);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.oil-worth {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e1e7ea;
+}
+
+.oil-worth span {
+  color: #6b7383;
+  font-size: 15px;
+}
+
+.oil-worth b {
+  font-size: 19px;
+}
+
+.oil-sell-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.business .oil-sell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 13px 4px;
+  border-radius: 18px;
+  background: var(--oil);
+  color: #fff;
+}
+
+.business .oil-sell:disabled {
+  opacity: 0.4;
+}
+
+.oil-sell strong {
+  font-size: 15px;
+}
+
+.oil-sell span {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.oil-upgrading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #fff6e3;
+  color: #a46d12;
+}
+
+.oil-upgrading svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.oil-upgrading div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oil-upgrading strong {
+  font-size: 16px;
+}
+
+.oil-upgrading span {
+  color: #7d6a4a;
+  font-size: 13px;
+}
+
+.oil-card > .oil-muted.center:last-child {
+  margin: 14px 0 0;
+}
+
+/* --- Oljepris --- */
+.oil-price {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.oil-price div {
+  display: flex;
+  flex-direction: column;
+}
+
+.oil-price strong {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.oil-price span {
+  color: #6b7383;
+  font-size: 13px;
+}
+
+.oil-price-change {
+  align-items: flex-end;
+}
+
+.oil-price-change b {
+  font-size: 18px;
+}
+
+.oil-minmax {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.oil-minmax div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.oil-minmax span {
+  color: #8a92a1;
+  font-size: 12px;
+}
+
+.oil-minmax b {
+  font-size: 14px;
+}
+
+/* --- Plattformene --- */
+.oil-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oil-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border: 2px solid transparent;
+  border-radius: 22px;
+  background: var(--oil-card);
+}
+
+.oil-row.active {
+  border-color: var(--oil);
+  background: var(--oil-soft);
+}
+
+.oil-row.next {
+  border-color: #cfe3e6;
+  background: #fff;
+}
+
+.oil-row.locked {
+  opacity: 0.55;
+}
+
+.oil-row.locked .oil-row-photo img {
+  filter: grayscale(1);
+}
+
+.business .oil-row-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-align: left;
+}
+
+.oil-row-photo {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #d5dde0;
+}
+
+.oil-row-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.oil-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.oil-row-text strong {
+  font-size: 17px;
+}
+
+.oil-row-text span {
+  color: #6b7383;
+  font-size: 13px;
+}
+
+.oil-row-text small {
+  margin-top: 3px;
+  color: var(--oil);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.oil-row-text .oil-bar {
+  height: 7px;
+  margin-top: 6px;
+}
+
+.oil-row.building .oil-row-text small {
+  color: #a46d12;
+}
+
+.oil-row.building .oil-bar span {
+  background: var(--oil-amber);
+}
+
+.oil-chip {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--oil);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.oil-chip.soft {
+  padding: 8px;
+  background: #fff6e3;
+  color: #a46d12;
+}
+
+.oil-chip svg {
+  width: 20px;
+  height: 20px;
+}
+
+.oil-lock {
+  display: flex;
+  flex-shrink: 0;
+  color: #8a92a1;
+}
+
+.oil-lock svg {
+  width: 22px;
+  height: 22px;
+}
+
+.oil-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.oil-buy b {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.oil-help {
+  margin-top: 26px;
+  padding: 18px;
+  border-radius: 22px;
+  background: var(--oil-card);
+}
+
+.oil-help h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.oil-help p {
+  margin: 0 0 8px;
+  color: #5b6474;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.oil-help p:last-child {
+  margin: 0;
+}
+
+/* --- Én plattform --- */
+.business[data-view='oPlat'] {
+  padding-top: 0;
+}
+
+.business[data-view='oPlat'] .biz-back {
+  background: transparent;
+  color: #fff;
+}
+
+body.scrolled .business[data-view='oPlat'] .biz-back {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+}
+
+.oil-banner {
+  position: relative;
+  height: 280px;
+  margin: 0 -18px;
+  border-radius: 0 0 50% 50% / 0 0 34px 34px;
+  overflow: hidden;
+}
+
+.oil-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.oil-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent 35%, rgba(6, 30, 36, 0.85));
+}
+
+.oil-banner-text {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: #fff;
+}
+
+.oil-banner-text h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.business[data-theme='oil'] .oil-income {
+  margin-top: -44px;
+}
+
+.oil-active-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 0;
+  color: var(--oil-green);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.oil-active-note svg {
+  width: 22px;
+  height: 22px;
+}
+
+.oil-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.oil-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--oil-card);
+}
+
+.oil-stats span {
+  color: #8a92a1;
+  font-size: 13px;
+}
+
+.oil-stats b {
+  font-size: 16px;
+}
+
+.oil-up-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  background: var(--oil-card);
+}
+
+.oil-up-card.done {
+  background: var(--oil-soft);
+}
+
+.oil-up-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--oil);
+}
+
+.oil-up-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.oil-up-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.oil-up-text strong {
+  font-size: 16px;
+}
+
+.oil-up-text span {
+  color: #6b7383;
+  font-size: 13px;
+}
+
+.oil-up-text b {
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.oil-done {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--oil);
+  color: #fff;
+}
+
+.oil-done svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mangler et bilde, vises en rolig petrolfarge i stedet */
+.business .oil-hero-card,
+.oil-banner,
+.oil-row-photo {
+  background: linear-gradient(160deg, #3d9aa2, #155760 60%, #0b2a30);
+}
