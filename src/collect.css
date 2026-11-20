@@ -1,0 +1,568 @@
+/* =========================================================================
+ * SAMLINGER (cl-), MERKER (bd-) og NFT (nft-) – src/pages/collectViews.ts
+ * Vises inne på Eiendeler-siden (.items).
+ * ========================================================================= */
+.ei-section {
+  margin: 0 0 16px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.cl-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.items .cl-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 16px 10px 18px;
+  border-radius: 24px;
+  background: #eef1f6;
+}
+
+.cl-tile-img {
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 92px;
+  margin-bottom: 8px;
+}
+
+.cl-tile-img img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(20, 30, 60, 0.2));
+}
+
+.cl-tile strong {
+  font-size: 18px;
+}
+
+.cl-tile > span:last-child {
+  color: #7a8291;
+  font-size: 15px;
+}
+
+.items .cl-wide {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  padding: 20px 24px;
+  border-radius: 24px;
+  background: #eef1f6;
+  text-align: left;
+}
+
+.cl-wide div {
+  display: flex;
+  flex-direction: column;
+}
+
+.cl-wide strong {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.cl-wide div span {
+  color: #7a8291;
+  font-size: 17px;
+}
+
+.bd-medal {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe08a, #d39b22 70%);
+  color: #7a4a06;
+  box-shadow: 0 0 0 5px #f1c95b, 0 8px 14px rgba(120, 70, 0, 0.25);
+}
+
+.bd-medal svg {
+  width: 40px;
+  height: 40px;
+}
+
+.nft-frame {
+  display: block;
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #6b4f55;
+  box-shadow: inset 0 0 0 3px #4d3a3f;
+}
+
+.nft-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.items .cl-islands {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e3edf8, #f3f6fb);
+}
+
+.cl-islands-art {
+  display: grid;
+  place-items: center;
+  height: 140px;
+}
+
+.cl-islands-art svg {
+  width: 190px;
+}
+
+.cl-islands b {
+  display: block;
+  padding: 12px;
+  background: linear-gradient(90deg, #6fe39b, #2f7a6e 55%, #1c2f40);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* --- Faner (Marked / Min samling) --- */
+.cl-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 -18px 18px;
+  border-bottom: 1px solid #e3e6ec;
+}
+
+.items .cl-tabs button {
+  padding: 12px 0 14px;
+  border-bottom: 3px solid transparent;
+  color: #4b5262;
+  font-size: 18px;
+}
+
+.items .cl-tabs button.active {
+  border-bottom-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.cl-empty {
+  margin: 10px 4px;
+  color: #7a8291;
+  font-size: 16px;
+  text-align: center;
+}
+
+.cl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cl-list.row {
+  gap: 0;
+}
+
+/* Store kort: mynter, malerier, unike ting, veteranbiler */
+.items .cl-card {
+  display: block;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #eef1f6;
+  text-align: left;
+}
+
+.cl-card-img {
+  display: grid;
+  place-items: center;
+  height: 240px;
+  padding: 18px;
+  background: linear-gradient(160deg, #36536a, #1c2a38);
+  border-bottom: 2px solid #3b82f6;
+}
+
+.cl-card-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.35));
+}
+
+.cl-card.retro .cl-card-img {
+  padding: 0;
+}
+
+.cl-card.retro .cl-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: none;
+}
+
+.cl-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px 22px;
+}
+
+.cl-card-text strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.cl-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cl-price svg {
+  width: 22px;
+  height: 22px;
+  color: #3b82f6;
+}
+
+.cl-price b {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Rader: smykker og frimerker */
+.items .cl-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 10px 0;
+  text-align: left;
+}
+
+.cl-row-img {
+  flex-shrink: 0;
+  width: 116px;
+  height: 96px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef1f6;
+}
+
+.cl-row-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cl-row div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  align-self: stretch;
+  border-bottom: 1px solid #e3e6ec;
+}
+
+.cl-row strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* --- Én ting --- */
+.cl-hero {
+  display: grid;
+  place-items: center;
+  height: 300px;
+  margin: 0 -18px;
+  padding: 56px 20px 18px;
+  border-bottom: 3px solid #3b82f6;
+}
+
+.cl-hero img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.cl-hero.retro {
+  background: linear-gradient(180deg, #2b3550, #c9d0da);
+  border-bottom: 0;
+}
+
+.cl-hero.retro img {
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cl-item-body {
+  padding-top: 18px;
+}
+
+.cl-item-name {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.cl-coll-name {
+  margin: 4px 0 0;
+  color: #7a8291;
+  font-size: 15px;
+}
+
+.cl-line {
+  margin: 18px 0;
+  border: 0;
+  border-top: 1px solid #e3e6ec;
+}
+
+.cl-label {
+  margin: 0;
+  color: #3a4252;
+  font-size: 18px;
+}
+
+.cl-big {
+  margin: 6px 0 22px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+/* --- Merker --- */
+.bd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.items .bd-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 112px;
+  text-align: left;
+}
+
+.items .bd-row::before {
+  content: '';
+  position: absolute;
+  inset: 16px 0 16px 50px;
+  border-radius: 24px;
+  background: #eef1f6;
+}
+
+.bd-row div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.bd-row strong {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.bd-got {
+  color: #2f9e57;
+  font-size: 16px;
+}
+
+.bd-ready {
+  color: #e28a1a;
+  font-size: 16px;
+}
+
+.bd-circle {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, var(--a), var(--b));
+  color: #fff;
+}
+
+.bd-circle svg {
+  width: 52px;
+  height: 52px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+}
+
+.bd-circle.big {
+  width: 190px;
+  height: 190px;
+}
+
+.bd-circle.big svg {
+  width: 88px;
+  height: 88px;
+}
+
+.bd-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.bd-page h1 {
+  margin: 22px 0 0;
+  font-size: 28px;
+}
+
+.bd-page .cl-line {
+  width: 100%;
+}
+
+.bd-page .cl-label {
+  align-self: flex-start;
+  font-weight: 700;
+}
+
+.bd-cond {
+  align-self: flex-start;
+  margin: 12px 0 26px;
+  font-size: 17px;
+}
+
+.bd-done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2f9e57;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.bd-done svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* --- NFT --- */
+.nft-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.items .nft-card {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.nft-card .nft-svg {
+  position: absolute;
+  inset: 0;
+}
+
+.nft-eth {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nft-card .nft-eth {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  left: 8px;
+}
+
+.nft-eth i {
+  display: flex;
+  width: 24px;
+  height: 24px;
+}
+
+.nft-eth svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nft-balance {
+  margin: -4px 0 16px;
+  padding-left: 50px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.nft-big {
+  aspect-ratio: 1;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.nft-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.nft-head h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.nft-head div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  color: #8a92a1;
+}
+
+.nft-head .nft-eth {
+  background: #eef1f6;
+  color: var(--text);
+  font-size: 18px;
+}
+
+.nft-text {
+  margin: 0 0 22px;
+  font-size: 17px;
+}
+
+/* Faste maks-høyder (prosent virker ikke i et grid uten fast rad) */
+.cl-tile-img img {
+  max-width: 108px;
+  max-height: 92px;
+}
+
+.cl-card-img img {
+  max-height: 204px;
+}
+
+.cl-card.retro .cl-card-img img {
+  max-height: none;
+  height: 240px;
+}
+
+.cl-hero img {
+  max-height: 226px;
+}

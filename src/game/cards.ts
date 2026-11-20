@@ -4,6 +4,7 @@ import { cryptoSummary } from './crypto';
 import { realEstateSummary } from './realEstate';
 import type { GameState } from './state';
 import { itemsValue } from './items';
+import { collectionsValue } from './collections';
 
 /*
  * BANKKORT
@@ -117,7 +118,7 @@ export function cardById(id: string): CardDef {
 
 /** Verdien av eiendelene dine (biler, fly og yachter – det du får ved å selge dem). */
 export function assetsValue(state: GameState): number {
-  return itemsValue(state.assets);
+  return itemsValue(state.assets) + collectionsValue(state);
 }
 
 /** Formue = saldo + aksjer + krypto + bedrifter (kapitalisering) + eiendeler. */

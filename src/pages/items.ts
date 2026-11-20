@@ -23,6 +23,10 @@ import type { GameState } from '../game/state';
 import { formatMoney, formatMoneyFull, formatMoneyWhole } from '../ui/format';
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
+import { COLLECTIONS, buyCollItem, buyNft, collItem, receiveBadge, sellCollItem, badgeById } from '../game/collections';
+import { nftById } from '../game/nft';
+import { fortune } from '../game/cards';
+import { renderBadge, renderBadges, renderCollectHome, renderCollItem, renderCollection, renderNft, renderNfts, type CollTab } from './collectViews';
 import { html, type Page } from './page';
 
 /*
@@ -43,7 +47,13 @@ type View =
   | { name: 'item'; uid: string }
   | { name: 'shop'; kind: ItemKind }
   | { name: 'buy'; id: string; a: number; b: number; place: string }
-  | { name: 'places'; uid?: string };
+  | { name: 'places'; uid?: string; islands?: boolean }
+  | { name: 'coll'; id: string; tab: CollTab }
+  | { name: 'citem'; id: string }
+  | { name: 'badges' }
+  | { name: 'badge'; id: string }
+  | { name: 'nft'; tab: 'buy' | 'mine' }
+  | { name: 'nftitem'; id: string };
 
 const ROOM: Record<ItemKind, { title: string; empty: string; shop: string }> = {
   car: { title: 'Garasje', empty: 'Du har ingen biler ennå.', shop: 'Bilbutikk' },
@@ -67,7 +77,7 @@ const keep: HTMLImageElement[] = [];
 function preloadImages() {
   if (preloaded) return;
   preloaded = true;
-  const urls = [...ALL_ITEMS.map((d) => d.image), ...PLACES.map((p) => `items/places/${p.id}.jpg`)];
+  const urls = [...ALL_ITEMS.map((d) => d.image), ...PLACES.map((p) => `items/places/${p.id}.jpg`), ...COLLECTIONS.flatMap((c) => c.items.map((i) => i.image))];
   for (const url of urls) {
     const im = new Image();
     im.decoding = 'async';
@@ -144,7 +154,9 @@ export function createItemsPage(state: GameState): Page {
           <span>${icons.yacht}${ownedOfKind(s, 'yacht').length}</span>
         </div>
       </div>
-      <p class="ei-note">Eiendelene gir ingen inntekt – de er for moro skyld, men teller med i formuen din.</p>`;
+      <p class="ei-note">Eiendelene gir ingen inntekt – de er for moro skyld, men teller med i formuen din.</p>
+      <hr class="ei-sep" />
+      ${renderCollectHome(state)}`;
   }
 
   // =========================================================================
@@ -289,8 +301,8 @@ export function createItemsPage(state: GameState): Page {
   // =========================================================================
   // Plasseringer (yacht)
   // =========================================================================
-  function renderPlaces(uid?: string): string {
-    const chosen = uid ? state.assets.items.find((o) => o.uid === uid)?.place : buyView()?.place;
+  function renderPlaces(uid?: string, islands = false): string {
+    const chosen = islands ? undefined : uid ? state.assets.items.find((o) => o.uid === uid)?.place : buyView()?.place;
     const cards = PLACES.map((p) => {
       const owned = ownsPlace(state.assets, p.id);
       const isChosen = chosen === p.id;
@@ -301,7 +313,9 @@ export function createItemsPage(state: GameState): Page {
           <div class="ei-place-foot">
             ${
               owned
-                ? isChosen
+                ? islands
+                  ? `<span class="ei-chosen">${icons.check} Din</span>`
+                  : isChosen
                   ? `<span class="ei-chosen">${icons.check} Valgt</span>`
                   : `<button class="ei-pill" data-action="pick-place" data-place="${p.id}">Velg</button>`
                 : `<b>${formatMoneyWhole(p.price)}</b><button class="ei-pill ${state.balance >= p.price ? '' : 'off'}" data-action="buy-place" data-place="${p.id}">Kjøp</button>`
@@ -310,8 +324,8 @@ export function createItemsPage(state: GameState): Page {
         </div>`;
     }).join('');
     return `
-      <div class="ei-head two"><h1>Yachtens plassering</h1><span>Saldo: <b data-balance>${formatMoneyFull(state.balance)}</b></span></div>
-      <p class="ei-note">Et sted du kjøper, kan brukes av alle yachtene dine – også dem du kjøper senere.</p>
+      <div class="ei-head two"><h1>${islands ? 'Øyer' : 'Yachtens plassering'}</h1><span>Saldo: <b data-balance>${formatMoneyFull(state.balance)}</b></span></div>
+      <p class="ei-note">${islands ? 'Stedene du eier her, kan du også velge som plassering for yachtene dine.' : 'Et sted du kjøper, kan brukes av alle yachtene dine – også dem du kjøper senere.'}</p>
       <div class="ei-list">${cards}</div>`;
   }
 
@@ -354,7 +368,25 @@ export function createItemsPage(state: GameState): Page {
         body = backBtn + renderBuy(v);
         break;
       case 'places':
-        body = backBtn + renderPlaces(v.uid);
+        body = backBtn + renderPlaces(v.uid, v.islands);
+        break;
+      case 'coll':
+        body = backBtn + renderCollection(state, v.id, v.tab);
+        break;
+      case 'citem':
+        body = backBtn + renderCollItem(state, v.id, confirmSell);
+        break;
+      case 'badges':
+        body = backBtn + renderBadges(state, fortune(state));
+        break;
+      case 'badge':
+        body = backBtn + renderBadge(state, v.id, fortune(state));
+        break;
+      case 'nft':
+        body = backBtn + renderNfts(state, v.tab);
+        break;
+      case 'nftitem':
+        body = backBtn + renderNft(state, v.id);
         break;
     }
     const kind = v.name === 'owned' || v.name === 'shop' ? v.kind : v.name === 'buy' ? itemDef(v.id)?.kind : undefined;
@@ -368,11 +400,74 @@ export function createItemsPage(state: GameState): Page {
     if (!target) return;
     const { action } = target.dataset;
     const v = current();
-    if (action !== 'sell') confirmSell = false;
+    if (action !== 'sell' && action !== 'csell') confirmSell = false;
 
     switch (action) {
       case 'back':
         return back();
+      // --- Samlinger, merker, NFT og øyer ---
+      case 'coll':
+        return go({ name: 'coll', id: target.dataset.coll!, tab: 'market' });
+      case 'ctab':
+        if (v.name === 'coll') v.tab = target.dataset.tab === 'a' ? 'market' : 'mine';
+        render();
+        window.scrollTo(0, 0);
+        return;
+      case 'citem':
+        return go({ name: 'citem', id: target.dataset.item! });
+      case 'cbuy': {
+        const id = target.dataset.item!;
+        if (!buyCollItem(state, id)) {
+          shake(target);
+          return showToast('Du har ikke nok penger');
+        }
+        showToast(`Du kjøpte ${collItem(id)!.name}!`);
+        return back();
+      }
+      case 'csell': {
+        const id = target.dataset.item!;
+        if (!confirmSell) {
+          confirmSell = true;
+          return render();
+        }
+        confirmSell = false;
+        const got = sellCollItem(state, id);
+        if (got > 0) showToast(`Solgt for ${formatMoney(got)}`);
+        return back();
+      }
+      case 'badges':
+        return go({ name: 'badges' });
+      case 'badge':
+        return go({ name: 'badge', id: target.dataset.badge! });
+      case 'receive': {
+        const id = target.dataset.badge!;
+        if (!receiveBadge(state, id, fortune(state))) {
+          shake(target);
+          return showToast('Du har ikke nådd målet ennå');
+        }
+        showToast(`Du fikk merket «${badgeById(id)!.name}»!`);
+        return render();
+      }
+      case 'nft':
+        return go({ name: 'nft', tab: 'buy' });
+      case 'ntab':
+        if (v.name === 'nft') v.tab = target.dataset.tab === 'a' ? 'buy' : 'mine';
+        render();
+        window.scrollTo(0, 0);
+        return;
+      case 'nftitem':
+        return go({ name: 'nftitem', id: target.dataset.nft! });
+      case 'nftbuy': {
+        const id = target.dataset.nft!;
+        if (!buyNft(state, id)) {
+          shake(target);
+          return showToast('Du har ikke nok ETH');
+        }
+        showToast(`Du kjøpte ${nftById(id)!.name}!`);
+        return back();
+      }
+      case 'islands':
+        return go({ name: 'places', islands: true });
       case 'owned':
         return go({ name: 'owned', kind: target.dataset.kind as ItemKind, sort: 'desc' });
       case 'shop':
@@ -477,6 +572,10 @@ export function createItemsPage(state: GameState): Page {
         if (el.textContent !== text) el.textContent = text;
       });
       const v = current();
+      if (v.name === 'citem') {
+        const btn = element.querySelector<HTMLElement>('[data-action=cbuy]');
+        if (btn) btn.classList.toggle('off', state.balance < Number(btn.dataset.price));
+      }
       if (v.name === 'buy') {
         const btn = element.querySelector('[data-action=purchase]');
         const def = itemDef(v.id);

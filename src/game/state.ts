@@ -7,6 +7,7 @@ import { createMarket, ensureMarket, type Holding, type MarketState } from './ma
 import { createCrypto, ensureCrypto, type CryptoState } from './crypto';
 import type { OwnedProperty } from './realEstate';
 import type { ItemsState } from './items';
+import type { CollectState } from './collections';
 
 /**
  * Spillets tilstand: alt som skal huskes mellom økter.
@@ -73,6 +74,8 @@ export interface GameState {
 
   // --- Eiendeler (biler, fly og yachter) ---
   assets: ItemsState;
+  /** Samlinger, merker og NFT-er (se collections.ts). */
+  collect?: CollectState;
 }
 
 const SAVE_KEY = 'afk-game-save-v3';

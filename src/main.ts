@@ -11,6 +11,7 @@ import './oil.css';
 import './airline.css';
 import './profile.css';
 import './items.css';
+import './collect.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
 import { removeRetiredBusinesses, tickBusinesses } from './game/business';

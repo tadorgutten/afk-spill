@@ -48,13 +48,14 @@ const car = (id: string, name: string, tier: CarTier, display: number, dir = 'it
   tier,
 });
 /** Fly og yachter er ekte fotografier (ikke utklipp). `info` vises under navnet. */
-const plane = (id: string, name: string, display: number, info: string): ItemDef => ({
+const plane = (id: string, name: string, display: number, info: string, flip = false): ItemDef => ({
   id,
   kind: 'plane',
   name,
   price: shown(display),
   image: `items/planes/${id}.jpg`,
   photo: true,
+  flip,
   info,
 });
 const yacht = (id: string, name: string, display: number, info: string): ItemDef => ({
@@ -175,7 +176,7 @@ export const PLANES: ItemDef[] = [
   plane('g650', 'Gulfstream G650', 68_000_000, 'Privatjet · 19 seter'),
   plane('global7500', 'Bombardier Global 7500', 78_000_000, 'Privatjet · 19 seter'),
   plane('bbj', 'Boeing Business Jet', 95_000_000, 'Privat passasjerfly · 25 seter'),
-  plane('b747', 'Boeing 747-8 BBJ', 400_000_000, 'Jumbojet · privat'),
+  plane('b747', 'Boeing 747-8 BBJ', 400_000_000, 'Jumbojet · privat', true),
   plane('a380', 'Airbus A380', 520_000_000, 'Verdens største passasjerfly'),
 ];
 
