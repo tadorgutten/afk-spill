@@ -566,3 +566,10 @@
 .cl-hero img {
   max-height: 226px;
 }
+
+/* Ikonene på flisene er frilagte bilder (ingen ramme) */
+.cl-tile-img img {
+  border-radius: 0;
+  max-width: 120px;
+  max-height: 92px;
+}

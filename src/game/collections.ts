@@ -51,7 +51,8 @@ function build(id: CollId, name: string, layout: 'card' | 'row', min: number, ma
     const shown = i === 0 ? min : i === n - 1 ? max : nice(min * (max / min) ** (i / (n - 1)));
     return { id: `${id}:${key}`, name: label, price: shown / MONEY_SCALE, image: `collect/${id}/${key}.jpg` };
   });
-  return { id, name, layout, cover: items[Math.min(cover, n - 1)].image, items };
+  void cover;
+  return { id, name, layout, cover: `collect/icons/${id}.png`, items };
 }
 
 export const COLLECTIONS: CollDef[] = [

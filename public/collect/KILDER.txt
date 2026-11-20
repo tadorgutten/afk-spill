@@ -131,3 +131,5 @@ stamps https://en.wikipedia.org/wiki/Penny_Lilac
 jewels https://en.wikipedia.org/wiki/Imperial_Crown_of_the_Holy_Roman_Empire
 jewels https://en.wikipedia.org/wiki/Crown_of_Louis_XV
 jewels https://en.wikipedia.org/wiki/Daria-i-Noor
+
+Ikoner (icons/) fra pngimg.com (CC BY-NC 4.0): coin_PNG36943, palette_PNG68349, star_PNG76931, crown_PNG25, postage_stamp_PNG88946. retro.png = items/cars/mb540k.png
