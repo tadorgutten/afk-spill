@@ -1,0 +1,237 @@
+/* =========================================================================
+ * GULLBARRER: telleren på Inntekt-siden og vinduet for dagens barre
+ * (src/ui/goldBar.ts, src/game/daily.ts)
+ * ========================================================================= */
+.gold-bar {
+  display: block;
+  width: 26px;
+  height: auto;
+  filter: drop-shadow(0 2px 2px rgba(120, 70, 0, 0.35));
+}
+
+/* --- Telleren øverst på Inntekt-siden --- */
+.earn-topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: -6px 0 12px;
+}
+
+.bar-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5b3a00;
+  font-size: 17px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 4px 12px rgba(20, 30, 60, 0.15), inset 0 0 0 2px #ffd84d;
+}
+
+.bar-pill .gold-bar {
+  width: 28px;
+}
+
+.bar-pill.bump {
+  animation: bar-bump 0.6s ease;
+}
+
+@keyframes bar-bump {
+  30% {
+    transform: scale(1.18);
+  }
+}
+
+/* --- Vinduet --- */
+.daily-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 14, 30, 0.6);
+  backdrop-filter: blur(4px);
+  animation: daily-fade 0.25s ease;
+}
+
+.daily-overlay.closing {
+  animation: daily-fade 0.25s ease reverse forwards;
+}
+
+@keyframes daily-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.daily-box {
+  position: relative;
+  width: min(100%, 360px);
+  padding: 26px 24px 24px;
+  border-radius: 32px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 22%, #3a2c6e 0%, #1c1838 55%, #120f26 100%);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 0 0 2px rgba(255, 216, 77, 0.35);
+  animation: daily-pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes daily-pop {
+  from {
+    transform: scale(0.6) translateY(30px);
+    opacity: 0;
+  }
+}
+
+.daily-label {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 216, 77, 0.16);
+  color: #ffd84d;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.daily-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 190px;
+  margin: 6px 0 4px;
+}
+
+/* Lysstråler som snurrer bak barren */
+.daily-rays {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 216, 77, 0.28) 0 10deg, transparent 10deg 30deg);
+  -webkit-mask: radial-gradient(circle, #000 20%, transparent 68%);
+  mask: radial-gradient(circle, #000 20%, transparent 68%);
+  animation: daily-spin 12s linear infinite;
+}
+
+@keyframes daily-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.daily-sparks i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px;
+  border-radius: 50%;
+  background: #ffe68a;
+  box-shadow: 0 0 10px #ffd84d;
+  opacity: 0;
+  animation: daily-spark 1.6s ease-out var(--d) infinite;
+}
+
+@keyframes daily-spark {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 0;
+  }
+}
+
+.gold-bar.big {
+  position: relative;
+  width: 150px;
+  filter: drop-shadow(0 12px 18px rgba(255, 180, 0, 0.45));
+  animation: daily-float 2.4s ease-in-out infinite;
+}
+
+@keyframes daily-float {
+  50% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+}
+
+.daily-plus {
+  position: absolute;
+  right: 50px;
+  top: 26px;
+  color: #ffd84d;
+  font-size: 34px;
+  font-weight: 900;
+  text-shadow: 0 0 16px rgba(255, 200, 40, 0.8);
+  animation: daily-plus 0.9s 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes daily-plus {
+  from {
+    transform: translateY(20px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.daily-box h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.daily-box p {
+  margin: 8px 0 16px;
+  color: #c9c4e6;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.daily-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 15px;
+}
+
+.daily-total b {
+  color: #ffd84d;
+}
+
+.daily-total .gold-bar {
+  width: 24px;
+}
+
+.daily-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffe17a, #f2a612);
+  color: #4a2c00;
+  font: inherit;
+  font-size: 19px;
+  font-weight: 800;
+  box-shadow: 0 6px 0 #b8740a, 0 12px 20px rgba(242, 166, 18, 0.35);
+  cursor: pointer;
+}
+
+.daily-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #b8740a;
+}

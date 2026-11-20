@@ -76,6 +76,11 @@ export interface GameState {
   assets: ItemsState;
   /** Samlinger, merker og NFT-er (se collections.ts). */
   collect?: CollectState;
+
+  // --- Gullbarrer (se daily.ts) ---
+  goldBars: number;
+  /** Siste dag (norsk tid, "ÅÅÅÅ-MM-DD") man fikk dagens gullbarre. */
+  lastBarDay: string;
 }
 
 const SAVE_KEY = 'afk-game-save-v3';
@@ -111,6 +116,8 @@ function baseState(): Omit<GameState, 'market' | 'crypto'> {
     businessSlots: 5,
     slotExpansionEnd: null,
     assets: { items: [], places: [] },
+    goldBars: 0,
+    lastBarDay: '',
   };
 }
 

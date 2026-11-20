@@ -6,6 +6,7 @@ import { formatBalance, formatMoney, formatMoneyRounded, formatMoneyWhole, MONEY
 import { icons } from '../ui/icons';
 import { showToast } from '../ui/toast';
 import { html, type Page } from './page';
+import { goldBarSvg } from '../ui/goldBar';
 
 /**
  * Inntekt: bankkortet med saldo, oppgradering av "per klikk",
@@ -15,6 +16,8 @@ export function createEarningsPage(state: GameState): Page {
   const element = html(`
     <section class="page earnings">
       <div class="earn-header">
+        <!-- Gullbarrer: én for hver dag man åpner appen -->
+        <div class="earn-topbar"><span class="bar-pill" data-bars>${goldBarSvg()}<b data-bar-count>0</b></span></div>
         <!-- Trykk på kortet: gå til "Mine kort" -->
         <button class="card-slot" data-open-cards aria-label="Mine kort"></button>
 
@@ -71,6 +74,8 @@ export function createEarningsPage(state: GameState): Page {
   let balanceEl = q('[data-open-cards]'); // byttes ut når kortet tegnes
   let shownCard = '';
   const perClickEl = q('[data-per-click]');
+  const barPill = q('[data-bars]');
+  const barCountEl = q('[data-bar-count]');
   const levelEl = q('[data-level]');
   const nextEl = q('[data-next]');
   const nextValueEl = q('[data-next-value]');
@@ -236,6 +241,13 @@ export function createEarningsPage(state: GameState): Page {
     },
     update(s) {
       if (cardsOpen) return updateCardList(s);
+
+      // Gullbarrer (spretter litt når tallet øker)
+      const bars = String(s.goldBars ?? 0);
+      if (barCountEl.textContent !== bars) {
+        if (barCountEl.textContent !== '0' || bars !== '0') barPill.classList.remove('bump'), void barPill.offsetWidth, barPill.classList.add('bump');
+        barCountEl.textContent = bars;
+      }
 
       // Valgt kort er byttet: tegn det på nytt
       // Kortet i bruk (faller formuen for lavt, vises det beste kortet man har råd til)

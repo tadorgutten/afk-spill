@@ -11,6 +11,9 @@ import './oil.css';
 import './airline.css';
 import './profile.css';
 import './items.css';
+import './daily.css';
+import { claimDailyBar } from './game/daily';
+import { showDailyBar } from './ui/goldBar';
 import './collect.css';
 import { App } from '@capacitor/app';
 import { checkNewBestCard } from './game/cards';
@@ -90,6 +93,14 @@ if (retiredRefund > 0) {
   saveState(state);
 }
 
+// Dagens gullbarre (første gang appen åpnes i dag, norsk tid): vises når åpningsskjermen er borte
+function checkDailyBar(delay: number) {
+  if (!claimDailyBar(state)) return;
+  saveState(state);
+  setTimeout(() => showDailyBar(state.goldBars), delay);
+}
+checkDailyBar(2600);
+
 // Finn logobilder i public/logos/ (vises automatisk ved neste oppdatering)
 initLogos();
 
@@ -124,6 +135,7 @@ function loop() {
   if (now - lastCardCheck > 1000) {
     lastCardCheck = now;
     checkTaxes(state, now); // har skattefristen gått ut?
+    checkDailyBar(0); // appen kan stå åpen over midnatt
     const card = checkNewBestCard(state);
     if (card) showToast(`Nytt kort låst opp: ${card.name}!`, 4000);
   }
