@@ -30,6 +30,10 @@ export interface ItemDef {
   /** Bildet speilvendes så alle peker samme vei. */
   flip?: boolean;
   tier?: CarTier;
+  /** Ekte fotografi (fyller hele bildeflaten) i stedet for et utklipp. */
+  photo?: boolean;
+  /** Liten tekst under navnet (f.eks. lengden på yachten). */
+  info?: string;
 }
 
 const shown = (display: number) => display / MONEY_SCALE;
@@ -43,21 +47,24 @@ const car = (id: string, name: string, tier: CarTier, display: number, dir = 'it
   flip,
   tier,
 });
-const plane = (id: string, name: string, display: number, flip = false, image = `items/planes/${id}.png`): ItemDef => ({
+/** Fly og yachter er ekte fotografier (ikke utklipp). `info` vises under navnet. */
+const plane = (id: string, name: string, display: number, info: string): ItemDef => ({
   id,
   kind: 'plane',
   name,
   price: shown(display),
-  image,
-  flip,
+  image: `items/planes/${id}.jpg`,
+  photo: true,
+  info,
 });
-const yacht = (id: string, name: string, display: number, flip = false): ItemDef => ({
+const yacht = (id: string, name: string, display: number, info: string): ItemDef => ({
   id,
   kind: 'yacht',
   name,
   price: shown(display),
-  image: `items/yachts/${id}.png`,
-  flip,
+  image: `items/yachts/${id}.jpg`,
+  photo: true,
+  info,
 });
 
 // Grå 20 · lyseblå 20 · mørkeblå 20 · lilla 15 · rød 10 · gul 5
@@ -65,48 +72,48 @@ export const CARS: ItemDef[] = [
   car('granta', 'Lada Granta', 'grey', 2_250, 'cars/'),
   car('logan', 'Renault Logan', 'grey', 2_500, 'cars/', true),
   car('solaris', 'Hyundai Solaris', 'grey', 2_750, 'cars/'),
-  car('picanto', 'Kia Picanto', 'grey', 3_000, 'dealer/'),
+  car('picanto', 'Kia Picanto', 'grey', 3_000, 'dealer/', true),
   car('rio', 'Kia Rio', 'grey', 3_300, 'dealer/', true),
-  car('fiesta', 'Ford Fiesta', 'grey', 3_650, 'dealer/', true),
+  car('fiesta', 'Ford Fiesta', 'grey', 3_650, 'dealer/'),
   car('duster', 'Renault Duster', 'grey', 4_000, 'dealer/'),
   car('polo', 'Volkswagen Polo', 'grey', 4_400, 'dealer/'),
   car('corsa', 'Opel Corsa', 'grey', 4_850, 'dealer/', true),
   car('yaris', 'Toyota Yaris', 'grey', 5_350, 'dealer/'),
-  car('clio', 'Renault Clio', 'grey', 5_900, 'dealer/', true),
-  car('cruze', 'Chevrolet Cruze', 'grey', 6_500, 'dealer/'),
+  car('clio', 'Renault Clio', 'grey', 5_900, 'dealer/'),
+  car('cruze', 'Chevrolet Cruze', 'grey', 6_500, 'dealer/', true),
   car('focus', 'Ford Focus', 'grey', 7_150, 'dealer/'),
-  car('captur', 'Renault Captur', 'grey', 7_850, 'dealer/'),
-  car('astra', 'Opel Astra', 'grey', 8_650, 'dealer/'),
+  car('captur', 'Renault Captur', 'grey', 7_850, 'dealer/', true),
+  car('astra', 'Opel Astra', 'grey', 8_650, 'dealer/', true),
   car('juke', 'Nissan Juke', 'grey', 9_550, 'dealer/'),
   car('corolla', 'Toyota Corolla', 'grey', 10_500, 'dealer/'),
-  car('beetle', 'Volkswagen Beetle', 'grey', 11_500, 'dealer/', true),
+  car('beetle', 'Volkswagen Beetle', 'grey', 11_500, 'dealer/'),
   car('elantra', 'Hyundai Elantra', 'grey', 12_750, 'cars/'),
   car('jetta', 'Volkswagen Jetta', 'grey', 14_000, 'cars/'),
   car('octavia', 'Škoda Octavia', 'sky', 15_650, 'cars/', true),
-  car('golf', 'Volkswagen Golf', 'sky', 16_500, 'dealer/', true),
+  car('golf', 'Volkswagen Golf', 'sky', 16_500, 'dealer/'),
   car('civic', 'Honda Civic', 'sky', 17_750),
   car('qashqai', 'Nissan Qashqai', 'sky', 18_750, 'dealer/'),
-  car('sportage', 'Kia Sportage', 'sky', 20_000, 'dealer/'),
+  car('sportage', 'Kia Sportage', 'sky', 20_000, 'dealer/', true),
   car('kuga', 'Ford Kuga', 'sky', 21_250, 'dealer/'),
-  car('cx5', 'Mazda CX-5', 'sky', 22_500, 'items/cars/', true),
-  car('crv', 'Honda CR-V', 'sky', 23_750),
+  car('cx5', 'Mazda CX-5', 'sky', 22_500, 'items/cars/'),
+  car('crv', 'Honda CR-V', 'sky', 23_750, 'items/cars/', true),
   car('rav4', 'Toyota RAV4', 'sky', 25_250, 'dealer/'),
   car('tiguan', 'Volkswagen Tiguan', 'sky', 26_750, 'dealer/'),
-  car('camry', 'Toyota Camry', 'sky', 28_500, 'cars/'),
+  car('camry', 'Toyota Camry', 'sky', 28_500, 'cars/', true),
   car('passat', 'Volkswagen Passat', 'sky', 30_250, 'cars/'),
   car('sonata', 'Hyundai Sonata', 'sky', 32_250, 'cars/'),
-  car('mx5', 'Mazda MX-5', 'sky', 34_250, 'items/cars/', true),
+  car('mx5', 'Mazda MX-5', 'sky', 34_250, 'items/cars/'),
   car('wrangler', 'Jeep Wrangler', 'sky', 36_250),
-  car('camaro', 'Chevrolet Camaro', 'sky', 38_500, 'dealer/', true),
-  car('mustang', 'Ford Mustang', 'sky', 41_000, 'dealer/'),
-  car('grandcherokee', 'Jeep Grand Cherokee', 'sky', 43_500),
+  car('camaro', 'Chevrolet Camaro', 'sky', 38_500, 'dealer/'),
+  car('mustang', 'Ford Mustang', 'sky', 41_000, 'dealer/', true),
+  car('grandcherokee', 'Jeep Grand Cherokee', 'sky', 43_500, 'items/cars/', true),
   car('xc60', 'Volvo XC60', 'sky', 46_250),
   car('xc90', 'Volvo XC90', 'sky', 49_000),
   car('a6', 'Audi A6', 'navy', 50_000, 'cars/'),
   car('bmw5', 'BMW 5-serie', 'navy', 53_000, 'cars/'),
   car('eclass', 'Mercedes-Benz E-klasse', 'navy', 56_250, 'cars/'),
   car('defender', 'Land Rover Defender', 'navy', 59_750, 'dealer/', true),
-  car('q7', 'Audi Q7', 'navy', 63_500, 'dealer/'),
+  car('q7', 'Audi Q7', 'navy', 63_500, 'dealer/', true),
   car('cayman', 'Porsche 718 Cayman', 'navy', 67_250, 'dealer/'),
   car('x5', 'BMW X5', 'navy', 71_500, 'dealer/'),
   car('ghibli', 'Maserati Ghibli', 'navy', 75_750, 'dealer/'),
@@ -115,34 +122,34 @@ export const CARS: ItemDef[] = [
   car('amggt', 'Mercedes-AMG GT', 'navy', 90_750),
   car('panamera', 'Porsche Panamera', 'navy', 96_250, 'dealer/'),
   car('rangerover', 'Range Rover', 'navy', 102_000, 'dealer/'),
-  car('vantage', 'Aston Martin V8 Vantage', 'navy', 108_000, 'items/cars/', true),
+  car('vantage', 'Aston Martin V8 Vantage', 'navy', 108_000, 'items/cars/'),
   car('p911', 'Porsche 911', 'navy', 115_000, 'dealer/'),
   car('a8', 'Audi A8', 'navy', 122_000, 'cars/'),
   car('bmw7', 'BMW 7-serie', 'navy', 130_000, 'cars/'),
   car('gclass', 'Mercedes-Benz G-klasse', 'navy', 138_000, 'dealer/'),
   car('sclass', 'Mercedes-Benz S-klasse', 'navy', 146_000, 'cars/'),
-  car('r8', 'Audi R8', 'navy', 155_000, 'dealer/', true),
+  car('r8', 'Audi R8', 'navy', 155_000, 'dealer/'),
   car('db11', 'Aston Martin DB11', 'purple', 165_000, 'dealer/'),
   car('urus', 'Lamborghini Urus', 'purple', 182_000, 'dealer/'),
   car('continental', 'Bentley Continental GT', 'purple', 200_000, 'dealer/'),
   car('huracan', 'Lamborghini Huracán', 'purple', 220_000, 'dealer/'),
-  car('f488', 'Ferrari 488 GTB', 'purple', 242_000, 'dealer/'),
-  car('mc720s', 'McLaren 720S', 'purple', 266_000, 'dealer/', true),
+  car('f488', 'Ferrari 488 GTB', 'purple', 242_000, 'dealer/', true),
+  car('mc720s', 'McLaren 720S', 'purple', 266_000, 'dealer/'),
   car('maybach', 'Mercedes-Maybach S-klasse', 'purple', 292_000, 'cars/'),
   car('f12', 'Ferrari F12berlinetta', 'purple', 322_000, 'items/cars/', true),
   car('vanquish', 'Aston Martin Vanquish', 'purple', 354_000),
   car('wraith', 'Rolls-Royce Wraith', 'purple', 389_000),
   car('ghost', 'Rolls-Royce Ghost', 'purple', 428_000, 'dealer/'),
   car('mc675lt', 'McLaren 675LT', 'purple', 471_000, 'items/cars/'),
-  car('f812', 'Ferrari 812 Superfast', 'purple', 518_000, 'dealer/', true),
+  car('f812', 'Ferrari 812 Superfast', 'purple', 518_000, 'dealer/'),
   car('phantom', 'Rolls-Royce Phantom', 'purple', 570_000, 'dealer/'),
   car('aventador', 'Lamborghini Aventador', 'purple', 626_600, 'dealer/'),
   car('p1', 'McLaren P1', 'red', 1_000_000, 'dealer/'),
   car('p918', 'Porsche 918 Spyder', 'red', 1_500_000),
-  car('veyron', 'Bugatti Veyron', 'red', 1_900_000, 'dealer/', true),
+  car('veyron', 'Bugatti Veyron', 'red', 1_900_000, 'dealer/'),
   car('regera', 'Koenigsegg Regera', 'red', 2_500_000),
-  car('agerars', 'Koenigsegg Agera RS', 'red', 2_800_000, 'items/cars/', true),
-  car('enzo', 'Ferrari Enzo', 'red', 3_200_000),
+  car('agerars', 'Koenigsegg Agera RS', 'red', 2_800_000, 'items/cars/'),
+  car('enzo', 'Ferrari Enzo', 'red', 3_200_000, 'items/cars/', true),
   car('chiron', 'Bugatti Chiron', 'red', 3_300_000, 'dealer/'),
   car('laferrari', 'Ferrari LaFerrari', 'red', 3_800_000, 'dealer/'),
   car('zonda', 'Pagani Zonda Cinque', 'red', 8_000_000),
@@ -155,35 +162,36 @@ export const CARS: ItemDef[] = [
 ];
 
 export const PLANES: ItemDef[] = [
-  plane('cessna150', 'Cessna 150', 45_000, true),
-  plane('r44', 'Robinson R44', 500_000),
-  plane('bell206', 'Bell 206 JetRanger', 1_200_000, true),
-  plane('h130', 'Airbus H130', 3_200_000),
-  plane('aw109', 'AgustaWestland AW109', 6_500_000, true),
-  plane('s76', 'Sikorsky S-76', 12_000_000, true),
-  plane('aw139', 'AgustaWestland AW139', 14_500_000, true),
-  plane('challenger850', 'Bombardier Challenger 850', 26_000_000, true),
-  plane('legacy600', 'Embraer Legacy 600', 30_000_000, false, 'airline/small.png'),
-  plane('falcon7x', 'Dassault Falcon 7X', 54_000_000, true),
-  plane('bbj', 'Boeing Business Jet', 95_000_000),
-  plane('acj320', 'Airbus ACJ320neo', 110_000_000, false, 'airline/medium.png'),
-  plane('b787', 'Boeing 787 BBJ', 250_000_000, true),
-  plane('b747', 'Boeing 747-8 BBJ', 400_000_000),
-  plane('a380', 'Airbus A380', 520_000_000, false, 'airline/xlarge.png'),
+  plane('cessna150', 'Cessna 150', 45_000, 'Småfly · 2 seter'),
+  plane('r44', 'Robinson R44', 500_000, 'Helikopter · 4 seter'),
+  plane('bell206', 'Bell 206 JetRanger', 1_200_000, 'Helikopter · 5 seter'),
+  plane('h130', 'Airbus H130', 3_200_000, 'Helikopter · 7 seter'),
+  plane('pc12', 'Pilatus PC-12', 5_000_000, 'Propellfly · 9 seter'),
+  plane('aw109', 'AgustaWestland AW109', 6_500_000, 'Helikopter · 7 seter'),
+  plane('s76', 'Sikorsky S-76', 12_000_000, 'Helikopter · 12 seter'),
+  plane('aw139', 'AgustaWestland AW139', 14_500_000, 'Helikopter · 15 seter'),
+  plane('legacy600', 'Embraer Legacy 600', 30_000_000, 'Privatjet · 13 seter'),
+  plane('falcon7x', 'Dassault Falcon 7X', 54_000_000, 'Privatjet · 16 seter'),
+  plane('g650', 'Gulfstream G650', 68_000_000, 'Privatjet · 19 seter'),
+  plane('global7500', 'Bombardier Global 7500', 78_000_000, 'Privatjet · 19 seter'),
+  plane('bbj', 'Boeing Business Jet', 95_000_000, 'Privat passasjerfly · 25 seter'),
+  plane('b747', 'Boeing 747-8 BBJ', 400_000_000, 'Jumbojet · privat'),
+  plane('a380', 'Airbus A380', 520_000_000, 'Verdens største passasjerfly'),
 ];
 
+// Ordnet etter lengde: hver yacht er større enn den før
 export const YACHTS: ItemDef[] = [
-  yacht('predator74', 'Sunseeker Predator 74', 20_500_000),
-  yacht('y95', 'Princess Y95', 48_000_000),
-  yacht('pershing140', 'Pershing 140', 95_000_000),
-  yacht('sanlorenzo52', 'Sanlorenzo 52Steel', 210_000_000, true),
-  yacht('oasis40', 'Benetti Oasis 40M', 480_000_000),
-  yacht('seaxplorer77', 'Damen SeaXplorer 77', 1_100_000_000),
-  yacht('symphony', 'Feadship Symphony', 2_600_000_000),
-  yacht('dilbar', 'Lürssen Dilbar', 6_000_000_000),
-  yacht('azzam', 'Lürssen Azzam', 14_000_000_000),
-  yacht('historysupreme', 'History Supreme', 27_500_000_000),
-  yacht('streetsofmonaco', 'Streets of Monaco', 45_000_000_000, true),
+  yacht('princess', 'Princess V65', 20_500_000, '20 meter'),
+  yacht('kalizma', 'Kalizma', 48_000_000, '51 meter'),
+  yacht('talitha', 'Talitha', 95_000_000, '82 meter'),
+  yacht('nero', 'Nero', 210_000_000, '90 meter'),
+  yacht('christinao', 'Christina O', 480_000_000, '99 meter'),
+  yacht('ladymoura', 'Lady Moura', 1_100_000_000, '105 meter'),
+  yacht('octopus', 'Octopus', 2_600_000_000, '126 meter'),
+  yacht('serene', 'Serene', 6_000_000_000, '134 meter'),
+  yacht('risingsun', 'Rising Sun', 14_000_000_000, '138 meter'),
+  yacht('eclipse', 'Eclipse', 27_500_000_000, '162 meter'),
+  yacht('azzam', 'Azzam', 45_000_000_000, '180 meter – verdens lengste'),
 ];
 
 export const ALL_ITEMS = [...CARS, ...PLANES, ...YACHTS];
@@ -314,6 +322,18 @@ export interface ItemsState {
   items: OwnedItem[];
   /** Plasseringene man har kjøpt (offentlig havn eier alle). */
   places: string[];
+}
+
+/** Fly og yachter som er byttet ut: gamle id-er → nye (samme plass i rekken). */
+export const RENAMED: Record<string, string> = {
+  challenger850: 'legacy600', acj320: 'bbj', b787: 'b747', predator74: 'princess', y95: 'kalizma', pershing140: 'talitha',
+  sanlorenzo52: 'nero', oasis40: 'christinao', seaxplorer77: 'ladymoura', symphony: 'octopus', dilbar: 'serene',
+  historysupreme: 'eclipse', streetsofmonaco: 'azzam',
+};
+/** Retter opp gamle lagringer. */
+export function fixItems(s: ItemsState) {
+  for (const o of s.items) o.id = RENAMED[o.id] ?? o.id;
+  s.items = s.items.filter((o) => itemDef(o.id));
 }
 
 export const ownsPlace = (s: ItemsState, id: string) => id === 'public' || s.places.includes(id);

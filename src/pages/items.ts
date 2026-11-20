@@ -1,5 +1,6 @@
 import {
   ALL_ITEMS,
+  fixItems,
   OPTIONS,
   PLACES,
   buyItem,
@@ -51,7 +52,7 @@ const ROOM: Record<ItemKind, { title: string; empty: string; shop: string }> = {
 };
 
 const img = (def: ItemDef, cls = '') =>
-  `<img class="ei-img ${def.flip ? 'flip' : ''} ${cls}" src="${def.image}" alt="" decoding="async" draggable="false" />`;
+  `<img class="ei-img ${def.flip ? 'flip' : ''} ${def.photo ? 'photo' : ''} ${cls}" src="${def.image}" alt="" decoding="async" draggable="false" />`;
 const placeImg = (id: string) => `<img src="items/places/${id}.jpg" alt="" onerror="this.style.display='none'" />`;
 /** Fargen på kortet: bilene etter klasse, fly blått, yachter havblått. */
 const tone = (def: ItemDef) => (def.kind === 'car' ? `tier-${def.tier}` : def.kind);
@@ -76,6 +77,7 @@ function preloadImages() {
 }
 
 export function createItemsPage(state: GameState): Page {
+  fixItems(state.assets);
   // Start å hente bildene litt etter at appen har startet
   setTimeout(preloadImages, 3000);
   const element = html(`<section class="page items"></section>`);
@@ -151,13 +153,13 @@ export function createItemsPage(state: GameState): Page {
   function ownedCard(o: OwnedItem): string {
     const def = itemDef(o.id)!;
     const [x, y] = optionText(o, def);
-    if (def.kind === 'yacht') {
+    if (def.photo) {
       return `
-        <button class="ei-yacht-card" data-action="item" data-uid="${o.uid}">
+        <button class="ei-yacht-card ${def.kind}" data-action="item" data-uid="${o.uid}">
           <div class="ei-sea">${img(def)}</div>
           <div class="ei-yacht-foot">
             <div class="ei-tags"><span>${y}</span><span>${x}</span></div>
-            <strong>${def.name}</strong>
+            <strong>${def.name}</strong>${def.info ? `<small>${def.info}</small>` : ''}
           </div>
         </button>`;
     }
@@ -193,12 +195,12 @@ export function createItemsPage(state: GameState): Page {
       `<div class="ei-opt static"><strong>${value}</strong><span>${caption}</span></div>`;
     const p = o.place ? placeDef(o.place) : null;
     return `
-      ${def.kind === 'yacht' ? `<div class="ei-hero-sea">${img(def)}</div>` : ''}
-      <div class="ei-item-head ${def.kind === 'yacht' ? 'on-sea' : ''}">
+      ${def.photo ? `<div class="ei-hero-sea">${img(def)}</div>` : ''}
+      <div class="ei-item-head ${def.photo ? 'on-sea' : ''}">
         <h1>${def.name}</h1>
         <span>Kjøpspris: <b>${formatMoneyWhole(o.paid)}</b></span>
       </div>
-      ${def.kind !== 'yacht' ? `<div class="ei-big">${img(def)}</div>` : ''}
+      ${!def.photo ? `<div class="ei-big">${img(def)}</div>` : ''}
       <h2 class="ei-sub">Valg</h2>
       <div class="ei-opts">${optCard(ga.options[o.a]?.short, ga.caption)}${optCard(gb.options[o.b]?.short, gb.caption)}</div>
       ${
@@ -220,11 +222,11 @@ export function createItemsPage(state: GameState): Page {
   // Butikken
   // =========================================================================
   function shopCard(def: ItemDef): string {
-    if (def.kind === 'yacht') {
+    if (def.photo) {
       return `
-        <button class="ei-yacht-shop" data-action="buy" data-id="${def.id}">
+        <button class="ei-yacht-shop ${def.kind}" data-action="buy" data-id="${def.id}">
           <div class="ei-sea">${img(def)}</div>
-          <div class="ei-yacht-shop-text"><strong>${def.name}</strong><span>Startpris:</span><b>${formatMoneyWhole(def.price)}</b></div>
+          <div class="ei-yacht-shop-text"><strong>${def.name}</strong>${def.info ? `<em>${def.info}</em>` : ''}<span>Startpris:</span><b>${formatMoneyWhole(def.price)}</b></div>
         </button>`;
     }
     return `
@@ -259,12 +261,12 @@ export function createItemsPage(state: GameState): Page {
         .join('')}</div>`;
     const p = placeDef(v.place);
     return `
-      ${def.kind === 'yacht' ? `<div class="ei-hero-sea">${img(def)}</div>` : ''}
-      <div class="ei-item-head ${def.kind === 'yacht' ? 'on-sea' : ''} ${def.kind === 'car' ? 'right' : ''}">
+      ${def.photo ? `<div class="ei-hero-sea">${img(def)}</div>` : ''}
+      <div class="ei-item-head ${def.photo ? 'on-sea' : ''} ${def.kind === 'car' ? 'right' : ''}">
         <h1>${def.name}</h1>
         <span>Pris fra <b>${formatMoneyWhole(def.price)}</b></span>
       </div>
-      ${def.kind !== 'yacht' ? `<div class="ei-big">${img(def)}</div>` : ''}
+      ${!def.photo ? `<div class="ei-big">${img(def)}</div>` : ''}
       <div class="ei-buy ${tone(def)}">
         ${group(ga.title, ga.options, v.a, 'a')}
         ${group(gb.title, gb.options, v.b, 'b')}

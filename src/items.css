@@ -901,3 +901,48 @@ body.scrolled .items .ei-back {
 .ei-sea .ei-img {
   max-height: 170px;
 }
+
+/* --- Fly og yachter er ekte fotografier: de fyller hele bildeflaten --- */
+.ei-sea:has(.photo),
+.ei-hero-sea:has(.photo) {
+  padding: 0;
+  background: #cfe3ef;
+}
+
+.ei-sea .ei-img.photo,
+.ei-hero-sea .ei-img.photo {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  filter: none;
+}
+
+.ei-hero-sea:has(.photo) {
+  height: 320px;
+}
+
+.ei-yacht-card.plane .ei-yacht-foot,
+.ei-yacht-shop.plane .ei-yacht-shop-text {
+  background: linear-gradient(110deg, #2f3d6b, #4a6fe0);
+}
+
+.ei-yacht-foot small {
+  margin-top: -6px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.ei-yacht-shop-text em {
+  font-size: 14px;
+  font-style: normal;
+  opacity: 0.85;
+}
+
+/* Hele fotoet skal synes (ikke klippes i toppen og bunnen) */
+.ei-yacht-shop .ei-sea:has(.photo),
+.ei-yacht-card .ei-sea:has(.photo) {
+  height: auto;
+  aspect-ratio: 16 / 10;
+}

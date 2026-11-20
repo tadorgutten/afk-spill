@@ -36,29 +36,9 @@ cars/visiongt.png	https://pngimg.com/uploads/bugatti/bugatti_PNG24.png
 cars/mb540k.png	https://pngimg.com/uploads/mercedes/mercedes_PNG80143.png
 cars/royale.png	https://pngimg.com/uploads/bugatti/bugatti_PNG99580.png
 cars/silverghost.png	https://pngimg.com/uploads/rolls_royce/rolls_royce_PNG3.png
-planes/cessna150.png	https://pngimg.com/uploads/plane/plane_PNG101241.png
-planes/r44.png	https://pngimg.com/uploads/helicopter/helicopter_PNG80103.png
-planes/bell206.png	https://pngimg.com/uploads/helicopter/helicopter_PNG80104.png
-planes/h130.png	https://pngimg.com/uploads/helicopter/helicopter_PNG80084.png
-planes/aw109.png	https://pngimg.com/uploads/helicopter/helicopter_PNG80039.png
-planes/s76.png	https://pngimg.com/uploads/helicopter/helicopter_PNG80048.png
-planes/aw139.png	https://pngimg.com/uploads/helicopter/helicopter_PNG80067.png
-planes/challenger850.png	https://pngimg.com/uploads/plane/plane_PNG5251.png
-planes/falcon7x.png	https://pngimg.com/uploads/plane/plane_PNG101218.png
-planes/bbj.png	https://pngimg.com/uploads/plane/plane_PNG101255.png
-planes/b787.png	https://pngimg.com/uploads/plane/plane_PNG5227.png
-planes/b747.png	https://pngimg.com/uploads/plane/plane_PNG101222.png
-yachts/predator74.png	https://pngimg.com/uploads/ship/ship_PNG5417.png
-yachts/y95.png	https://pngimg.com/uploads/boat/boat_PNG36.png
-yachts/pershing140.png	https://pngimg.com/uploads/ship/ship_PNG5423.png
-yachts/sanlorenzo52.png	https://pngimg.com/uploads/ship/ship_PNG5422.png
-yachts/oasis40.png	https://pngimg.com/uploads/ship/ship_PNG5414.png
-yachts/seaxplorer77.png	https://pngimg.com/uploads/ship/ship_PNG5404.png
-yachts/symphony.png	https://pngimg.com/uploads/ship/ship_PNG5394.png
-yachts/dilbar.png	https://pngimg.com/uploads/ship/ship_PNG5412.png
-yachts/azzam.png	https://pngimg.com/uploads/ship/ship_PNG5410.png
-yachts/historysupreme.png	https://pngimg.com/uploads/ship/ship_PNG5419.png
-yachts/streetsofmonaco.png	https://pngimg.com/uploads/ship/ship_PNG5413.png
 
 Rom-bilder (rooms/): garage.png = public/dealer/hall-showroom.png, harbor.jpg = places/public.jpg,
 hangar.jpg https://commons.wikimedia.org/wiki/File:OO-FLN.JPG
+
+Fly (planes/) og yachter (yachts/): ekte fotografier fra Wikimedia Commons via Wikipedia-artiklene om hver modell/yacht
+(f.eks. https://en.wikipedia.org/wiki/Cessna_150, https://en.wikipedia.org/wiki/Azzam_(yacht)). Frie lisenser, se filsidene der.
